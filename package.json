@@ -30,7 +30,8 @@
   "homepage": "https://github.com/GastonZalba/ol-street-view#readme",
   "dependencies": {},
   "peerDependencies": {
-    "ol": "~5.0"
+    "ol": "~5.0",
+    "interactjs": "^1.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -49,6 +50,7 @@
     "eslint-config-openlayers": "^14.0.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "interactjs": "^1.10.3",
     "ncp": "^2.0.0",
     "ol": "^6.5.0",
     "prettier": "^2.2.1",

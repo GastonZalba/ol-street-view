@@ -6,20 +6,17 @@ import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
 import { Select, Translate } from 'ol/interaction';
 import { Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
-
-const keys = require('../../../../../config/public_keys.json');
+import { unByKey } from 'ol/Observable';
+import IconAnchorUnits from 'ol/style/IconAnchorUnits';
+import { EventsKey } from 'ol/events';
 
 import interact from 'interactjs';
 import { Loader } from 'google-maps';
-import { EventsKey } from 'ol/events';
-import { unByKey } from 'ol/Observable';
-import IconAnchorUnits from 'ol/style/IconAnchorUnits';
 
 
 let google;
 
-const API_KEY = keys.GOOGLE_MAPS;
-const STREETVIEW_MAX_DISTANCE = 100; // meters
+const STREET_VIEW_MAX_DISTANCE = 100; // meters
 
 class StreetView {
 
@@ -39,18 +36,21 @@ class StreetView {
     protected streetViewContainer: HTMLElement;
 
     // Obserbable keys
-    protected _keyClick: EventsKey | EventsKey[];
+    protected _keyClickOnMap: EventsKey | EventsKey[];
 
     protected _streetViewXyzLayer: TileLayer;
     protected _pegmanLayer: VectorLayer;
 
-    protected panorama: any;
-    protected pegmanSelectedCoords: Coordinate;
-    protected pegmanHeading: number;
-    protected pegmanFeature: Feature;
+    protected _panorama: any;
+    protected _pegmanFeature: Feature;
+
+    protected _pegmanSelectedCoords: Coordinate;
+    protected _pegmanHeading: number;
 
     protected _selectPegman: Select;
     protected _translatePegman: Translate;
+
+    protected _clickListener: any;
 
     // Events
     protected _streetViewInitEvt: Event;
@@ -58,24 +58,127 @@ class StreetView {
 
     constructor(map: PluggableMap, opt_options?: Options) {
 
+        // Default options
+        this.options = {
+            apiKey: null,
+            language: 'en',
+            ...opt_options 
+        }
+
         this.map = map;
         this.view = map.getView();
         this.viewport = map.getTargetElement();
 
-        this.pegmanSelectedCoords = [];
-        this.pegmanHeading = 180;
+        this._pegmanSelectedCoords = [];
+        this._pegmanHeading = 180;
 
         this._streetViewInitEvt = new Event('streetViewInit');
         this._streetViewExitEvt = new Event('streetViewExit');
 
-        this.addControl();
-        this.init();
-        this.addDragDrop();
-        this.addStreetViewHtml();
+        this._prepareLayers();
+        this._addMapInteractions();
+        this._createControl();
 
     }
 
-    addControl(): void {
+    _prepareLayers(): void {
+
+        const getPegmanIconOffset = () => {
+
+            let heading = this._pegmanHeading;
+
+            let offset: Array<number>;
+
+            if (heading >= 0 && heading < 22.5) {
+                offset = [0, 0]
+            } else if (heading >= 22.5 && heading < 45) {
+                offset = [0, 52]
+            } else if (heading >= 45 && heading < 67.5) {
+                offset = [0, 104]
+            } else if (heading >= 67.5 && heading < 90) {
+                offset = [0, 156]
+            } else if (heading >= 90 && heading < 112.5) {
+                offset = [0, 208]
+            } else if (heading >= 112.5 && heading < 135) {
+                offset = [0, 260]
+            } else if (heading >= 135 && heading < 157.5) {
+                offset = [0, 312]
+            } else if (heading >= 157.5 && heading < 180) {
+                offset = [0, 364]
+            } else if (heading >= 180 && heading < 205.5) {
+                offset = [0, 416]
+            } else if (heading >= 205.5 && heading < 225) {
+                offset = [0, 468]
+            } else if (heading >= 225 && heading < 247.5) {
+                offset = [0, 520]
+            } else if (heading >= 247.5 && heading < 270) {
+                offset = [0, 572]
+            } else if (heading >= 270 && heading < 292.5) {
+                offset = [0, 624]
+            } else if (heading >= 292.5 && heading < 315) {
+                offset = [0, 676]
+            } else if (heading >= 315 && heading < 337.5) {
+                offset = [0, 728]
+            } else if (heading >= 337.5) {
+                offset = [0, 780]
+            }
+
+            return offset;
+        }
+
+
+        // Street View XYZ Layer
+        // It's activated once pegman is dragged
+        this._streetViewXyzLayer = new TileLayer({
+            zIndex: 10,
+            source: new XYZ({
+                url: 'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}' // Google
+            })
+        });
+
+        // Current Pegman Layer Position
+        this._pegmanLayer = new VectorLayer({
+            zIndex: 99,
+            source: new VectorSource(),
+            style: () => new Style({
+                image: new Icon(({
+                    anchor: [0.5, 46],
+                    anchorXUnits: IconAnchorUnits.FRACTION,
+                    anchorYUnits: IconAnchorUnits.PIXELS,
+                    rotateWithView: true,
+                    opacity: 1.00,
+                    src: '/images/markers/pegman_sprites.png',
+                    size: [52, 52],
+                    offset: getPegmanIconOffset()
+                }))
+            })
+        })
+
+        this.map.addLayer(this._pegmanLayer);
+
+    }
+
+    _addMapInteractions(): void {
+
+        const translatePegmanHandler = (evt): void => {
+
+            this._pegmanSelectedCoords = evt.coordinate;
+            this._updateStreetViewPosition(this._pegmanSelectedCoords);
+
+        }
+
+        this._selectPegman = new Select();
+
+        this._translatePegman = new Translate({
+            features: this._selectPegman.getFeatures()
+        });
+
+        this._translatePegman.on('translateend', translatePegmanHandler);
+
+        this.map.addInteraction(this._translatePegman);
+    }
+
+    _createControl(): void {
 
         this.pegmanBtn = document.createElement('div');
         this.pegmanBtn.id = 'pegmanButtonDiv';
@@ -94,299 +197,14 @@ class StreetView {
         this.viewport.appendChild(this.pegmanBtn);
         this.pegmanDraggable = document.querySelector('#pegmanButtonDiv .draggable');
 
-    }
+        this._addPegmanInteraction();
 
-    showNoData(): void {
-        this.panorama.setVisible(false);
-    }
-
-    async addStreetViewHtml(): Promise<void> {
-
-        this.streetViewContainer = document.createElement('div');
-        this.streetViewContainer.id = 'streetView';
-
-        const streetViewNoResultsDiv = document.createElement('div');
-        streetViewNoResultsDiv.className = 'no-results';
-        streetViewNoResultsDiv.innerHTML = `
-            <div class="no-results-icon icon-visibility_off"></DIV>
-            <div class="no-results-text">Sin imágenes en la zona. Click en el mapa para trasladarse.</div>
-        `;
-        this.streetViewContainer.appendChild(streetViewNoResultsDiv);
-
-        // Create exit control div
-        this.exitControlUI = document.createElement('button');
-        this.exitControlUI.innerHTML = "SALIR";
-        this.exitControlUI.type = "button";
-        this.exitControlUI.className = "gm-control-active gm-control-exit";
-        this.exitControlUI.title = "Salir de la vista Street View";
-        this.exitControlUI.index = 1;
-        this.exitControlUI.onclick = this.hideStreetView.bind(this);
-
-        streetViewNoResultsDiv.appendChild(this.exitControlUI);
-
-        this.viewport.parentElement.appendChild(this.streetViewContainer);
-        const loader = new Loader(API_KEY);
-
-        try {
-            google = await loader.load();
-        } catch (err) {
-            console.error(err)
-        }
-    }
-
-    updateStreetViewPosition(coords): void {
-        let latLon = transform(coords, this.view.getProjection(), 'EPSG:4326').reverse();
-        latLon = { lat: latLon[0], lng: latLon[1] };
-
-        let streetViewService = new google.maps.StreetViewService();
-
-        streetViewService.getPanoramaByLocation(latLon, STREETVIEW_MAX_DISTANCE, (_, status) => {
-            if (status === google.maps.StreetViewStatus.OK) {
-                this.panorama.setPosition(latLon);
-                this.panorama.setVisible(true);
-            } else {
-                this.showNoData();
-                this.updatePegmanPosition(coords, /** transform = */ false);
-            }
-        });
+        this._addStreetViewHtml();
 
     }
 
-    updatePegmanPosition(coords, transf = true) {
 
-        if (transf) {
-            coords = transform([coords.lng(), coords.lat()], 'EPSG:4326', this.view.getProjection());
-        }
-
-        this.pegmanSelectedCoords = coords;
-
-        (this.pegmanFeature.getGeometry() as Point).setCoordinates(this.pegmanSelectedCoords);
-
-        this.view.animate({
-            center: coords,
-            duration: 100
-        });
-
-    }
-
-    getPegmanOffset() {
-
-        let heading = this.pegmanHeading;
-
-        let offset: Array<number>;
-
-        if (heading >= 0 && heading < 22.5) {
-            offset = [0, 0]
-        } else if (heading >= 22.5 && heading < 45) {
-            offset = [0, 52]
-        } else if (heading >= 45 && heading < 67.5) {
-            offset = [0, 104]
-        } else if (heading >= 67.5 && heading < 90) {
-            offset = [0, 156]
-        } else if (heading >= 90 && heading < 112.5) {
-            offset = [0, 208]
-        } else if (heading >= 112.5 && heading < 135) {
-            offset = [0, 260]
-        } else if (heading >= 135 && heading < 157.5) {
-            offset = [0, 312]
-        } else if (heading >= 157.5 && heading < 180) {
-            offset = [0, 364]
-        } else if (heading >= 180 && heading < 205.5) {
-            offset = [0, 416]
-        } else if (heading >= 205.5 && heading < 225) {
-            offset = [0, 468]
-        } else if (heading >= 225 && heading < 247.5) {
-            offset = [0, 520]
-        } else if (heading >= 247.5 && heading < 270) {
-            offset = [0, 572]
-        } else if (heading >= 270 && heading < 292.5) {
-            offset = [0, 624]
-        } else if (heading >= 292.5 && heading < 315) {
-            offset = [0, 676]
-        } else if (heading >= 315 && heading < 337.5) {
-            offset = [0, 728]
-        } else if (heading >= 337.5) {
-            offset = [0, 780]
-        }
-
-        return offset;
-    }
-
-    initStreerView() {
-
-        this.panorama = new google.maps.StreetViewPanorama(this.streetViewContainer, {
-            pov: { heading: 165, pitch: 0 },
-            zoom: 1,
-            visible: false,
-            motionTracking: false,
-            motionTrackingControl: false,
-            radius: STREETVIEW_MAX_DISTANCE
-        });
-
-        this.panorama.addListener("position_changed", () => {
-            let position = this.panorama.getPosition();
-            this.updatePegmanPosition(position);
-        });
-
-        this.panorama.addListener("pov_changed", () => {
-            let heading = this.panorama.getPov().heading;
-            this.pegmanHeading = heading;
-            this._pegmanLayer.getSource().refresh();
-        });
-
-        let exitControlST = this.exitControlUI.cloneNode(true)
-        exitControlST.onclick = this.hideStreetView.bind(this);
-
-        this.panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(exitControlST);
-
-        this._isInitialized = true;
-    }
-
-
-    showStreetView() {
-
-        // Only init one time
-        if (!this._isInitialized) {
-            this.initStreerView();
-        }
-
-        this.updateStreetViewPosition(this.pegmanSelectedCoords)
-        this.panorama.setVisible(true);
-        this.addClickListener();
-        this.viewport.dispatchEvent(this._streetViewInitEvt);
-
-    }
-
-    hideStreetView() {
-
-        this._selectPegman.getFeatures().clear();
-
-        let pegmanLayerSource = this._pegmanLayer.getSource();
-
-        pegmanLayerSource.clear();
-        this.pegmanSelectedCoords = [];
-
-        // Remove SV Layer
-        this.map.removeLayer(this._streetViewXyzLayer);
-
-        document.body.classList.remove('streetViewMode');
-
-        this.map.updateSize();
-        window.dispatchEvent(new Event('resize'));
-
-        this.panorama.setVisible(false);
-
-        this.removeClickListener();
-
-        // Maybe, exit fullscreen
-        if (document.fullscreenElement) document.exitFullscreen();
-
-        this.viewport.dispatchEvent(this._streetViewExitEvt);
-
-    }
-
-    toggleStreetView() {
-        let toggle = this.panorama.getVisible();
-        if (toggle == false) {
-            this.panorama.setVisible(true);
-        } else {
-            this.panorama.setVisible(false);
-        }
-    }
-
-    init() {
-
-        // SV Layer
-        this._streetViewXyzLayer = new TileLayer({
-            zIndex: 10,
-            source: new XYZ({
-                url: 'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}' // Google
-            })
-        });
-
-        // Pegman Marker Status (should be toggled depending on if active or not)
-        this.pegman = {
-            show: false,
-            dragging: false,
-            position: 0,
-            pegmanFeatureLoaded: []
-        };
-
-        // Pegman: Current Pegman Layer Position
-        this._pegmanLayer = new VectorLayer({
-            zIndex: 99,
-            source: new VectorSource(),
-            style: new Style({
-                image: new Icon(({
-                    anchor: [0.5, 46],
-                    anchorXUnits: IconAnchorUnits.FRACTION,
-                    anchorYUnits: IconAnchorUnits.PIXELS,
-                    rotateWithView: true,
-                    opacity: 1.00,
-                    src: '/images/markers/pegman_sprites.png',
-                    size: [52, 52],
-                    offset: this.getPegmanOffset()
-                }))
-            })
-        })
-
-        this.map.addLayer(this._pegmanLayer);
-
-        // Pegman: Select Interaction
-        this._selectPegman = new Select()
-        this._translatePegman = new Translate({
-            features: this._selectPegman.getFeatures()
-        });
-
-        this._translatePegman.on('translateend', this.onUpdatePointPos.bind(this));
-
-        this.map.addInteraction(this._translatePegman)
-    }
-
-
-
-    addToMap() {
-
-        if (this._pegmanLayer.getSource().getFeatures().length) {
-            return;
-        }
-
-        // Add Class to Body
-        if (!document.body.classList.contains('streetViewMode')) {
-            document.body.classList.add('streetViewMode')
-
-            // Update Map Size
-            this.map.updateSize();
-        }
-
-        this._selectPegman.getFeatures().clear();
-
-        if (!Object.keys(this.pegmanSelectedCoords)) this.pegmanSelectedCoords = this.view.getCenter();
-
-        this.pegmanFeature = new Feature({
-            name: 'Pegman',
-            geometry: new Point(this.pegmanSelectedCoords)
-        });
-
-        this._pegmanLayer.getSource().addFeature(this.pegmanFeature);
-
-        this._selectPegman.getFeatures().push(this.pegmanFeature);
-
-        this.view.setCenter(this.pegmanSelectedCoords);
-        this.view.setZoom(18);
-        this.showStreetView();
-
-    }
-
-
-    onUpdatePointPos(e): void {
-
-        this.pegmanSelectedCoords = e.coordinate;
-        this.updateStreetViewPosition(this.pegmanSelectedCoords);
-
-    }
-
-    addDragDrop(): void {
+    _addPegmanInteraction(): void {
 
         let direction = '', oldx = 0;
 
@@ -413,11 +231,6 @@ class StreetView {
 
         interact('.draggable').draggable({
             inertia: false,
-            restrict: {
-                restriction: "#geojson-box", // Load Where Pegman can be Dropped (GEOJSON)?
-                endOnly: true,
-                elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-            },
             onmove: (e) => {
 
                 document.addEventListener('mousemove', mousemovemethod.bind(this));
@@ -442,8 +255,8 @@ class StreetView {
             onend: (e) => {
 
                 let location = this.map.getCoordinateFromPixel([e.client.x - 60, e.client.y + this.pegmanDraggable.clientHeight]);
-                this.pegmanSelectedCoords = location;
-                this.addToMap();
+                this._pegmanSelectedCoords = location;
+                this._addPegmanToMap();
 
                 // Reset Pegman Dragging Cursor
                 this.pegmanDraggable.classList.remove('can-drop', 'dragged', 'left', 'right', 'active', 'dropped');
@@ -515,29 +328,210 @@ class StreetView {
         });
     }
 
-    addClickListener(): void {
+    async _addStreetViewHtml(): Promise<void> {
+
+        this.streetViewContainer = document.createElement('div');
+        this.streetViewContainer.id = 'streetView';
+
+        const streetViewNoResultsDiv = document.createElement('div');
+        streetViewNoResultsDiv.className = 'no-results';
+        streetViewNoResultsDiv.innerHTML = `
+            <div class="no-results-icon icon-visibility_off"></DIV>
+            <div class="no-results-text">Sin imágenes en la zona. Click en el mapa para trasladarse.</div>
+        `;
+        this.streetViewContainer.appendChild(streetViewNoResultsDiv);
+
+        // Create exit control div
+        this.exitControlUI = document.createElement('button');
+        this.exitControlUI.innerHTML = "SALIR";
+        this.exitControlUI.type = "button";
+        this.exitControlUI.className = "gm-control-active gm-control-exit";
+        this.exitControlUI.title = "Salir de la vista Street View";
+        //this.exitControlUI.index = 1;
+        this.exitControlUI.onclick = this.hideStreetView.bind(this);
+
+        streetViewNoResultsDiv.appendChild(this.exitControlUI);
+
+        this.viewport.parentElement.appendChild(this.streetViewContainer);
+
+        const loader = new Loader(this.options.apiKey);
+
+        try {
+            google = await loader.load();
+        } catch (err) {
+            console.error(err)
+        }
+
+    }
+
+    _updateStreetViewPosition(coords): void {
+
+        let latLon = transform(coords, this.view.getProjection(), 'EPSG:4326').reverse();
+        let latLonGoogle = { lat: latLon[0], lng: latLon[1] };
+
+        let streetViewService = new google.maps.StreetViewService();
+
+        streetViewService.getPanoramaByLocation(latLonGoogle, STREET_VIEW_MAX_DISTANCE, (_, status) => {
+            if (status === google.maps.StreetViewStatus.OK) {
+                this._panorama.setPosition(latLonGoogle);
+                this._panorama.setVisible(true);
+            } else {
+                this._showNoData();
+                this._updatePegmanPosition(coords, /** transform = */ false);
+            }
+        });
+
+    }
+
+    _updatePegmanPosition(coords, transf = true):void {
+
+        if (transf) {
+            coords = transform([coords.lng(), coords.lat()], 'EPSG:4326', this.view.getProjection());
+        }
+
+        this._pegmanSelectedCoords = coords;
+
+        (this._pegmanFeature.getGeometry() as Point).setCoordinates(this._pegmanSelectedCoords);
+
+        this.view.animate({
+            center: coords,
+            duration: 100
+        });
+
+    }
+
+    _initStreetView():void {
+
+        this._panorama = new google.maps.StreetViewPanorama(this.streetViewContainer, {
+            pov: { heading: 165, pitch: 0 },
+            zoom: 1,
+            visible: false,
+            motionTracking: false,
+            motionTrackingControl: false,
+            radius: STREET_VIEW_MAX_DISTANCE
+        });
+
+        this._panorama.addListener("position_changed", () => {
+            let position = this._panorama.getPosition();
+            this._updatePegmanPosition(position);
+        });
+
+        this._panorama.addListener("pov_changed", () => {
+            let heading = this._panorama.getPov().heading;
+            this._pegmanHeading = heading;
+            this._pegmanLayer.getSource().refresh();
+        });
+
+        let exitControlST = this.exitControlUI.cloneNode(true);
+        (exitControlST as HTMLButtonElement).onclick = this.hideStreetView.bind(this);
+
+        this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(exitControlST);
+
+        this._isInitialized = true;
+    }
+
+
+    showStreetView():void {
+
+        // Only init one time
+        if (!this._isInitialized) {
+            this._initStreetView();
+        }
+
+        this._updateStreetViewPosition(this._pegmanSelectedCoords)
+        this._panorama.setVisible(true);
+        this._addClickListener();
+        this.viewport.dispatchEvent(this._streetViewInitEvt);
+
+    }
+
+    hideStreetView():void {
+    
+        this._selectPegman.getFeatures().clear();
+
+        let pegmanLayerSource = this._pegmanLayer.getSource();
+
+        pegmanLayerSource.clear();
+
+        this._pegmanSelectedCoords = [];
+
+        // Remove SV Layer
+        this.map.removeLayer(this._streetViewXyzLayer);
+
+        document.body.classList.remove('streetViewMode');
+
+        // Force refresh the layers
+        this.map.updateSize();
+        window.dispatchEvent(new Event('resize'));
+
+        this._panorama.setVisible(false);
+
+        unByKey(this._keyClickOnMap);
+
+        // Maybe, exit fullscreen
+        if (document.fullscreenElement) document.exitFullscreen();
+
+        this.viewport.dispatchEvent(this._streetViewExitEvt);
+
+    }
+
+
+    _addPegmanToMap():void {
+
+        if (this._pegmanLayer.getSource().getFeatures().length) {
+            return;
+        }
+
+        // Add Class to Body
+        if (!document.body.classList.contains('streetViewMode')) {
+            document.body.classList.add('streetViewMode')
+
+            // Update Map Size
+            this.map.updateSize();
+        }
+
+        this._selectPegman.getFeatures().clear();
+
+        if (!Object.keys(this._pegmanSelectedCoords)) this._pegmanSelectedCoords = this.view.getCenter();
+
+        this._pegmanFeature = new Feature({
+            name: 'Pegman',
+            geometry: new Point(this._pegmanSelectedCoords)
+        });
+
+        this._pegmanLayer.getSource().addFeature(this._pegmanFeature);
+
+        this._selectPegman.getFeatures().push(this._pegmanFeature);
+
+        this.view.setCenter(this._pegmanSelectedCoords);
+        this.view.setZoom(18);
+        this.showStreetView();
+
+    }
+
+    _showNoData(): void {
+        this._panorama.setVisible(false);
+    }
+
+    _addClickListener(): void {
 
         const clickListener = (e) => {
             let position = this.map.getCoordinateFromPixel(e.pixel);
-            this.updateStreetViewPosition(position);
+            this._updateStreetViewPosition(position);
             e.preventDefault();
             e.stopPropagation();
         }
 
-        this.clickListener = clickListener.bind(this);
+        this._clickListener = clickListener.bind(this);
 
-        this._keyClick = this.map.on('click', this.clickListener);
+        this._keyClickOnMap = this.map.on('click', this._clickListener);
     }
-
-    removeClickListener(): void {
-        unByKey(this._keyClick);
-    }
-
 
 }
 
 interface Options {
-    key: string;
+    apiKey: string;
+    language: string;
 }
 
 export default StreetView;
