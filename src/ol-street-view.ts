@@ -40,6 +40,7 @@ export default class StreetView {
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
     protected streetViewContainer: HTMLElement;
+    protected mapContainer: HTMLElement;
 
     // Obserbable keys
     protected _keyClickOnMap: EventsKey | EventsKey[];
@@ -149,7 +150,7 @@ export default class StreetView {
                         anchorYUnits: IconAnchorUnits.PIXELS,
                         rotateWithView: true,
                         opacity: 1.0,
-                        src: pegmanSprites,
+                        src: (pegmanSprites as string),
                         size: [52, 52],
                         offset: calculatePegmanIconOffset()
                     })
@@ -312,11 +313,7 @@ export default class StreetView {
                 e.relatedTarget.classList.remove('can-drop');
             },
             ondrop: () => {
-                this.pegmanDraggable.classList.remove(
-                    'active',
-                    'left',
-                    'right'
-                );
+        
                 this.pegmanDraggable.classList.add('dropped');
 
                 // Reset Pegman Dragging Cursor
@@ -334,24 +331,29 @@ export default class StreetView {
                 this.pegmanDraggable.removeAttribute('data-y');
             },
             ondropdeactivate: (e) => {
+
                 this.pegmanDraggable.classList.remove(
                     'active',
                     'left',
                     'right'
                 );
+
                 document.body.classList.remove('streetViewModeOnDragging');
 
                 // Remove Active Dropzone Feedback
-                e.target.classList.remove('drop-active');
-                e.target.classList.remove('drop-target');
+                e.target.classList.remove(
+                    'drop-active',
+                    'drop-target'
+                );
             }
         });
     }
 
+    /**
+     * Create the streView container
+     * and move the map inside another parent container
+     */
     _addStreetViewHtml(): void {
-
-        this.mapContainer = document.createElement('div');
-        this.mapContainer.id = 'mapContainer';
 
         this.streetViewContainer = document.createElement('div');
         this.streetViewContainer.id = 'streetView';
@@ -359,7 +361,7 @@ export default class StreetView {
         const streetViewNoResultsDiv = document.createElement('div');
         streetViewNoResultsDiv.className = 'no-results';
         streetViewNoResultsDiv.innerHTML = `
-            <div class="no-results-icon icon-visibility_off"></DIV>
+            <div class="no-results-icon icon-visibility_off"></div>
             <div class="no-results-text">Sin imágenes en la zona. Click en el mapa para trasladarse.</div>
         `;
         this.streetViewContainer.appendChild(streetViewNoResultsDiv);
@@ -376,10 +378,15 @@ export default class StreetView {
         streetViewNoResultsDiv.appendChild(this.exitControlUI);
 
         const parentMap = this.viewport.parentElement;
-        parentMap.appendChild(this.mapContainer);
+
+        this.mapContainer = document.createElement('div');
+        this.mapContainer.id = 'mapContainer';
+
+        // Move the map element (viewport) inside a new container
+        parentMap.replaceChild(this.mapContainer, this.viewport);
 
         this.mapContainer.appendChild(this.streetViewContainer);
-        this.mapContainer.appendChild(this.viewport)
+        this.mapContainer.appendChild(this.viewport);
     }
 
     async _loadStreetView(): Promise<void> {
@@ -393,6 +400,7 @@ export default class StreetView {
     }
 
     _updateStreetViewPosition(coords: Coordinate): void {
+
         const latLon = transform(
             coords,
             this.view.getProjection(),

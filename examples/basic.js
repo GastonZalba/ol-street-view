@@ -3,7 +3,9 @@
     var map = new ol.Map({
         layers: [
             new ol.layer.Tile({
-                source: new ol.source.OSM(),
+                source: new ol.source.OSM({
+                    url: 'https://mt1.google.com/vt/?lyrs=y&x={x}&y={y}&z={z}' // Hybrid Google
+                })
             })
         ],
         target: 'map',
@@ -14,9 +16,9 @@
         })
     });
 
-    var wfst = new StreetView(map,
+    var streetView = new StreetView(map,
         {
-            apiKey: '_testing_'
+            apiKey: null
 
         }
     );

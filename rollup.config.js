@@ -1,3 +1,4 @@
+import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
 import image from '@rollup/plugin-image';
 import css from 'rollup-plugin-css-only'
@@ -7,7 +8,7 @@ module.exports = {
     input: 'tmp-lib/ol-street-view.js',
     output: [
         {
-            file: 'lib/ol-street-view.js',
+            file: pkg.module,
             format: 'es',
             name: 'StreetView',
             globals: {
@@ -30,14 +31,15 @@ module.exports = {
                 'ol/interaction': 'ol.interaction',
                 'ol/TileState': 'ol.TileState',
                 'ol/coordinate': 'ol.coordinate',
-                'ol/style/IconAnchorUnits':'ol.style.IconAnchorUnits',
-                'ol/interaction/Translate':'ol.interaction.Translate',
-                'interactjs': 'interact',
+                'ol/style/IconAnchorUnits': 'ol.style.IconAnchorUnits',
+                'ol/interaction/Translate': 'ol.interaction.Translate',
+                'interactjs': 'interactjs',
                 'google-maps': 'google-maps'
             }
         }
     ],
     plugins: [
+        image(),
         babel({
             presets: [
                 [
@@ -50,9 +52,8 @@ module.exports = {
                 ]
             ],
             babelHelpers: 'bundled',
-            exclude: 'node_modules/**'
-        }),
-        image(),
+            exclude: ["node_modules/**", "src/assets/**"]
+        }),        
         css({
             output: function (styles, styleNodes) {
                 mkdirSync('lib/css', { recursive: true });
@@ -68,6 +69,7 @@ module.exports = {
         'ol/geom',
         'ol/Feature',
         'ol/Overlay',
+        'ol/style',
         'ol/control',
         'ol/proj',
         'ol/Observable',

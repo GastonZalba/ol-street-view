@@ -2,10 +2,13 @@
   "name": "ol-street-view",
   "version": "1.0.0",
   "description": "Street View implementation for Open Layers",
+  "browser": "dist/ol-street-view.min.js",
   "main": "dist/ol-street-view.js",
   "module": "lib/ol-street-view.js",
   "types": "lib/ol-street-view.d.ts",
+  "style": "lib/ol-street-view.css",
   "files": [
+    "index.js",
     "lib/**/*",
     "dist/**/*"
   ],
@@ -36,12 +39,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
+    "@babel/plugin-transform-runtime": "^7.12.15",
     "@babel/preset-env": "^7.12.1",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-image": "^2.0.6",
     "@rollup/plugin-node-resolve": "^11.0.1",
-    "@types/google.maps": "^3.43.0",
     "@types/node": "^14.14.10",
     "@types/ol": "^6.4.2",
     "@typescript-eslint/eslint-plugin": "^4.8.2",

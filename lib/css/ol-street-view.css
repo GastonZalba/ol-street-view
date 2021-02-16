@@ -1,0 +1,207 @@
+.streetViewMode #pegmanButtonDiv {
+    display: none;
+}
+
+#streetView {
+    position: relative;
+    display: none;
+    background-color: #26485f !important;
+}
+
+#pegmanButtonDiv {
+    display: none;
+    position: absolute;
+    top: 475px;
+    right: 20px;
+    z-index: 10;
+    width: 42px;
+    height: 42px;
+}
+
+#pegmanButtonDiv #pegmanButton {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: url("/images/markers/pegman_sprites.png");
+    background-position: -101px 1px;
+    background-repeat: no-repeat;
+    background-color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+#pegmanButtonDiv #pegmanButton:hover {
+    background-position: -109px -49px;
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: grab;
+}
+
+#pegmanButtonDiv #pegmanButton:active {
+    background-position: -109px -49px;
+    cursor: grabbing;
+}
+
+/* Marker */
+#pegmanMarker {
+    position: absolute;
+    z-index: 9999999;
+    display: block;
+    width: 42px;
+    height: 42px;
+    cursor: grab;
+    opacity: 0;
+}
+#pegmanMarker::before {
+    position: relative;
+    z-index: 5;
+    display: block;
+    width: 32px;
+    height: 42px;
+    content: " ";
+    background-image: url("/images/markers/pegman_sprites.png");
+    background-repeat: no-repeat;
+    background-position: -102px 1px;
+}
+#pegmanMarker::after {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    z-index: 4;
+    margin-left: -9px;
+    display: block;
+    width: 22px;
+    height: 22px;
+    content: " ";
+    overflow: visible;
+    visibility: visible;
+    border: 1px dotted rgba(51, 51, 51, 0.9);
+    background-color: rgba(105, 185, 70, 0.7);
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+    -webkit-box-shadow: 3px 10px 25px rgba(105, 185, 70, 1);
+    -moz-box-shadow: 3px 10px 25px rgba(105, 185, 70, 1);
+    box-shadow: 3px 10px 25px rgba(105, 185, 70, 1);
+    animation: pulse 1.5s infinite;
+}
+#pegmanMarker.active {
+    opacity: 1 !important;
+    /* Pegman Marker Icon */
+}
+#pegmanMarker.active {
+    cursor: grabbing;
+}
+#pegmanMarker.active.left::before {
+    background-position: -110px -50px;
+}
+#pegmanMarker.active.right::before {
+    background-position: -100px -154px;
+}
+#pegmanMarker.dropped {
+    opacity: 1;
+}
+#pegmanMarker.dropped::before {
+    background-position: -112px -4px;
+}
+/* End Marker */
+
+#streetView .no-results {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    color: #fff;
+    text-align: center;
+}
+.no-results-icon {
+    font-size: 40px;
+    margin-bottom: 5px;
+}
+.no-results-text {
+    font-size: 12px;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+    }
+
+    50% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(0.8);
+    }
+}
+
+@media all and (min-width: 961px) {
+    .streetViewModeOnDragging .ol-overlaycontainer-stopevent,
+    .streetViewMode .ol-overlaycontainer-stopevent,
+    .streetViewModeOnDragging #pegmanButtonDiv #pegmanButton {
+        display: none;
+    }
+    .streetViewModeOnDragging .tippy-popper {
+        display: none;
+    }
+
+    .streetViewMode #pegmanExitButtonDiv {
+        display: block;
+    }
+
+    .streetViewMode #map {
+        flex-direction: column-reverse;
+        display: flex;
+    }
+    .streetViewMode #streetView {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-bottom: 4px solid #222222;
+    }
+
+    .streetViewMode #olMap {
+        height: 250px;
+        overflow-y: inherit !important;
+    }
+    #pegmanButtonDiv {
+        display: block;
+    }
+}
+
+@media all and (max-width: 1280px) {
+    .streetViewMode #olMap {
+        height: 180px;
+        overflow-y: inherit !important;
+    }
+    #pegmanButtonDiv {
+        top: 435px;
+    }
+}
+
+/* Google */
+.gm-control-exit {
+    background: none rgb(34, 34, 34);
+    border: 0px;
+    margin: 10px;
+    padding: 0px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 2px;
+    height: 40px;
+    width: 80px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+    overflow: hidden;
+    color: #666666;
+    font-size: 1.1rem;
+    outline: 0;
+}
+
+.gm-control-exit:hover {
+    color: #fff;
+}
+/* End Google */

@@ -4,3 +4,4 @@ package-lock.json
 tmp-dist
 tmp-lib
 local_test
+keys.json
