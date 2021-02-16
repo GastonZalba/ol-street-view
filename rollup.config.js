@@ -9,7 +9,7 @@ module.exports = {
         {
             file: 'lib/ol-street-view.js',
             format: 'es',
-            name: 'Street View',
+            name: 'StreetView',
             globals: {
                 'ol': 'ol',
                 'ol/Map': 'ol.Map',

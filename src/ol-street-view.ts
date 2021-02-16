@@ -349,6 +349,10 @@ export default class StreetView {
     }
 
     _addStreetViewHtml(): void {
+
+        this.mapContainer = document.createElement('div');
+        this.mapContainer.id = 'mapContainer';
+
         this.streetViewContainer = document.createElement('div');
         this.streetViewContainer.id = 'streetView';
 
@@ -371,7 +375,11 @@ export default class StreetView {
 
         streetViewNoResultsDiv.appendChild(this.exitControlUI);
 
-        this.viewport.parentElement.appendChild(this.streetViewContainer);
+        const parentMap = this.viewport.parentElement;
+        parentMap.appendChild(this.mapContainer);
+
+        this.mapContainer.appendChild(this.streetViewContainer);
+        this.mapContainer.appendChild(this.viewport)
     }
 
     async _loadStreetView(): Promise<void> {
