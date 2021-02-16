@@ -31,7 +31,8 @@
   "dependencies": {},
   "peerDependencies": {
     "ol": "~5.0",
-    "interactjs": "^1.10.0"
+    "interactjs": "^1.10.0",
+    "google-maps": "~4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -40,6 +41,7 @@
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-image": "^2.0.6",
     "@rollup/plugin-node-resolve": "^11.0.1",
+    "@types/google.maps": "^3.43.0",
     "@types/node": "^14.14.10",
     "@types/ol": "^6.4.2",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
@@ -50,6 +52,7 @@
     "eslint-config-openlayers": "^14.0.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "google-maps": "^4.3.3",
     "interactjs": "^1.10.3",
     "ncp": "^2.0.0",
     "ol": "^6.5.0",
