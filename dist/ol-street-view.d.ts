@@ -79,6 +79,6 @@ export default class StreetView {
 }
 interface Options {
     apiKey: string;
-    language: string;
+    language: 'es' | 'en';
 }
 export { Options };

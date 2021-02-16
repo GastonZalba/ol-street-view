@@ -90,9 +90,11 @@ export default class StreetView {
      * @protected
      */
     _prepareLayers(): void {
-        const calculatePegmanIconOffset = () => {
+        const calculatePegmanIconOffset = ():Array<number> => {
 
             const heading = this._pegmanHeading;
+
+            console.log(heading);
 
             let offset: Array<number>;
 
@@ -143,23 +145,22 @@ export default class StreetView {
             })
         });
 
-        // Current Pegman Layer Position
+        // Pegman Layer
         this._pegmanLayer = new VectorLayer({
             zIndex: 99,
             source: new VectorSource(),
-            style: () =>
-                new Style({
-                    image: new Icon({
-                        anchor: [0.5, 46],
-                        anchorXUnits: IconAnchorUnits.FRACTION,
-                        anchorYUnits: IconAnchorUnits.PIXELS,
-                        rotateWithView: true,
-                        opacity: 1.0,
-                        src: (pegmanSprites as string),
-                        size: [52, 52],
-                        offset: calculatePegmanIconOffset()
-                    })
+            style: () => new Style({
+                image: new Icon({
+                    anchor: [0.5, 46],
+                    anchorXUnits: IconAnchorUnits.FRACTION,
+                    anchorYUnits: IconAnchorUnits.PIXELS,
+                    rotateWithView: true,
+                    opacity: 1.0,
+                    src: (pegmanSprites as string),
+                    size: [52, 52],
+                    offset: calculatePegmanIconOffset()
                 })
+            })
         });
 
         this.map.addLayer(this._pegmanLayer);
@@ -388,11 +389,11 @@ export default class StreetView {
         this.pegmanDivControl.title = 'Arrastrar para iniciar Google Street View';
 
         this.pegmanDraggable = document.createElement('div');
-        this.pegmanDraggable.id = 'ol-street-view--pegman-marker';
+        this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
         this.pegmanDraggable.className = 'ol-street-view--draggable drag-drop';
 
         const pegmanBtn = document.createElement('div');
-        pegmanBtn.id = 'pegmanButton';
+        pegmanBtn.id = 'ol-street-view--pegman-button';
 
         this.pegmanDivControl.append(this.pegmanDraggable);
         this.pegmanDivControl.append(pegmanBtn);
@@ -506,9 +507,8 @@ export default class StreetView {
         });
 
         this._panorama.addListener('pov_changed', () => {
-            const heading = this._panorama.getPov().heading;
-            this._pegmanHeading = heading;
-            this._pegmanLayer.getSource().refresh();
+            this._pegmanHeading = this._panorama.getPov().heading;
+            this._pegmanLayer.getSource().changed()
         });
 
         const exitControlST = this.exitControlUI.cloneNode(true);

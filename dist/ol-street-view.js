@@ -946,6 +946,7 @@
 
 	      var calculatePegmanIconOffset = function calculatePegmanIconOffset() {
 	        var heading = _this._pegmanHeading;
+	        console.log(heading);
 	        var offset;
 
 	        if (heading >= 0 && heading < 22.5) {
@@ -993,7 +994,7 @@
 	          url: 'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}' // Google
 
 	        })
-	      }); // Current Pegman Layer Position
+	      }); // Pegman Layer
 
 	      this._pegmanLayer = new layer.Vector({
 	        zIndex: 99,
@@ -1200,10 +1201,10 @@
 	      this.pegmanDivControl.className = 'tooltip-cnt';
 	      this.pegmanDivControl.title = 'Arrastrar para iniciar Google Street View';
 	      this.pegmanDraggable = document.createElement('div');
-	      this.pegmanDraggable.id = 'ol-street-view--pegman-marker';
+	      this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
 	      this.pegmanDraggable.className = 'ol-street-view--draggable drag-drop';
 	      var pegmanBtn = document.createElement('div');
-	      pegmanBtn.id = 'pegmanButton';
+	      pegmanBtn.id = 'ol-street-view--pegman-button';
 	      this.pegmanDivControl.append(this.pegmanDraggable);
 	      this.pegmanDivControl.append(pegmanBtn);
 	      this.viewport.appendChild(this.pegmanDivControl);
@@ -1327,11 +1328,9 @@
 	      });
 
 	      this._panorama.addListener('pov_changed', function () {
-	        var heading = _this5._panorama.getPov().heading;
+	        _this5._pegmanHeading = _this5._panorama.getPov().heading;
 
-	        _this5._pegmanHeading = heading;
-
-	        _this5._pegmanLayer.getSource().refresh();
+	        _this5._pegmanLayer.getSource().changed();
 	      });
 
 	      var exitControlST = this.exitControlUI.cloneNode(true);

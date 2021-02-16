@@ -1,5 +1,6 @@
-.ol-street-view--activated #ol-street-view--pegman-button-div {
-    display: none;
+#ol-street-view--map-container {
+    height: 100%;
+    width: 100%;
 }
 
 #ol-street-view {
@@ -18,11 +19,14 @@
     height: 42px;
 }
 
-#ol-street-view--pegman-button-div #pegmanButton {
+.ol-street-view--activated #ol-street-view--pegman-button-div {
+    display: none;
+}
+
+#ol-street-view--pegman-button-div #ol-street-view--pegman-button {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url("./pegman_sprites.png");
     background-position: -101px 1px;
     background-repeat: no-repeat;
     background-color: #fff;
@@ -30,7 +34,7 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-#ol-street-view--pegman-button-div #pegmanButton:hover {
+#ol-street-view--pegman-button-div #ol-street-view--pegman-button:hover {
     background-position: -109px -49px;
     cursor: move;
     cursor: -webkit-grab;
@@ -38,13 +42,13 @@
     cursor: grab;
 }
 
-#ol-street-view--pegman-button-div #pegmanButton:active {
+#ol-street-view--pegman-button-div #ol-street-view--pegman-button:active {
     background-position: -109px -49px;
     cursor: grabbing;
 }
 
-/* Marker */
-#ol-street-view--pegman-marker {
+/* Pegman draggable */
+#ol-street-view--pegman-draggable {
     position: absolute;
     z-index: 9999999;
     display: block;
@@ -53,18 +57,17 @@
     cursor: grab;
     opacity: 0;
 }
-#ol-street-view--pegman-marker::before {
+#ol-street-view--pegman-draggable::before {
     position: relative;
     z-index: 5;
     display: block;
     width: 32px;
     height: 42px;
     content: " ";
-    background-image: url("./pegman_sprites.png");
     background-repeat: no-repeat;
     background-position: -102px 1px;
 }
-#ol-street-view--pegman-marker::after {
+#ol-street-view--pegman-draggable::after {
     position: absolute;
     bottom: -18px;
     left: 50%;
@@ -86,27 +89,28 @@
     box-shadow: 3px 10px 25px rgba(105, 185, 70, 1);
     animation: pulse 1.5s infinite;
 }
-#ol-street-view--pegman-marker.active {
+#ol-street-view--pegman-draggable.active {
     opacity: 1 !important;
     /* Pegman Marker Icon */
 }
-#ol-street-view--pegman-marker.active {
+#ol-street-view--pegman-draggable.active {
     cursor: grabbing;
 }
-#ol-street-view--pegman-marker.active.left::before {
+#ol-street-view--pegman-draggable.active.left::before {
     background-position: -110px -50px;
 }
-#ol-street-view--pegman-marker.active.right::before {
+#ol-street-view--pegman-draggable.active.right::before {
     background-position: -100px -154px;
 }
-#ol-street-view--pegman-marker.dropped {
+#ol-street-view--pegman-draggable.dropped {
     opacity: 1;
 }
-#ol-street-view--pegman-marker.dropped::before {
+#ol-street-view--pegman-draggable.dropped::before {
     background-position: -112px -4px;
 }
-/* End Marker */
+/* End Pegman draggable */
 
+/* No results mode */
 #ol-street-view .ol-street-view--no-results {
     margin: 0;
     position: absolute;
@@ -124,6 +128,7 @@
 .ol-street-view--no-results-text {
     font-size: 12px;
 }
+/* End No results mode */
 
 @keyframes pulse {
     0% {
@@ -139,48 +144,41 @@
     }
 }
 
+@media all and (max-width: 1280px) {
+    .ol-street-view--activated #ol-street-view--map {
+        height: 180px;
+        overflow-y: inherit !important;
+    }
+    #ol-street-view--pegman-button-div {
+        top: 435px;
+    }
+}
+
 @media all and (min-width: 961px) {
-    .ol-street-view--activated-on-dragging .ol-overlaycontainer-stopevent,
-    .ol-street-view--activated .ol-overlaycontainer-stopevent,
-    .ol-street-view--activated-on-dragging #ol-street-view--pegman-button-div #pegmanButton {
-        display: none;
-    }
-    .ol-street-view--activated-on-dragging .tippy-popper {
-        display: none;
-    }
-
-    .ol-street-view--activated #pegmanExitButtonDiv {
-        display: block;
-    }
-
-    .ol-street-view--activated #ol-street-view--map-container {
-        flex-direction: column-reverse;
-        display: flex;
-    }
     .ol-street-view--activated #ol-street-view {
         width: 100%;
         height: 100%;
         display: block;
         border-bottom: 4px solid #222222;
     }
-
+    .ol-street-view--activated .ol-overlaycontainer-stopevent,
+    .ol-street-view--activated-on-dragging .ol-overlaycontainer-stopevent,
+    .ol-street-view--activated-on-dragging #ol-street-view--pegman-button-div #ol-street-view--pegman-button {
+        display: none;
+    }
+    .ol-street-view--activated-on-dragging .tippy-popper {
+        display: none;
+    }
+    .ol-street-view--activated #ol-street-view--map-container {
+        flex-direction: column;
+        display: flex;
+    }
     .ol-street-view--activated .ol-street-view--map {
         height: 250px;
         overflow-y: inherit !important;
     }
-
     #ol-street-view--pegman-button-div {
         display: block;
-    }
-}
-
-@media all and (max-width: 1280px) {
-    .ol-street-view--activated .ol-street-view--map {
-        height: 180px;
-        overflow-y: inherit !important;
-    }
-    #ol-street-view--pegman-button-div {
-        top: 435px;
     }
 }
 

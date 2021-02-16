@@ -10,8 +10,8 @@
         ],
         target: 'map',
         view: new ol.View({
-            center: [-57.11345, -36.28140],
-            zoom: 13,
+            center: [-57.95409,-34.92209],
+            zoom: 15,
             projection: 'EPSG:4326'
         })
     });
