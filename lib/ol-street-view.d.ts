@@ -11,7 +11,7 @@ export default class StreetView {
     view: View;
     viewport: HTMLElement;
     protected _isInitialized: boolean;
-    protected pegmanBtn: HTMLElement;
+    protected pegmanDivControl: HTMLElement;
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
     protected streetViewContainer: HTMLElement;
@@ -28,24 +28,54 @@ export default class StreetView {
     protected _streetViewInitEvt: Event;
     protected _streetViewExitEvt: Event;
     constructor(map: PluggableMap, opt_options?: Options);
-    _prepareLayers(): void;
-    _addMapInteractions(): void;
-    _createControl(): void;
-    _addPegmanInteraction(): void;
     /**
-     * Create the streView container
-     * and move the map inside another parent container
+     * @protected
      */
-    _addStreetViewHtml(): void;
+    _prepareLayers(): void;
+    /**
+     * @protected
+     */
+    _addMapInteractions(): void;
+    /**
+     * @protected
+     */
+    _createControl(): void;
+    /**
+     * @protected
+     */
     _loadStreetView(): Promise<void>;
+    /**
+     * @protected
+     */
     _updateStreetViewPosition(coords: Coordinate): void;
+    /**
+     * @protected
+     */
     _updatePegmanPosition(coords: Coordinate | google.maps.LatLng, isGoogleFormat?: boolean): void;
+    /**
+     * @protected
+     */
     _initStreetView(): void;
-    showStreetView(): void;
-    hideStreetView(): void;
-    _addPegmanToMap(): void;
-    _showNoData(): void;
+    /**
+     * @protected
+     */
+    _initPegmanOnMap(): void;
+    /**
+     * @protected
+     */
+    _showNoDataMode(): void;
+    /**
+     * @protected
+     */
     _addClickListener(): void;
+    /**
+     * @public
+     */
+    showStreetView(): void;
+    /**
+     * @public
+     */
+    hideStreetView(): void;
 }
 interface Options {
     apiKey: string;

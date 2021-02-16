@@ -931,7 +931,13 @@
 	    this._addMapInteractions();
 
 	    this._createControl();
+
+	    this._loadStreetView();
 	  }
+	  /**
+	   * @protected
+	   */
+
 
 	  createClass(StreetView, [{
 	    key: "_prepareLayers",
@@ -1009,6 +1015,10 @@
 	      });
 	      this.map.addLayer(this._pegmanLayer);
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
 	    key: "_addMapInteractions",
 	    value: function _addMapInteractions() {
@@ -1029,166 +1039,181 @@
 
 	      this.map.addInteraction(this._translatePegman);
 	    }
-	  }, {
-	    key: "_createControl",
-	    value: function _createControl() {
-	      this.pegmanBtn = document.createElement('div');
-	      this.pegmanBtn.id = 'pegmanButtonDiv';
-	      this.pegmanBtn.className = 'tooltip-cnt';
-	      this.pegmanBtn.title = 'Arrastrar para iniciar Google Street View';
-	      this.pegmanDraggable = document.createElement('div');
-	      this.pegmanDraggable.id = 'pegmanMarker';
-	      this.pegmanDraggable.className = 'draggable drag-drop';
-	      this.pegmanBtn.innerHTML = "\n            <div id=\"pegmanMarker\" class=\"draggable drag-drop\"></div>\n            <div id=\"pegmanButton\"></div>\n            ";
-	      this.viewport.appendChild(this.pegmanBtn);
-	      this.pegmanDraggable = document.querySelector('#pegmanButtonDiv .draggable');
-
-	      this._addPegmanInteraction();
-
-	      this._addStreetViewHtml();
-
-	      this._loadStreetView();
-	    }
-	  }, {
-	    key: "_addPegmanInteraction",
-	    value: function _addPegmanInteraction() {
-	      var _this3 = this;
-
-	      var oldx = 0; // Grab Left/Right Direction of Mouse for Pegman Image
-
-	      var mousemovemethod = function mousemovemethod(e) {
-	        // Left
-	        if (e.pageX < oldx) {
-	          _this3.pegmanDraggable.classList.add('left');
-
-	          _this3.pegmanDraggable.classList.remove('right'); // Right
-
-	        } else if (e.pageX > oldx) {
-	          _this3.pegmanDraggable.classList.add('right');
-
-	          _this3.pegmanDraggable.classList.remove('left');
-	        }
-
-	        oldx = e.pageX;
-	        return oldx;
-	      };
-
-	      interact__default['default']('.draggable').draggable({
-	        inertia: false,
-	        onmove: function onmove(e) {
-	          document.addEventListener('mousemove', mousemovemethod.bind(_this3)); // Remove Class 'dropped' if Exists
-
-	          _this3.pegmanDraggable.classList.remove('dropped');
-
-	          var pTarget = e.target,
-	              // Keep the Dragged Position in the data-x/data-y Attributes
-	          x = (parseFloat(pTarget.getAttribute('data-x')) || 0) + e.dx,
-	              y = (parseFloat(pTarget.getAttribute('data-y')) || 0) + e.dy; // Translate the Element
-
-	          pTarget.style.webkitTransform = pTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'; // Update the Posiion Attributes
-
-	          pTarget.setAttribute('data-x', x);
-	          pTarget.setAttribute('data-y', y);
-	        },
-	        onend: function onend(e) {
-	          var location = _this3.map.getCoordinateFromPixel([e.client.x - 60, e.client.y + _this3.pegmanDraggable.clientHeight]);
-
-	          _this3._pegmanSelectedCoords = location;
-
-	          _this3._addPegmanToMap(); // Reset Pegman Dragging Cursor
-
-
-	          _this3.pegmanDraggable.classList.remove('can-drop', 'dragged', 'left', 'right', 'active', 'dropped');
-
-	          _this3.pegmanDraggable.removeAttribute('style');
-
-	          _this3.pegmanDraggable.removeAttribute('data-x');
-
-	          _this3.pegmanDraggable.removeAttribute('data-y');
-	        }
-	      }).styleCursor(false); // Enable Draggables to be Dropped into this Container
-
-	      interact__default['default'](this.viewport).dropzone({
-	        // Only Accept Elements Matching this CSS Selector
-	        accept: '.draggable',
-	        // Require a 75% Element Overlap for a Drop to be Possible
-	        overlap: 0.75,
-	        // Listen for Drop Related Events:
-	        ondropactivate: function ondropactivate(e) {
-	          // Add Active Dropzone Feedback
-	          e.target.classList.add('drop-active');
-	        },
-	        ondragenter: function ondragenter(e) {
-	          var draggableElement = e.relatedTarget,
-	              dropzoneElement = e.target; // Add SV Layer
-
-	          _this3.map.addLayer(_this3._streetViewXyzLayer);
-
-	          document.body.classList.add('streetViewModeOnDragging'); // Add Class 'active' While Dragging
-
-	          _this3.pegmanDraggable.classList.add('active'); // Feedback the Possibility of a Drop
-
-
-	          dropzoneElement.classList.add('drop-target');
-	          draggableElement.classList.add('can-drop');
-	        },
-	        ondragleave: function ondragleave(e) {
-	          // Remove the Drop Feedback Style
-	          e.target.classList.remove('drop-target');
-	          e.relatedTarget.classList.remove('can-drop');
-	        },
-	        ondrop: function ondrop() {
-	          _this3.pegmanDraggable.classList.add('dropped'); // Reset Pegman Dragging Cursor
-
-
-	          _this3.pegmanDraggable.classList.remove('can-drop', 'dragged', 'left', 'right', 'active', 'dropped');
-
-	          _this3.pegmanDraggable.removeAttribute('style');
-
-	          _this3.pegmanDraggable.removeAttribute('data-x');
-
-	          _this3.pegmanDraggable.removeAttribute('data-y');
-	        },
-	        ondropdeactivate: function ondropdeactivate(e) {
-	          _this3.pegmanDraggable.classList.remove('active', 'left', 'right');
-
-	          document.body.classList.remove('streetViewModeOnDragging'); // Remove Active Dropzone Feedback
-
-	          e.target.classList.remove('drop-active', 'drop-target');
-	        }
-	      });
-	    }
 	    /**
-	     * Create the streView container
-	     * and move the map inside another parent container
+	     * @protected
 	     */
 
 	  }, {
-	    key: "_addStreetViewHtml",
-	    value: function _addStreetViewHtml() {
-	      this.streetViewContainer = document.createElement('div');
-	      this.streetViewContainer.id = 'streetView';
-	      var streetViewNoResultsDiv = document.createElement('div');
-	      streetViewNoResultsDiv.className = 'no-results';
-	      streetViewNoResultsDiv.innerHTML = "\n            <div class=\"no-results-icon icon-visibility_off\"></div>\n            <div class=\"no-results-text\">Sin im\xE1genes en la zona. Click en el mapa para trasladarse.</div>\n        ";
-	      this.streetViewContainer.appendChild(streetViewNoResultsDiv); // Create exit control div
+	    key: "_createControl",
+	    value: function _createControl() {
+	      var _this3 = this;
 
-	      this.exitControlUI = document.createElement('button');
-	      this.exitControlUI.innerHTML = 'SALIR';
-	      this.exitControlUI.type = 'button';
-	      this.exitControlUI.className = 'gm-control-active gm-control-exit';
-	      this.exitControlUI.title = 'Salir de la vista Street View'; //this.exitControlUI.index = 1;
+	      /**
+	      * Create the streView container
+	      * and move the map inside another parent container
+	      *
+	      * @protected
+	      */
+	      var addStreetViewHtml = function addStreetViewHtml() {
+	        _this3.streetViewContainer = document.createElement('div');
+	        _this3.streetViewContainer.id = 'ol-street-view';
+	        var streetViewNoResultsDiv = document.createElement('div');
+	        streetViewNoResultsDiv.className = 'ol-street-view--no-results';
+	        streetViewNoResultsDiv.innerHTML = "\n            <div class=\"ol-street-view--no-results-icon icon-visibility_off\"></div>\n            <div class=\"ol-street-view--no-results-text\">Sin im\xE1genes en la zona. Click en el mapa para trasladarse.</div>\n        ";
 
-	      this.exitControlUI.onclick = this.hideStreetView.bind(this);
-	      streetViewNoResultsDiv.appendChild(this.exitControlUI);
-	      var parentMap = this.viewport.parentElement;
-	      this.mapContainer = document.createElement('div');
-	      this.mapContainer.id = 'mapContainer'; // Move the map element (viewport) inside a new container
+	        _this3.streetViewContainer.appendChild(streetViewNoResultsDiv); // Create exit control div
 
-	      parentMap.replaceChild(this.mapContainer, this.viewport);
-	      this.mapContainer.appendChild(this.streetViewContainer);
-	      this.mapContainer.appendChild(this.viewport);
+
+	        _this3.exitControlUI = document.createElement('button');
+	        _this3.exitControlUI.innerHTML = 'SALIR';
+	        _this3.exitControlUI.type = 'button';
+	        _this3.exitControlUI.className = 'gm-control-active gm-control-exit';
+	        _this3.exitControlUI.title = 'Salir de la vista Street View'; //this.exitControlUI.index = 1;
+
+	        _this3.exitControlUI.onclick = _this3.hideStreetView.bind(_this3);
+	        streetViewNoResultsDiv.appendChild(_this3.exitControlUI);
+	        var parentMap = _this3.viewport.parentElement;
+	        _this3.mapContainer = document.createElement('div');
+	        _this3.mapContainer.id = 'ol-street-view--map-container'; // Move the map element (viewport) inside a new container
+
+	        parentMap.replaceChild(_this3.mapContainer, _this3.viewport);
+
+	        _this3.mapContainer.appendChild(_this3.streetViewContainer);
+
+	        _this3.mapContainer.appendChild(_this3.viewport);
+
+	        _this3.viewport.classList.add('ol-street-view--map');
+	      };
+	      /**
+	       * @protected
+	       */
+
+
+	      var addPegmanInteraction = function addPegmanInteraction() {
+	        var oldx = 0; // Grab Left/Right Direction of Mouse for Pegman Image
+
+	        var mousemovemethod = function mousemovemethod(e) {
+	          // Left
+	          if (e.pageX < oldx) {
+	            _this3.pegmanDraggable.classList.add('left');
+
+	            _this3.pegmanDraggable.classList.remove('right'); // Right
+
+	          } else if (e.pageX > oldx) {
+	            _this3.pegmanDraggable.classList.add('right');
+
+	            _this3.pegmanDraggable.classList.remove('left');
+	          }
+
+	          oldx = e.pageX;
+	          return oldx;
+	        };
+
+	        interact__default['default']('.ol-street-view--draggable').draggable({
+	          inertia: false,
+	          onmove: function onmove(e) {
+	            document.addEventListener('mousemove', mousemovemethod.bind(_this3)); // Remove Class 'dropped' if Exists
+
+	            _this3.pegmanDraggable.classList.remove('dropped');
+
+	            var pTarget = e.target,
+	                // Keep the Dragged Position in the data-x/data-y Attributes
+	            x = (parseFloat(pTarget.getAttribute('data-x')) || 0) + e.dx,
+	                y = (parseFloat(pTarget.getAttribute('data-y')) || 0) + e.dy; // Translate the Element
+
+	            pTarget.style.webkitTransform = pTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'; // Update the Posiion Attributes
+
+	            pTarget.setAttribute('data-x', x);
+	            pTarget.setAttribute('data-y', y);
+	          },
+	          onend: function onend(e) {
+	            var location = _this3.map.getCoordinateFromPixel([e.client.x - 60, e.client.y + _this3.pegmanDraggable.clientHeight]);
+
+	            _this3._pegmanSelectedCoords = location;
+
+	            _this3._initPegmanOnMap(); // Reset Pegman Dragging Cursor
+
+
+	            _this3.pegmanDraggable.classList.remove('can-drop', 'dragged', 'left', 'right', 'active', 'dropped');
+
+	            _this3.pegmanDraggable.removeAttribute('style');
+
+	            _this3.pegmanDraggable.removeAttribute('data-x');
+
+	            _this3.pegmanDraggable.removeAttribute('data-y');
+	          }
+	        }).styleCursor(false); // Enable Draggables to be Dropped into this Container
+
+	        interact__default['default'](_this3.viewport).dropzone({
+	          // Only Accept Elements Matching this CSS Selector
+	          accept: '.ol-street-view--draggable',
+	          // Require a 75% Element Overlap for a Drop to be Possible
+	          overlap: 0.75,
+	          // Listen for Drop Related Events:
+	          ondropactivate: function ondropactivate(e) {
+	            // Add Active Dropzone Feedback
+	            e.target.classList.add('drop-active');
+	          },
+	          ondragenter: function ondragenter(e) {
+	            var draggableElement = e.relatedTarget,
+	                dropzoneElement = e.target; // Add SV Layer
+
+	            _this3.map.addLayer(_this3._streetViewXyzLayer);
+
+	            document.body.classList.add('ol-street-view--activated-on-dragging'); // Add Class 'active' While Dragging
+
+	            _this3.pegmanDraggable.classList.add('active'); // Feedback the Possibility of a Drop
+
+
+	            dropzoneElement.classList.add('drop-target');
+	            draggableElement.classList.add('can-drop');
+	          },
+	          ondragleave: function ondragleave(e) {
+	            // Remove the Drop Feedback Style
+	            e.target.classList.remove('drop-target');
+	            e.relatedTarget.classList.remove('can-drop');
+	          },
+	          ondrop: function ondrop() {
+	            _this3.pegmanDraggable.classList.add('dropped'); // Reset Pegman Dragging Cursor
+
+
+	            _this3.pegmanDraggable.classList.remove('can-drop', 'dragged', 'left', 'right', 'active', 'dropped');
+
+	            _this3.pegmanDraggable.removeAttribute('style');
+
+	            _this3.pegmanDraggable.removeAttribute('data-x');
+
+	            _this3.pegmanDraggable.removeAttribute('data-y');
+	          },
+	          ondropdeactivate: function ondropdeactivate(e) {
+	            _this3.pegmanDraggable.classList.remove('active', 'left', 'right');
+
+	            document.body.classList.remove('ol-street-view--activated-on-dragging'); // Remove Active Dropzone Feedback
+
+	            e.target.classList.remove('drop-active', 'drop-target');
+	          }
+	        });
+	      };
+
+	      this.pegmanDivControl = document.createElement('div');
+	      this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
+	      this.pegmanDivControl.className = 'tooltip-cnt';
+	      this.pegmanDivControl.title = 'Arrastrar para iniciar Google Street View';
+	      this.pegmanDraggable = document.createElement('div');
+	      this.pegmanDraggable.id = 'ol-street-view--pegman-marker';
+	      this.pegmanDraggable.className = 'ol-street-view--draggable drag-drop';
+	      var pegmanBtn = document.createElement('div');
+	      pegmanBtn.id = 'pegmanButton';
+	      this.pegmanDivControl.append(this.pegmanDraggable);
+	      this.pegmanDivControl.append(pegmanBtn);
+	      this.viewport.appendChild(this.pegmanDivControl);
+	      addPegmanInteraction();
+	      addStreetViewHtml();
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
 	    key: "_loadStreetView",
 	    value: function _loadStreetView() {
@@ -1221,6 +1246,10 @@
 	        }, _callee, this, [[1, 7]]);
 	      }));
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
 	    key: "_updateStreetViewPosition",
 	    value: function _updateStreetViewPosition(coords) {
@@ -1238,7 +1267,7 @@
 
 	          _this4._panorama.setVisible(true);
 	        } else {
-	          _this4._showNoData();
+	          _this4._showNoDataMode();
 
 	          _this4._updatePegmanPosition(coords,
 	          /** transform = */
@@ -1246,6 +1275,10 @@
 	        }
 	      });
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
 	    key: "_updatePegmanPosition",
 	    value: function _updatePegmanPosition(coords) {
@@ -1266,6 +1299,10 @@
 	        duration: 100
 	      });
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
 	    key: "_initStreetView",
 	    value: function _initStreetView() {
@@ -1304,55 +1341,20 @@
 
 	      this._isInitialized = true;
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
-	    key: "showStreetView",
-	    value: function showStreetView() {
-	      // Only init one time
-	      if (!this._isInitialized) {
-	        this._initStreetView();
-	      }
-
-	      this._updateStreetViewPosition(this._pegmanSelectedCoords);
-
-	      this._panorama.setVisible(true);
-
-	      this._addClickListener();
-
-	      this.viewport.dispatchEvent(this._streetViewInitEvt);
-	    }
-	  }, {
-	    key: "hideStreetView",
-	    value: function hideStreetView() {
-	      this._selectPegman.getFeatures().clear();
-
-	      var pegmanLayerSource = this._pegmanLayer.getSource();
-
-	      pegmanLayerSource.clear();
-	      this._pegmanSelectedCoords = []; // Remove SV Layer
-
-	      this.map.removeLayer(this._streetViewXyzLayer);
-	      document.body.classList.remove('streetViewMode'); // Force refresh the layers
-
-	      this.map.updateSize();
-	      window.dispatchEvent(new Event('resize'));
-
-	      this._panorama.setVisible(false);
-
-	      Observable.unByKey(this._keyClickOnMap); // Maybe, exit fullscreen
-
-	      if (document.fullscreenElement) document.exitFullscreen();
-	      this.viewport.dispatchEvent(this._streetViewExitEvt);
-	    }
-	  }, {
-	    key: "_addPegmanToMap",
-	    value: function _addPegmanToMap() {
+	    key: "_initPegmanOnMap",
+	    value: function _initPegmanOnMap() {
 	      if (this._pegmanLayer.getSource().getFeatures().length) {
 	        return;
 	      } // Add Class to Body
 
 
-	      if (!document.body.classList.contains('streetViewMode')) {
-	        document.body.classList.add('streetViewMode'); // Update Map Size
+	      if (!document.body.classList.contains('ol-street-view--activated')) {
+	        document.body.classList.add('ol-street-view--activated'); // Update Map Size
 
 	        this.map.updateSize();
 	      }
@@ -1373,11 +1375,19 @@
 	      this.view.setZoom(18);
 	      this.showStreetView();
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
-	    key: "_showNoData",
-	    value: function _showNoData() {
+	    key: "_showNoDataMode",
+	    value: function _showNoDataMode() {
 	      this._panorama.setVisible(false);
 	    }
+	    /**
+	     * @protected
+	     */
+
 	  }, {
 	    key: "_addClickListener",
 	    value: function _addClickListener() {
@@ -1393,6 +1403,53 @@
 	      };
 
 	      this._keyClickOnMap = this.map.on('click', clickListener);
+	    }
+	    /**
+	     * @public
+	     */
+
+	  }, {
+	    key: "showStreetView",
+	    value: function showStreetView() {
+	      // Only init one time
+	      if (!this._isInitialized) {
+	        this._initStreetView();
+	      }
+
+	      this._updateStreetViewPosition(this._pegmanSelectedCoords);
+
+	      this._panorama.setVisible(true);
+
+	      this._addClickListener();
+
+	      this.viewport.dispatchEvent(this._streetViewInitEvt);
+	    }
+	    /**
+	     * @public
+	     */
+
+	  }, {
+	    key: "hideStreetView",
+	    value: function hideStreetView() {
+	      this._selectPegman.getFeatures().clear();
+
+	      var pegmanLayerSource = this._pegmanLayer.getSource();
+
+	      pegmanLayerSource.clear();
+	      this._pegmanSelectedCoords = []; // Remove SV Layer
+
+	      this.map.removeLayer(this._streetViewXyzLayer);
+	      document.body.classList.remove('ol-street-view--activated'); // Force refresh the layers
+
+	      this.map.updateSize();
+	      window.dispatchEvent(new Event('resize'));
+
+	      this._panorama.setVisible(false);
+
+	      Observable.unByKey(this._keyClickOnMap); // Maybe, exit fullscreen
+
+	      if (document.fullscreenElement) document.exitFullscreen();
+	      this.viewport.dispatchEvent(this._streetViewExitEvt);
 	    }
 	  }]);
 
