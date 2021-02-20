@@ -11,6 +11,9 @@ export default class StreetView {
     view: View;
     viewport: HTMLElement;
     protected _isInitialized: boolean;
+    protected _isDragging: boolean;
+    protected _stopInteraction: Function;
+    protected _onMouseMove: EventListener;
     protected pegmanDivControl: HTMLElement;
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
@@ -68,6 +71,14 @@ export default class StreetView {
      * @protected
      */
     _addClickListener(): void;
+    /**
+     * @protected
+     */
+    _addKeyboardEvents(): void;
+    /**
+     * @protected
+     */
+    _terminateDragging(): void;
     /**
      * @public
      */
