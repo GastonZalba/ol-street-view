@@ -10,9 +10,10 @@
         ],
         target: 'map',
         view: new ol.View({
-            center: [-57.95409,-34.92209],
+            center: [-6451375.8,-4153315.9],
             zoom: 15,
-            projection: 'EPSG:4326'
+            projection: 'EPSG:900913',
+            constrainResolution: true // Prevents blurry XYZ background
         })
     });
 

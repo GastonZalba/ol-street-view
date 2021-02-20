@@ -16,8 +16,7 @@ import interact from 'interactjs';
 import { Loader } from 'google-maps';
 
 // Images
-import pegmanSprites from './assets/images/pegman_sprites.png';
-
+import pegmanMarkerSprites from './assets/images/pegman_marker.png';
 
 // Css
 import './assets/css/ol-street-view.css';
@@ -36,8 +35,6 @@ export default class StreetView {
 
     protected _isInitialized: boolean;
     protected _isDragging: boolean;
-    protected _stopInteraction: Function;
-    protected _onMouseMove: EventListener;
 
     // Control
     protected pegmanDivControl: HTMLElement;
@@ -88,7 +85,6 @@ export default class StreetView {
         this._addMapInteractions();
         this._createControl();
         this._loadStreetView();
-        this._addKeyboardEvents()
     }
 
     /**
@@ -96,7 +92,6 @@ export default class StreetView {
      */
     _prepareLayers(): void {
         const calculatePegmanIconOffset = (): Array<number> => {
-
             const heading = this._pegmanHeading;
 
             let offset: Array<number>;
@@ -152,18 +147,19 @@ export default class StreetView {
         this._pegmanLayer = new VectorLayer({
             zIndex: 99,
             source: new VectorSource(),
-            style: () => new Style({
-                image: new Icon({
-                    anchor: [0.5, 46],
-                    anchorXUnits: IconAnchorUnits.FRACTION,
-                    anchorYUnits: IconAnchorUnits.PIXELS,
-                    rotateWithView: true,
-                    opacity: 1.0,
-                    src: (pegmanSprites as string),
-                    size: [52, 52],
-                    offset: calculatePegmanIconOffset()
+            style: () =>
+                new Style({
+                    image: new Icon({
+                        anchor: [0.5, 48],
+                        anchorXUnits: IconAnchorUnits.FRACTION,
+                        anchorYUnits: IconAnchorUnits.PIXELS,
+                        rotateWithView: true,
+                        opacity: 1.0,
+                        src: pegmanMarkerSprites as string,
+                        size: [48, 48],
+                        offset: calculatePegmanIconOffset()
+                    })
                 })
-            })
         });
 
         this.map.addLayer(this._pegmanLayer);
@@ -193,15 +189,13 @@ export default class StreetView {
      * @protected
      */
     _createControl(): void {
-
         /**
-        * Create the streView container
-        * and move the map inside another parent container
-        * 
-        * @protected
-        */
+         * Create the streView container
+         * and move the map inside another parent container
+         *
+         * @protected
+         */
         const addStreetViewHtml = (): void => {
-
             this.streetViewContainer = document.createElement('div');
             this.streetViewContainer.id = 'ol-street-view';
 
@@ -235,63 +229,105 @@ export default class StreetView {
             this.mapContainer.appendChild(this.streetViewContainer);
             this.mapContainer.appendChild(this.viewport);
 
-            this.viewport.classList.add('ol-street-view--map')
-        }
+            this.viewport.classList.add('ol-street-view--map');
+        };
 
         /**
          * @protected
          */
         const addPegmanInteraction = (): void => {
-            let oldx = 0;
+            let oldPosX = 0,
+                stopInteract;
 
             // Grab Left/Right Direction of Mouse for Pegman Image
-            const onMouseMove = (e: MouseEvent) => {
+            let onMouseMove: EventListener = (e: MouseEvent) => {
                 // Left
-                if (e.pageX < oldx) {
+                if (e.pageX < oldPosX) {
                     this.pegmanDraggable.classList.add('ol-street-view--left');
-                    this.pegmanDraggable.classList.remove('ol-street-view--right');
+                    this.pegmanDraggable.classList.remove(
+                        'ol-street-view--right'
+                    );
 
                     // Right
-                } else if (e.pageX > oldx) {
+                } else if (e.pageX > oldPosX) {
                     this.pegmanDraggable.classList.add('ol-street-view--right');
-                    this.pegmanDraggable.classList.remove('ol-street-view--left');
+                    this.pegmanDraggable.classList.remove(
+                        'ol-street-view--left'
+                    );
                 }
 
-                oldx = e.pageX;
+                oldPosX = e.pageX;
 
-                return oldx;
+                return oldPosX;
             };
 
-            this._onMouseMove = onMouseMove.bind(this);
+            onMouseMove = onMouseMove.bind(this);
+
+            /**
+             * @protected
+             */
+            const terminateDragging = (): void => {
+                this._isDragging = false;
+
+                document.body.classList.remove(
+                    'ol-street-view--activated-on-dragging'
+                );
+
+                // Reset Pegman
+                this.pegmanDraggable.classList.remove(
+                    'ol-street-view--can-drop',
+                    'ol-street-view--dragged',
+                    'ol-street-view--left',
+                    'ol-street-view--right',
+                    'ol-street-view--active',
+                    'ol-street-view--dropped'
+                );
+                this.pegmanDraggable.removeAttribute('style');
+                this.pegmanDraggable.removeAttribute('data-x');
+                this.pegmanDraggable.removeAttribute('data-y');
+
+                // Remove Dropzone Feedback
+                this.viewport.classList.remove(
+                    'ol-street-view--drop-active',
+                    'ol-street-view--drop-target'
+                );
+
+                document.removeEventListener('mousemove', onMouseMove);
+            };
+
+            // Add Escape support to abort the dragging
+            document.addEventListener('keydown', ({ key }) => {
+                if (this._isDragging && key === 'Escape') {
+                    stopInteract();
+                    terminateDragging();
+                    this.map.removeLayer(this._streetViewXyzLayer);
+                }
+            });
 
             interact('.ol-street-view--draggable')
                 .draggable({
                     inertia: false,
                     onmove: (e) => {
-
                         this._isDragging = true;
-                        this._stopInteraction = e.interaction.stop;
+                        stopInteract = e.interaction.stop;
 
-                        document.addEventListener(
-                            'mousemove',
-                            this._onMouseMove
+                        document.addEventListener('mousemove', onMouseMove);
+
+                        this.pegmanDraggable.classList.remove(
+                            'ol-street-view--dropped'
                         );
-
-                        // Remove Class 'dropped' if Exists
-                        this.pegmanDraggable.classList.remove('ol-street-view--dropped');
 
                         const pTarget = e.target,
                             // Keep the Dragged Position in the data-x/data-y Attributes
                             x =
-                                (parseFloat(pTarget.getAttribute('data-x')) || 0) +
-                                e.dx,
+                                (parseFloat(pTarget.getAttribute('data-x')) ||
+                                    0) + e.dx,
                             y =
-                                (parseFloat(pTarget.getAttribute('data-y')) || 0) +
-                                e.dy;
+                                (parseFloat(pTarget.getAttribute('data-y')) ||
+                                    0) + e.dy;
 
                         // Translate the Element
-                        pTarget.style.webkitTransform = pTarget.style.transform =
-                            'translate(' + x + 'px, ' + y + 'px)';
+                        pTarget.style.webkitTransform = pTarget.style.transform = `translate(${x}px, ${y}px)`;
 
                         // Update the Posiion Attributes
                         pTarget.setAttribute('data-x', x);
@@ -299,82 +335,67 @@ export default class StreetView {
                     },
                     onend: (e) => {
 
+                        // Compensate cursor offset
                         const location = this.map.getCoordinateFromPixel([
-                            e.client.x - 60,
+                            e.client.x - 20,
                             e.client.y + this.pegmanDraggable.clientHeight
                         ]);
 
                         this._pegmanSelectedCoords = location;
                         this._initPegmanOnMap();
-
-                
                     }
                 })
                 .styleCursor(false);
 
             // Enable Draggables to be Dropped into this Container
             interact(this.viewport).dropzone({
-                // Only Accept Elements Matching this CSS Selector
                 accept: '.ol-street-view--draggable',
-                // Require a 75% Element Overlap for a Drop to be Possible
                 overlap: 0.75,
-
-                // Listen for Drop Related Events:
                 ondropactivate: () => {
-                    // Add Active Dropzone Feedback
                     this.viewport.classList.add('ol-street-view--drop-active');
                 },
                 ondragenter: () => {
-
-                    // Add SV Layer
+                    // Add Stree View Layer showing areas wheres StreetView exists
                     this.map.addLayer(this._streetViewXyzLayer);
 
-                    document.body.classList.add('ol-street-view--activated-on-dragging');
+                    document.body.classList.add(
+                        'ol-street-view--activated-on-dragging'
+                    );
 
-                    // Add Class 'active' While Dragging
-                    this.pegmanDraggable.classList.add('ol-street-view--active', 'ol-street-view--can-drop');
+                    this.pegmanDraggable.classList.add(
+                        'ol-street-view--active',
+                        'ol-street-view--can-drop'
+                    );
 
-                    // Feedback the Possibility of a Drop
                     this.viewport.classList.add('ol-street-view--drop-target');
                 },
                 ondragleave: () => {
                     // Remove the Drop Feedback Style
-                    this.viewport.classList.remove('ol-street-view--drop-target');
-                    this.pegmanDraggable.classList.remove('ol-street-view--can-drop');
+                    this.viewport.classList.remove(
+                        'ol-street-view--drop-target'
+                    );
+                    this.pegmanDraggable.classList.remove(
+                        'ol-street-view--can-drop'
+                    );
                 },
                 ondrop: () => {
-
-                    this.pegmanDraggable.classList.add('ol-street-view--dropped');
-
-                    // Reset Pegman Dragging Cursor
-                    this.pegmanDraggable.classList.remove(
-                        'ol-street-view--can-drop',
-                        'ol-street-view--dragged',
-                        'ol-street-view--left',
-                        'ol-street-view--right',
-                        'ol-street-view--active',
+                    this.pegmanDraggable.classList.add(
                         'ol-street-view--dropped'
                     );
-
-                    this.pegmanDraggable.removeAttribute('style');
-                    this.pegmanDraggable.removeAttribute('data-x');
-                    this.pegmanDraggable.removeAttribute('data-y');
                 },
-                ondropdeactivate: (e) => {
-
-                    this._terminateDragging();
-
-                }
+                ondropdeactivate: () => terminateDragging()
             });
-        }
+        };
 
         this.pegmanDivControl = document.createElement('div');
         this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-        this.pegmanDivControl.title = 'Arrastrar para iniciar Google Street View';
+        this.pegmanDivControl.title =
+            'Arrastrar para iniciar Google Street View';
 
         this.pegmanDraggable = document.createElement('div');
         this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
-        this.pegmanDraggable.className = 'ol-street-view--draggable ol-street-view--drag-drop';
+        this.pegmanDraggable.className =
+            'ol-street-view--draggable ol-street-view--drag-drop';
 
         const pegmanBtn = document.createElement('div');
         pegmanBtn.id = 'ol-street-view--pegman-button';
@@ -387,9 +408,7 @@ export default class StreetView {
         addPegmanInteraction();
 
         addStreetViewHtml();
-
     }
-
 
     /**
      * @protected
@@ -408,7 +427,6 @@ export default class StreetView {
      * @protected
      */
     _updateStreetViewPosition(coords: Coordinate): void {
-
         const latLon = transform(
             coords,
             this.view.getProjection(),
@@ -492,7 +510,7 @@ export default class StreetView {
 
         this._panorama.addListener('pov_changed', () => {
             this._pegmanHeading = this._panorama.getPov().heading;
-            this._pegmanLayer.getSource().changed()
+            this._pegmanLayer.getSource().changed();
         });
 
         const exitControlST = this.exitControlUI.cloneNode(true);
@@ -511,7 +529,6 @@ export default class StreetView {
      * @protected
      */
     _initPegmanOnMap(): void {
-
         if (this._pegmanLayer.getSource().getFeatures().length) {
             return;
         }
@@ -551,6 +568,8 @@ export default class StreetView {
     }
 
     /**
+     * Map click listener to translate StreetView position
+     *
      * @protected
      */
     _addClickListener(): void {
@@ -562,58 +581,6 @@ export default class StreetView {
         };
 
         this._keyClickOnMap = this.map.on('click', clickListener);
-    }
-
-    /**
-     * @protected
-     */
-    _addKeyboardEvents(): void {
-
-        document.addEventListener('keydown', ({ key }) => {
-            if (this._isDragging && key === 'Escape') {
-                this._stopInteraction();
-                this._terminateDragging();
-            }
-        });
-
-    }
-
-    /**
-     * @protected
-     */
-    _terminateDragging(): void {
-
-        this._isDragging = false;
-
-        document.body.classList.remove('ol-street-view--activated-on-dragging');
-
-        this.map.removeLayer(this._streetViewXyzLayer);
-
-        // Reset Pegman Dragging Cursor
-        this.pegmanDraggable.classList.remove(
-            'ol-street-view--can-drop',
-            'ol-street-view--dragged',
-            'ol-street-view--left',
-            'ol-street-view--right',
-            'ol-street-view--active',
-            'ol-street-view--dropped'
-        );
-
-        this.pegmanDraggable.removeAttribute('style');
-        this.pegmanDraggable.removeAttribute('data-x');
-        this.pegmanDraggable.removeAttribute('data-y');
-
-        // Remove Active Dropzone Feedback
-        this.viewport.classList.remove(
-            'ol-street-view--drop-active',
-            'ol-street-view--drop-target'
-        );
-
-        document.removeEventListener(
-            'mousemove',
-            this._onMouseMove
-        );
-
     }
 
     /**
