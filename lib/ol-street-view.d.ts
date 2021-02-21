@@ -7,6 +7,7 @@ import { EventsKey } from 'ol/events';
 import './assets/css/ol-street-view.css';
 export default class StreetView {
     protected options: Options;
+    protected _i18n: i18n;
     map: PluggableMap;
     view: View;
     viewport: HTMLElement;
@@ -80,8 +81,15 @@ export default class StreetView {
      */
     hideStreetView(): void;
 }
+interface i18n {
+    exit: string;
+    exitView: string;
+    dragToInit: string;
+    noImages: string;
+}
 interface Options {
     apiKey: string;
+    small: boolean;
     language: 'es' | 'en';
 }
-export { Options };
+export { Options, i18n };

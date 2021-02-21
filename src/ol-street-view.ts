@@ -18,6 +18,8 @@ import { Loader } from 'google-maps';
 // Images
 import pegmanMarkerSprites from './assets/images/pegman_marker.png';
 
+import * as languages from './assets/i18n/index';
+
 // Css
 import './assets/css/ol-street-view.css';
 
@@ -27,6 +29,7 @@ const SV_MAX_DISTANCE_METERS = 100;
 
 export default class StreetView {
     protected options: Options;
+    protected _i18n: i18n;
 
     // Ol
     public map: PluggableMap;
@@ -68,8 +71,12 @@ export default class StreetView {
         this.options = {
             apiKey: null,
             language: 'en',
+            small: false,
             ...opt_options
         };
+
+       // Language support
+        this._i18n = languages[this.options.language];
 
         this.map = map;
         this.view = map.getView();
@@ -96,6 +103,7 @@ export default class StreetView {
 
             let offset: Array<number>;
 
+            // Calculating the sprite offset 
             if (heading >= 0 && heading < 22.5) {
                 offset = [0, 0];
             } else if (heading >= 22.5 && heading < 45) {
@@ -138,8 +146,9 @@ export default class StreetView {
         this._streetViewXyzLayer = new TileLayer({
             zIndex: 10,
             source: new XYZ({
-                url:
-                    'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}' // Google
+                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">Terms of Service</a>`,
+                maxZoom: 19,
+                url: 'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
             })
         });
 
@@ -203,16 +212,16 @@ export default class StreetView {
             streetViewNoResultsDiv.className = 'ol-street-view--no-results';
             streetViewNoResultsDiv.innerHTML = `
             <div class="ol-street-view--no-results-icon icon-visibility_off"></div>
-            <div class="ol-street-view--no-results-text">Sin imágenes en la zona. Click en el mapa para trasladarse.</div>
+            <div class="ol-street-view--no-results-text">${this._i18n.noImages}</div>
         `;
             this.streetViewContainer.appendChild(streetViewNoResultsDiv);
 
             // Create exit control div
             this.exitControlUI = document.createElement('button');
-            this.exitControlUI.innerHTML = 'SALIR';
+            this.exitControlUI.innerHTML = this._i18n.exit;
             this.exitControlUI.type = 'button';
             this.exitControlUI.className = 'gm-control-active gm-control-exit';
-            this.exitControlUI.title = 'Salir de la vista Street View';
+            this.exitControlUI.title = this._i18n.exitView;
             //this.exitControlUI.index = 1;
             this.exitControlUI.onclick = this.hideStreetView.bind(this);
 
@@ -389,8 +398,11 @@ export default class StreetView {
 
         this.pegmanDivControl = document.createElement('div');
         this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-        this.pegmanDivControl.title =
-            'Arrastrar para iniciar Google Street View';
+
+        if (this.options.small)
+            this.pegmanDivControl.className = 'ol-street-view--small-btn';
+
+        this.pegmanDivControl.title = this._i18n.dragToInit;
 
         this.pegmanDraggable = document.createElement('div');
         this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
@@ -630,9 +642,17 @@ export default class StreetView {
     }
 }
 
+interface i18n {
+    exit: string;
+    exitView: string;
+    dragToInit: string;
+    noImages: string;
+}
+
 interface Options {
     apiKey: string;
+    small: boolean;
     language: 'es' | 'en';
 }
 
-export { Options };
+export { Options, i18n };
