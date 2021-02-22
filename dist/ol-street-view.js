@@ -878,7 +878,7 @@
 	var es = {
 	  exit: 'Salir',
 	  exitView: 'Salir de la vista Street View',
-	  dragToInit: 'Arrastrar para iniciar Google Street View',
+	  dragToInit: 'Arrastre y suelte para iniciar Google Street View',
 	  noImages: 'Sin imágenes en la zona. Click en el mapa para trasladarse',
 	  termsOfService: 'Condiciones del Servicio'
 	};
@@ -886,8 +886,8 @@
 	var en = {
 	  exit: 'Exit',
 	  exitView: 'Exit Street View mode',
-	  dragToInit: 'Drag to initialize Google Street View',
-	  noImages: 'No images found. Click on map to traslate',
+	  dragToInit: 'Drag and drop to initialize Google Street View',
+	  noImages: 'No images found. Click on the map to move',
 	  termsOfService: 'Terms of Service'
 	};
 
@@ -1449,6 +1449,7 @@
 	      this._keyClickOnMap = this.map.on('click', clickListener);
 	    }
 	    /**
+	     * Show Street View mode
 	     * @public
 	     */
 
@@ -1469,6 +1470,7 @@
 	      this.viewport.dispatchEvent(this._streetViewInitEvt);
 	    }
 	    /**
+	     * Disables Street View mode
 	     * @public
 	     */
 

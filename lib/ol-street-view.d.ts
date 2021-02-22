@@ -80,10 +80,12 @@ export default class StreetView {
      */
     _addClickListener(): void;
     /**
+     * Show Street View mode
      * @public
      */
     showStreetView(): void;
     /**
+     * Disables Street View mode
      * @public
      */
     hideStreetView(): void;
