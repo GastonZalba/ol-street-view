@@ -1,10 +1,14 @@
 #ol-street-view--map-container {
-    height: 100%;
-    width: 100%;
+    position: absolute;
+    z-index: 99;
+    left: 0;
+    bottom: 0;
+    top: 0;
+    right: 0;
 }
 #ol-street-view--panorama {
     display: none;
-    background-color: #161616 !important;
+    background-color: #555555 !important;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
@@ -173,9 +177,13 @@
     text-align: center;
 }
 .ol-street-view--no-results-icon {
-    font-size: 40px;
     margin-bottom: 5px;
 }
+
+.ol-street-view--no-results-icon img {
+    width: 70px;
+}
+
 .ol-street-view--no-results-text {
     font: 300 14px Arial, sans-serif;
 }

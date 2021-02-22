@@ -11,3 +11,9 @@
 
 ## v1.0.2
 * Fixed resize action on touch devices
+
+## v1.0.3
+* Changed panorama background color
+* Added icon when no results are found
+* Some CSS improvement
+* More precise coordinates on drop

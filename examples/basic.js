@@ -24,7 +24,8 @@
         {
             apiKey: null,
             language: 'en',
-            size: 'md'
+            size: 'md',
+            resizable: true
         }
     );
 
