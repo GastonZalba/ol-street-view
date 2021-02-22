@@ -22,6 +22,7 @@ import * as languages from './assets/i18n/index';
 
 // Css
 import './assets/css/ol-street-view.css';
+import Control from 'ol/control/Control';
 
 let google;
 
@@ -50,7 +51,7 @@ export default class StreetView {
     protected pegmanDivControl: HTMLElement;
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
-    protected streetViewContainer: HTMLElement;
+    protected streetViewPanoramaDiv: HTMLElement;
     protected mapContainer: HTMLElement;
 
     // Obserbable keys
@@ -74,12 +75,12 @@ export default class StreetView {
     protected _streetViewExitEvt: Event;
 
     constructor(map: PluggableMap, opt_options?: Options) {
-
         // Default options
         this.options = {
             apiKey: null,
             language: 'en',
             size: 'bg',
+            resizable: true,
             ...opt_options
         };
 
@@ -216,8 +217,8 @@ export default class StreetView {
          * @protected
          */
         const addStreetViewHtml = (): void => {
-            this.streetViewContainer = document.createElement('div');
-            this.streetViewContainer.id = 'ol-street-view';
+            this.streetViewPanoramaDiv = document.createElement('div');
+            this.streetViewPanoramaDiv.id = 'ol-street-view--panorama';
 
             const streetViewNoResultsDiv = document.createElement('div');
             streetViewNoResultsDiv.className = 'ol-street-view--no-results';
@@ -225,7 +226,7 @@ export default class StreetView {
             <div class="ol-street-view--no-results-icon icon-visibility_off"></div>
             <div class="ol-street-view--no-results-text">${this._i18n.noImages}</div>
         `;
-            this.streetViewContainer.appendChild(streetViewNoResultsDiv);
+            this.streetViewPanoramaDiv.appendChild(streetViewNoResultsDiv);
 
             // Create exit control div
             this.exitControlUI = document.createElement('button');
@@ -246,10 +247,44 @@ export default class StreetView {
             // Move the map element (viewport) inside a new container
             parentMap.replaceChild(this.mapContainer, this.viewport);
 
-            this.mapContainer.appendChild(this.streetViewContainer);
+            this.mapContainer.appendChild(this.streetViewPanoramaDiv);
             this.mapContainer.appendChild(this.viewport);
 
             this.viewport.classList.add('ol-street-view--map');
+
+            if (this.options.resizable) {
+                const scrollHandler = document.createElement('div');
+                scrollHandler.className = 'ol-street-view--scroll-handler';
+                scrollHandler.innerHTML = '<span></span>';
+                this.viewport.append(scrollHandler);
+
+                interact(this.viewport).resizable({
+                    edges: {
+                        top: scrollHandler,
+                        left: false,
+                        bottom: false,
+                        right: false
+                    },
+                    listeners: {
+                        move: (event) => {
+                            let { x, y } = event.target.dataset;
+
+                            x = (parseFloat(x) || 0) + event.deltaRect.left;
+                            y = (parseFloat(y) || 0) + event.deltaRect.top;
+
+                            Object.assign(event.target.style, {
+                                height: `${event.rect.height}px`
+                            });
+
+                            Object.assign(event.target.dataset, { x, y });
+                        },
+                        end: () => {
+                            this.map.updateSize();
+                            window.dispatchEvent(new Event('resize'));
+                        }
+                    }
+                });
+            }
         };
 
         /**
@@ -424,7 +459,11 @@ export default class StreetView {
         this.pegmanDivControl.append(this.pegmanDraggable);
         this.pegmanDivControl.append(pegmanBtn);
 
-        this.viewport.appendChild(this.pegmanDivControl);
+        this.map.addControl(
+            new Control({
+                element: this.pegmanDivControl
+            })
+        );
 
         addPegmanInteraction();
 
@@ -515,7 +554,7 @@ export default class StreetView {
      */
     _initStreetView(): void {
         this._panorama = new google.maps.StreetViewPanorama(
-            this.streetViewContainer,
+            this.streetViewPanoramaDiv,
             {
                 pov: { heading: 165, pitch: 0 },
                 zoom: 1,
@@ -607,6 +646,15 @@ export default class StreetView {
     }
 
     /**
+     * @protected
+     */
+    _refreshMap(): void {
+        // Force refresh the layers
+        this.map.updateSize();
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    /**
      * Show Street View mode
      * @public
      */
@@ -640,9 +688,10 @@ export default class StreetView {
 
         document.body.classList.remove('ol-street-view--activated');
 
-        // Force refresh the layers
-        this.map.updateSize();
-        window.dispatchEvent(new Event('resize'));
+        // Restore height if it was resized
+        this.viewport.style.height = null;
+
+        this._refreshMap();
 
         this._panorama.setVisible(false);
 
@@ -669,7 +718,7 @@ interface i18n {
 
 /**
  * **_[interface]_** - StreetView Options specified when creating an instance
- * 
+ *
  * Default values:
  * ```javascript
  * {
@@ -683,6 +732,7 @@ interface Options {
     apiKey: string;
     size: 'sm' | 'md' | 'lg';
     language: 'es' | 'en';
+    resizable: boolean;
 }
 
 export { Options, i18n };

@@ -23,7 +23,7 @@ export default class StreetView {
     protected pegmanDivControl: HTMLElement;
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
-    protected streetViewContainer: HTMLElement;
+    protected streetViewPanoramaDiv: HTMLElement;
     protected mapContainer: HTMLElement;
     protected _keyClickOnMap: EventsKey | EventsKey[];
     protected _streetViewXyzLayer: TileLayer;
@@ -80,6 +80,10 @@ export default class StreetView {
      */
     _addClickListener(): void;
     /**
+     * @protected
+     */
+    _refreshMap(): void;
+    /**
      * Show Street View mode
      * @public
      */
@@ -117,5 +121,6 @@ interface Options {
     apiKey: string;
     size: 'sm' | 'md' | 'lg';
     language: 'es' | 'en';
+    resizable: boolean;
 }
 export { Options, i18n };
