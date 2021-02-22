@@ -409,8 +409,6 @@ export default class StreetView {
                             this.mapContainer.scrollLeft +
                             this.mapContainer.clientLeft;
 
-                        console.log(mapDistanceY);
-
                         // Compensate cursor offset
                         const location = this.map.getCoordinateFromPixel([
                             e.client.x - mapDistanceY,
