@@ -8,3 +8,6 @@
 * Added scroller to resize the layout
 * Renamed some ids and classes
 * Fixed some css on small devices
+
+## v1.0.2
+* Fixed resize action on touch devices

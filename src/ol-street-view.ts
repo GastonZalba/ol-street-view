@@ -279,6 +279,7 @@ export default class StreetView {
                             Object.assign(event.target.dataset, { x, y });
                         },
                         end: () => {
+                            console.log('end');
                             this.map.updateSize();
                             window.dispatchEvent(new Event('resize'));
                         }

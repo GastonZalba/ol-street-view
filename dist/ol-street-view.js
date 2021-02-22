@@ -2202,6 +2202,8 @@
 	                });
 	              },
 	              end: function end() {
+	                console.log('end');
+
 	                _this3.map.updateSize();
 
 	                window.dispatchEvent(new Event('resize'));
