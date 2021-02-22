@@ -159,7 +159,7 @@ export default class StreetView {
                 }</a>`,
                 maxZoom: 19,
                 url:
-                    'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
+                    'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
             })
         });
 
