@@ -17,3 +17,6 @@
 * Added icon when no results are found
 * Some CSS improvement
 * More precise coordinates on drop
+
+## v1.0.4
+* Fixed handler visibility

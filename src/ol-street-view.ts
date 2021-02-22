@@ -10,6 +10,7 @@ import { unByKey } from 'ol/Observable';
 import { EventsKey } from 'ol/events';
 import IconAnchorUnits from 'ol/style/IconAnchorUnits';
 import { TranslateEvent } from 'ol/interaction/Translate';
+import { Control } from 'ol/control';
 
 // External
 import interact from 'interactjs';
@@ -23,7 +24,6 @@ import * as languages from './assets/i18n/index';
 
 // Css
 import './assets/css/ol-street-view.css';
-import Control from 'ol/control/Control';
 
 let google;
 
@@ -156,9 +156,8 @@ export default class StreetView {
         this._streetViewXyzLayer = new TileLayer({
             zIndex: 10,
             source: new XYZ({
-                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">${
-                    this._i18n.termsOfService
-                }</a>`,
+                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">${this._i18n.termsOfService
+                    }</a>`,
                 maxZoom: 19,
                 url:
                     'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'

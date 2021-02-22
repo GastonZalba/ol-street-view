@@ -204,8 +204,11 @@
     touch-action: none;
     box-sizing: border-box;
     user-select: none;
+    display: none;
 }
-
+.ol-street-view--activated .ol-street-view--scroll-handler {
+    display: block;
+}
 .ol-street-view--scroll-handler span {
     width: 100%;
     height: 3px;

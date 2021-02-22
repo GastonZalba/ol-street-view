@@ -94,6 +94,7 @@ module.exports = {
         'ol/geom',
         'ol/Feature',
         'ol/Overlay',
+        'ol/Control',
         'ol/style',
         'ol/control',
         'ol/proj',
