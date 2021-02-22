@@ -6,7 +6,8 @@
                 source: new ol.source.OSM({
                     attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">Terms of Service</a>`,
                     maxZoom: 19,
-                    url: 'https://mt1.google.com/vt/?lyrs=y&x={x}&y={y}&z={z}' // Hybrid Google
+                    url: 'https://mt1.google.com/vt/?lyrs=r&x={x}&y={y}&z={z}'
+                    // url: 'https://mt1.google.com/vt/?lyrs=y&x={x}&y={y}&z={z}' // Hybrid Google
                 })
             })
         ],
@@ -21,7 +22,8 @@
 
     var streetView = new StreetView(map,
         {
-            apiKey: null
+            apiKey: null,
+            language: 'en'
         }
     );
 

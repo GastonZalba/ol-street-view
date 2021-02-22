@@ -71,7 +71,7 @@ export default class StreetView {
         this.options = {
             apiKey: null,
             language: 'en',
-            small: false,
+            size: 'bg',
             ...opt_options
         };
 
@@ -146,7 +146,7 @@ export default class StreetView {
         this._streetViewXyzLayer = new TileLayer({
             zIndex: 10,
             source: new XYZ({
-                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">Terms of Service</a>`,
+                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">${this._i18n.termsOfService}</a>`,
                 maxZoom: 19,
                 url: 'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
             })
@@ -346,7 +346,7 @@ export default class StreetView {
 
                         // Compensate cursor offset
                         const location = this.map.getCoordinateFromPixel([
-                            e.client.x - 20,
+                            e.client.x - 25,
                             e.client.y + this.pegmanDraggable.clientHeight
                         ]);
 
@@ -399,8 +399,7 @@ export default class StreetView {
         this.pegmanDivControl = document.createElement('div');
         this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
 
-        if (this.options.small)
-            this.pegmanDivControl.className = 'ol-street-view--small-btn';
+        this.pegmanDivControl.className = `ol-street-view--${this.options.size}-btn`;
 
         this.pegmanDivControl.title = this._i18n.dragToInit;
 
@@ -426,7 +425,9 @@ export default class StreetView {
      * @protected
      */
     async _loadStreetView(): Promise<void> {
-        const loader = new Loader(this.options.apiKey);
+        const loader = new Loader(this.options.apiKey, {
+            language: this.options.language
+        });
 
         try {
             google = await loader.load();
@@ -647,11 +648,12 @@ interface i18n {
     exitView: string;
     dragToInit: string;
     noImages: string;
+    termsOfService: string;
 }
 
 interface Options {
     apiKey: string;
-    small: boolean;
+    size: 'sm' | 'md' | 'lg';
     language: 'es' | 'en';
 }
 

@@ -86,10 +86,11 @@ interface i18n {
     exitView: string;
     dragToInit: string;
     noImages: string;
+    termsOfService: string;
 }
 interface Options {
     apiKey: string;
-    small: boolean;
+    size: 'sm' | 'md' | 'lg';
     language: 'es' | 'en';
 }
 export { Options, i18n };

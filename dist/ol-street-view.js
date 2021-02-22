@@ -879,14 +879,16 @@
 	  exit: 'Salir',
 	  exitView: 'Salir de la vista Street View',
 	  dragToInit: 'Arrastrar para iniciar Google Street View',
-	  noImages: 'Sin imágenes en la zona. Click en el mapa para trasladarse'
+	  noImages: 'Sin imágenes en la zona. Click en el mapa para trasladarse',
+	  termsOfService: 'Condiciones del Servicio'
 	};
 
 	var en = {
 	  exit: 'Exit',
 	  exitView: 'Exit Street View mode',
 	  dragToInit: 'Drag to initialize Google Street View',
-	  noImages: 'No images found. Click on map to traslate'
+	  noImages: 'No images found. Click on map to traslate',
+	  termsOfService: 'Terms of Service'
 	};
 
 	var languages = /*#__PURE__*/Object.freeze({
@@ -937,7 +939,7 @@
 	    this.options = Object.assign({
 	      apiKey: null,
 	      language: 'en',
-	      small: false
+	      size: 'bg'
 	    }, opt_options); // Language support
 
 	    this._i18n = languages[this.options.language];
@@ -1013,7 +1015,7 @@
 	      this._streetViewXyzLayer = new layer.Tile({
 	        zIndex: 10,
 	        source: new source.XYZ({
-	          attributions: "&copy; ".concat(new Date().getFullYear(), " Google Maps <a href=\"https://www.google.com/help/terms_maps/\" target=\"_blank\">Terms of Service</a>"),
+	          attributions: "&copy; ".concat(new Date().getFullYear(), " Google Maps <a href=\"https://www.google.com/help/terms_maps/\" target=\"_blank\">").concat(this._i18n.termsOfService, "</a>"),
 	          maxZoom: 19,
 	          url: 'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
 	        })
@@ -1189,7 +1191,7 @@
 	          },
 	          onend: function onend(e) {
 	            // Compensate cursor offset
-	            var location = _this3.map.getCoordinateFromPixel([e.client.x - 20, e.client.y + _this3.pegmanDraggable.clientHeight]);
+	            var location = _this3.map.getCoordinateFromPixel([e.client.x - 25, e.client.y + _this3.pegmanDraggable.clientHeight]);
 
 	            _this3._pegmanSelectedCoords = location;
 
@@ -1230,7 +1232,7 @@
 
 	      this.pegmanDivControl = document.createElement('div');
 	      this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-	      if (this.options.small) this.pegmanDivControl.className = 'ol-street-view--small-btn';
+	      this.pegmanDivControl.className = "ol-street-view--".concat(this.options.size, "-btn");
 	      this.pegmanDivControl.title = this._i18n.dragToInit;
 	      this.pegmanDraggable = document.createElement('div');
 	      this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
@@ -1256,7 +1258,9 @@
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
-	                loader = new Loader(this.options.apiKey);
+	                loader = new Loader(this.options.apiKey, {
+	                  language: this.options.language
+	                });
 	                _context.prev = 1;
 	                _context.next = 4;
 	                return loader.load();
