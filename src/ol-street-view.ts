@@ -27,6 +27,13 @@ let google;
 
 const SV_MAX_DISTANCE_METERS = 100;
 
+/**
+ * Street View implementation for Open Layers.
+ *
+ * @constructor
+ * @param map Instance of the created map
+ * @param opt_options StreetView options, see [StreetView Options](#options) for more details.
+ */
 export default class StreetView {
     protected options: Options;
     protected _i18n: i18n;
@@ -67,6 +74,7 @@ export default class StreetView {
     protected _streetViewExitEvt: Event;
 
     constructor(map: PluggableMap, opt_options?: Options) {
+
         // Default options
         this.options = {
             apiKey: null,
@@ -75,7 +83,7 @@ export default class StreetView {
             ...opt_options
         };
 
-       // Language support
+        // Language support
         this._i18n = languages[this.options.language];
 
         this.map = map;
@@ -103,7 +111,7 @@ export default class StreetView {
 
             let offset: Array<number>;
 
-            // Calculating the sprite offset 
+            // Calculating the sprite offset
             if (heading >= 0 && heading < 22.5) {
                 offset = [0, 0];
             } else if (heading >= 22.5 && heading < 45) {
@@ -146,9 +154,12 @@ export default class StreetView {
         this._streetViewXyzLayer = new TileLayer({
             zIndex: 10,
             source: new XYZ({
-                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">${this._i18n.termsOfService}</a>`,
+                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">${
+                    this._i18n.termsOfService
+                }</a>`,
                 maxZoom: 19,
-                url: 'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
+                url:
+                    'https://mt1.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
             })
         });
 
@@ -343,7 +354,6 @@ export default class StreetView {
                         pTarget.setAttribute('data-y', y);
                     },
                     onend: (e) => {
-
                         // Compensate cursor offset
                         const location = this.map.getCoordinateFromPixel([
                             e.client.x - 25,
@@ -597,6 +607,7 @@ export default class StreetView {
     }
 
     /**
+     * Show Street View mode
      * @public
      */
     showStreetView(): void {
@@ -612,6 +623,7 @@ export default class StreetView {
     }
 
     /**
+     * Disables Street View mode
      * @public
      */
     hideStreetView(): void {
@@ -643,6 +655,10 @@ export default class StreetView {
     }
 }
 
+/**
+ * **_[interface]_** - Custom Language
+ * @protected
+ */
 interface i18n {
     exit: string;
     exitView: string;
@@ -651,6 +667,18 @@ interface i18n {
     termsOfService: string;
 }
 
+/**
+ * **_[interface]_** - StreetView Options specified when creating an instance
+ * 
+ * Default values:
+ * ```javascript
+ * {
+ *   apiKey: null;
+ *   size: 'lg';
+ *   language: 'en';
+ * }
+ * ```
+ */
 interface Options {
     apiKey: string;
     size: 'sm' | 'md' | 'lg';

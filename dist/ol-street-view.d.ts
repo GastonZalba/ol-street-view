@@ -5,6 +5,13 @@ import { Select, Translate } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
 import { EventsKey } from 'ol/events';
 import './assets/css/ol-street-view.css';
+/**
+ * Street View implementation for Open Layers.
+ *
+ * @constructor
+ * @param map Instance of the created map
+ * @param opt_options StreetView options, see [StreetView Options](#options) for more details.
+ */
 export default class StreetView {
     protected options: Options;
     protected _i18n: i18n;
@@ -81,6 +88,10 @@ export default class StreetView {
      */
     hideStreetView(): void;
 }
+/**
+ * **_[interface]_** - Custom Language
+ * @protected
+ */
 interface i18n {
     exit: string;
     exitView: string;
@@ -88,6 +99,18 @@ interface i18n {
     noImages: string;
     termsOfService: string;
 }
+/**
+ * **_[interface]_** - StreetView Options specified when creating an instance
+ *
+ * Default values:
+ * ```javascript
+ * {
+ *   apiKey: null;
+ *   size: 'lg';
+ *   language: 'en';
+ * }
+ * ```
+ */
 interface Options {
     apiKey: string;
     size: 'sm' | 'md' | 'lg';

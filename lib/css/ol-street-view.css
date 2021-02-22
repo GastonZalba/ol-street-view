@@ -25,10 +25,14 @@
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button {
     background-position: -2px -69px;
 }
-.ol-street-view--activated-on-dragging #ol-street-view--pegman-button-div #ol-street-view--pegman-button {
+.ol-street-view--activated-on-dragging
+    #ol-street-view--pegman-button-div
+    #ol-street-view--pegman-button {
     background-position: -2px -129px !important;
 }
-#ol-street-view--pegman-button-div #ol-street-view--pegman-draggable:hover + #ol-street-view--pegman-button,
+#ol-street-view--pegman-button-div
+    #ol-street-view--pegman-draggable:hover
+    + #ol-street-view--pegman-button,
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button:hover {
     background-position: -2px -189px;
 }
@@ -43,13 +47,17 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-#ol-street-view--pegman-button-div.ol-street-view--md-btn #ol-street-view--pegman-button,
-#ol-street-view--pegman-button-div.ol-street-view--md-btn #ol-street-view--pegman-draggable {
-    transform: scale(0.80);
+#ol-street-view--pegman-button-div.ol-street-view--md-btn
+    #ol-street-view--pegman-button,
+#ol-street-view--pegman-button-div.ol-street-view--md-btn
+    #ol-street-view--pegman-draggable {
+    transform: scale(0.8);
 }
 
-#ol-street-view--pegman-button-div.ol-street-view--sm-btn #ol-street-view--pegman-button,
-#ol-street-view--pegman-button-div.ol-street-view--sm-btn #ol-street-view--pegman-draggable {
+#ol-street-view--pegman-button-div.ol-street-view--sm-btn
+    #ol-street-view--pegman-button,
+#ol-street-view--pegman-button-div.ol-street-view--sm-btn
+    #ol-street-view--pegman-draggable {
     transform: scale(0.73);
 }
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button,
@@ -64,7 +72,7 @@
 }
 
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button:hover {
-   /** background-position: -109px -49px; */
+    /** background-position: -109px -49px; */
     cursor: move;
     cursor: -webkit-grab;
     cursor: -moz-grab;
@@ -127,7 +135,7 @@
 #ol-street-view--pegman-draggable.ol-street-view--active.ol-street-view--can-drop.ol-street-view--left::before {
     background-position: -2px -248px;
 }
-#ol-street-view--pegman-draggable.ol-street-view--active.ol-street-view--can-drop.ol-street-view--right::before {    
+#ol-street-view--pegman-draggable.ol-street-view--active.ol-street-view--can-drop.ol-street-view--right::before {
     background-position: -2px -309px;
 }
 
@@ -190,13 +198,8 @@
         display: block;
         border-bottom: 4px solid #222222;
     }
-    .ol-street-view--activated .ol-overlaycontainer-stopevent {
-        display: none;
-    }
-    /* .ol-street-view--activated-on-dragging .ol-overlaycontainer-stopevent,
-    .ol-street-view--activated-on-dragging
-        #ol-street-view--pegman-button-div
-        #ol-street-view--pegman-button {
+    /* Disables all the controls in the map when Street View is activated */
+    /* .ol-street-view--activated .ol-overlaycontainer-stopevent {
         display: none;
     } */
     .ol-street-view--activated-on-dragging .tippy-popper {

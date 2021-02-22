@@ -21,6 +21,12 @@
     "build": "npm run precleanstart && tsc --pretty --project ./tsconfig.json && tsc --pretty --project ./tsconfig-dist.json && npm run copy-assets && rollup --config rollup.config.dist.js && rollup --config rollup.config.js",
     "postbuild": "ncp tmp-lib/ol-street-view.d.ts dist/ol-street-view.d.ts && ncp tmp-lib/ol-street-view.d.ts lib/ol-street-view.d.ts && del-cli tmp-dist tmp-lib"
   },
+  "keywords": [
+    "ol",
+    "openlayers",
+    "street view",
+    "google street view"    
+  ],
   "author": "Gastón Zalba",
   "license": "MIT",
   "repository": {

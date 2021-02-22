@@ -930,6 +930,13 @@
 	};
 	var google;
 	var SV_MAX_DISTANCE_METERS = 100;
+	/**
+	 * Street View implementation for Open Layers.
+	 *
+	 * @constructor
+	 * @param map Instance of the created map
+	 * @param opt_options StreetView options, see [StreetView Options](#options) for more details.
+	 */
 
 	var StreetView = /*#__PURE__*/function () {
 	  function StreetView(map, opt_options) {
@@ -971,7 +978,7 @@
 
 	      var calculatePegmanIconOffset = function calculatePegmanIconOffset() {
 	        var heading = _this._pegmanHeading;
-	        var offset; // Calculating the sprite offset 
+	        var offset; // Calculating the sprite offset
 
 	        if (heading >= 0 && heading < 22.5) {
 	          offset = [0, 0];
