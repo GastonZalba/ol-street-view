@@ -5,5 +5,7 @@ export const es: i18n = {
     exitView: 'Salir de la vista Street View',
     dragToInit: 'Arrastre y suelte para iniciar Google Street View',
     noImages: 'Sin imágenes en la zona. Click en el mapa para trasladarse',
-    termsOfService: 'Condiciones del Servicio'
+    termsOfService: 'Condiciones del Servicio',
+    expand: 'Expandir',
+    minimize: 'Minimizar'
 };

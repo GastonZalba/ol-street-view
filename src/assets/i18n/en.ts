@@ -5,5 +5,7 @@ export const en: i18n = {
     exitView: 'Exit Street View mode',
     dragToInit: 'Drag and drop to initialize Google Street View',
     noImages: 'No images found. Click on the map to move',
-    termsOfService: 'Terms of Service'
+    termsOfService: 'Terms of Service',
+    expand: 'Expand',
+    minimize: 'Minimize'
 };

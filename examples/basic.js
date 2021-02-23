@@ -25,7 +25,8 @@
             apiKey: null,
             language: 'en',
             size: 'md',
-            resizable: true
+            resizable: true,
+            sizeToggler: true
         }
     );
 

@@ -882,7 +882,9 @@
 	  exitView: 'Salir de la vista Street View',
 	  dragToInit: 'Arrastre y suelte para iniciar Google Street View',
 	  noImages: 'Sin imágenes en la zona. Click en el mapa para trasladarse',
-	  termsOfService: 'Condiciones del Servicio'
+	  termsOfService: 'Condiciones del Servicio',
+	  expand: 'Expandir',
+	  minimize: 'Minimizar'
 	};
 
 	var en = {
@@ -890,7 +892,9 @@
 	  exitView: 'Exit Street View mode',
 	  dragToInit: 'Drag and drop to initialize Google Street View',
 	  noImages: 'No images found. Click on the map to move',
-	  termsOfService: 'Terms of Service'
+	  termsOfService: 'Terms of Service',
+	  expand: 'Expand',
+	  minimize: 'Minimize'
 	};
 
 	var languages = /*#__PURE__*/Object.freeze({
@@ -947,9 +951,10 @@
 	    // Default options
 	    this.options = Object.assign({
 	      apiKey: null,
-	      language: 'en',
 	      size: 'bg',
-	      resizable: true
+	      resizable: true,
+	      sizeToggler: true,
+	      language: 'en'
 	    }, opt_options); // Language support
 
 	    this._i18n = languages[this.options.language];
@@ -965,7 +970,9 @@
 
 	    this._addMapInteractions();
 
-	    this._createControl();
+	    this._createMapControls();
+
+	    this._prepareLayout();
 
 	    this._loadStreetView();
 	  }
@@ -1027,7 +1034,7 @@
 	        source: new source.XYZ({
 	          attributions: "&copy; ".concat(new Date().getFullYear(), " Google Maps <a href=\"https://www.google.com/help/terms_maps/\" target=\"_blank\">").concat(this._i18n.termsOfService, "</a>"),
 	          maxZoom: 19,
-	          url: 'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=40,18&x={x}&y={y}&z={z}'
+	          url: 'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
 	        })
 	      }); // Pegman Layer
 
@@ -1080,8 +1087,8 @@
 	     */
 
 	  }, {
-	    key: "_createControl",
-	    value: function _createControl() {
+	    key: "_prepareLayout",
+	    value: function _prepareLayout() {
 	      var _this3 = this;
 
 	      /**
@@ -1123,7 +1130,13 @@
 
 	              window.dispatchEvent(new Event('resize'));
 	            }
-	          }
+	          },
+	          modifiers: [interact__default['default'].modifiers.restrictSize({
+	            min: {
+	              width: null,
+	              height: 200
+	            }
+	          })]
 	        });
 	      };
 	      /**
@@ -1168,11 +1181,21 @@
 	          addHandlerResizable();
 	        }
 	      };
+
+	      addStreetViewHtml();
+	    }
+	    /**
+	     * @protected
+	     */
+
+	  }, {
+	    key: "_createMapControls",
+	    value: function _createMapControls() {
+	      var _this4 = this;
+
 	      /**
 	       * @protected
 	       */
-
-
 	      var addPegmanInteraction = function addPegmanInteraction() {
 	        var oldPosX = 0,
 	            stopInteract; // Grab Left/Right Direction of Mouse for Pegman Image
@@ -1180,39 +1203,39 @@
 	        var onMouseMove = function onMouseMove(e) {
 	          // Left
 	          if (e.pageX < oldPosX) {
-	            _this3.pegmanDraggable.classList.add('ol-street-view--left');
+	            _this4.pegmanDraggable.classList.add('ol-street-view--left');
 
-	            _this3.pegmanDraggable.classList.remove('ol-street-view--right'); // Right
+	            _this4.pegmanDraggable.classList.remove('ol-street-view--right'); // Right
 
 	          } else if (e.pageX > oldPosX) {
-	            _this3.pegmanDraggable.classList.add('ol-street-view--right');
+	            _this4.pegmanDraggable.classList.add('ol-street-view--right');
 
-	            _this3.pegmanDraggable.classList.remove('ol-street-view--left');
+	            _this4.pegmanDraggable.classList.remove('ol-street-view--left');
 	          }
 
 	          oldPosX = e.pageX;
 	          return oldPosX;
 	        };
 
-	        onMouseMove = onMouseMove.bind(_this3);
+	        onMouseMove = onMouseMove.bind(_this4);
 	        /**
 	         * @protected
 	         */
 
 	        var terminateDragging = function terminateDragging() {
-	          _this3._isDragging = false;
+	          _this4._isDragging = false;
 	          document.body.classList.remove('ol-street-view--activated-on-dragging'); // Reset Pegman
 
-	          _this3.pegmanDraggable.classList.remove('ol-street-view--can-drop', 'ol-street-view--dragged', 'ol-street-view--left', 'ol-street-view--right', 'ol-street-view--active', 'ol-street-view--dropped');
+	          _this4.pegmanDraggable.classList.remove('ol-street-view--can-drop', 'ol-street-view--dragged', 'ol-street-view--left', 'ol-street-view--right', 'ol-street-view--active', 'ol-street-view--dropped');
 
-	          _this3.pegmanDraggable.removeAttribute('style');
+	          _this4.pegmanDraggable.removeAttribute('style');
 
-	          _this3.pegmanDraggable.removeAttribute('data-x');
+	          _this4.pegmanDraggable.removeAttribute('data-x');
 
-	          _this3.pegmanDraggable.removeAttribute('data-y'); // Remove Dropzone Feedback
+	          _this4.pegmanDraggable.removeAttribute('data-y'); // Remove Dropzone Feedback
 
 
-	          _this3.viewport.classList.remove('ol-street-view--drop-active', 'ol-street-view--drop-target');
+	          _this4.viewport.classList.remove('ol-street-view--drop-active', 'ol-street-view--drop-target');
 
 	          document.removeEventListener('mousemove', onMouseMove);
 	        }; // Add Escape support to abort the dragging
@@ -1221,21 +1244,21 @@
 	        document.addEventListener('keydown', function (_ref) {
 	          var key = _ref.key;
 
-	          if (_this3._isDragging && key === 'Escape') {
+	          if (_this4._isDragging && key === 'Escape') {
 	            stopInteract();
 	            terminateDragging();
 
-	            _this3.map.removeLayer(_this3._streetViewXyzLayer);
+	            _this4.map.removeLayer(_this4._streetViewXyzLayer);
 	          }
 	        });
 	        interact__default['default']('.ol-street-view--draggable').draggable({
 	          inertia: false,
 	          onmove: function onmove(e) {
-	            _this3._isDragging = true;
+	            _this4._isDragging = true;
 	            stopInteract = e.interaction.stop;
 	            document.addEventListener('mousemove', onMouseMove);
 
-	            _this3.pegmanDraggable.classList.remove('ol-street-view--dropped');
+	            _this4.pegmanDraggable.classList.remove('ol-street-view--dropped');
 
 	            var pTarget = e.target,
 	                // Keep the Dragged Position in the data-x/data-y Attributes
@@ -1249,63 +1272,112 @@
 	          },
 	          onend: function onend(e) {
 	            // To compensate if the map is not 100%  width of the browser
-	            var mapDistanceY = _this3.mapContainer.offsetLeft - _this3.mapContainer.scrollLeft + _this3.mapContainer.clientLeft; // Compensate cursor offset
+	            var mapDistanceY = _this4.mapContainer.offsetLeft - _this4.mapContainer.scrollLeft + _this4.mapContainer.clientLeft; // Compensate cursor offset
 
-	            var location = _this3.map.getCoordinateFromPixel([e.client.x - mapDistanceY, e.client.y + _this3.pegmanDraggable.clientHeight]);
+	            var location = _this4.map.getCoordinateFromPixel([e.client.x - mapDistanceY, e.client.y + _this4.pegmanDraggable.clientHeight]);
 
-	            _this3._pegmanSelectedCoords = location;
+	            _this4._pegmanSelectedCoords = location;
 
-	            _this3._initPegmanOnMap();
+	            _this4._initPegmanOnMap();
 	          }
 	        }).styleCursor(false); // Enable Draggables to be Dropped into this Container
 
-	        interact__default['default'](_this3.viewport).dropzone({
+	        interact__default['default'](_this4.viewport).dropzone({
 	          accept: '.ol-street-view--draggable',
 	          overlap: 0.75,
 	          ondropactivate: function ondropactivate() {
-	            _this3.viewport.classList.add('ol-street-view--drop-active');
+	            _this4.viewport.classList.add('ol-street-view--drop-active');
 	          },
 	          ondragenter: function ondragenter() {
 	            // Add Stree View Layer showing areas wheres StreetView exists
-	            _this3.map.addLayer(_this3._streetViewXyzLayer);
+	            _this4.map.addLayer(_this4._streetViewXyzLayer);
 
 	            document.body.classList.add('ol-street-view--activated-on-dragging');
 
-	            _this3.pegmanDraggable.classList.add('ol-street-view--active', 'ol-street-view--can-drop');
+	            _this4.pegmanDraggable.classList.add('ol-street-view--active', 'ol-street-view--can-drop');
 
-	            _this3.viewport.classList.add('ol-street-view--drop-target');
+	            _this4.viewport.classList.add('ol-street-view--drop-target');
 	          },
 	          ondragleave: function ondragleave() {
 	            // Remove the Drop Feedback Style
-	            _this3.viewport.classList.remove('ol-street-view--drop-target');
+	            _this4.viewport.classList.remove('ol-street-view--drop-target');
 
-	            _this3.pegmanDraggable.classList.remove('ol-street-view--can-drop');
+	            _this4.pegmanDraggable.classList.remove('ol-street-view--can-drop');
 	          },
 	          ondrop: function ondrop() {
-	            _this3.pegmanDraggable.classList.add('ol-street-view--dropped');
+	            _this4.pegmanDraggable.classList.add('ol-street-view--dropped');
 	          },
 	          ondropdeactivate: function ondropdeactivate() {
 	            return terminateDragging();
 	          }
 	        });
 	      };
+	      /**
+	       * @protected
+	       */
 
-	      this.pegmanDivControl = document.createElement('div');
-	      this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-	      this.pegmanDivControl.className = "ol-street-view--".concat(this.options.size, "-btn");
-	      this.pegmanDivControl.title = this._i18n.dragToInit;
-	      this.pegmanDraggable = document.createElement('div');
-	      this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
-	      this.pegmanDraggable.className = 'ol-street-view--draggable ol-street-view--drag-drop';
-	      var pegmanBtn = document.createElement('div');
-	      pegmanBtn.id = 'ol-street-view--pegman-button';
-	      this.pegmanDivControl.append(this.pegmanDraggable);
-	      this.pegmanDivControl.append(pegmanBtn);
-	      this.map.addControl(new control.Control({
-	        element: this.pegmanDivControl
-	      }));
-	      addPegmanInteraction();
-	      addStreetViewHtml();
+
+	      var addPegmanControl = function addPegmanControl() {
+	        _this4.pegmanDivControl = document.createElement('div');
+	        _this4.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
+	        _this4.pegmanDivControl.className = "ol-street-view--".concat(_this4.options.size, "-btn");
+	        _this4.pegmanDivControl.title = _this4._i18n.dragToInit;
+	        _this4.pegmanDraggable = document.createElement('div');
+	        _this4.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
+	        _this4.pegmanDraggable.className = 'ol-street-view--draggable ol-street-view--drag-drop';
+	        var pegmanBtn = document.createElement('div');
+	        pegmanBtn.id = 'ol-street-view--pegman-button';
+
+	        _this4.pegmanDivControl.append(_this4.pegmanDraggable);
+
+	        _this4.pegmanDivControl.append(pegmanBtn);
+
+	        _this4.map.addControl(new control.Control({
+	          element: _this4.pegmanDivControl
+	        }));
+
+	        addPegmanInteraction();
+	      };
+
+	      var addSizeTogglerControl = function addSizeTogglerControl() {
+	        var togglerDiv = document.createElement('div');
+	        togglerDiv.className = 'ol-street-view--size-toggler ol-unselectable ol-control';
+	        var togglerBtn = document.createElement('button');
+	        togglerBtn.title = _this4._i18n.minimize;
+	        togglerBtn.innerHTML = '<div class="ol-street-view--size-toggler-img"></div>';
+
+	        togglerBtn.onclick = function () {
+	          var compactClass = 'ol-street-view--compact';
+	          document.body.classList.toggle(compactClass);
+
+	          if (document.body.classList.contains(compactClass)) {
+	            // Minimized
+	            togglerBtn.title = _this4._i18n.expand; // Store height for later
+
+	            _this4._lastHeight = _this4.viewport.style.height; // Restore height if it was resized
+
+	            _this4.viewport.style.height = null;
+	          } else {
+	            // Expanded
+	            togglerBtn.title = _this4._i18n.minimize;
+	            if (_this4._lastHeight) _this4.viewport.style.height = _this4._lastHeight;
+	          }
+
+	          _this4._refreshMap();
+	        };
+
+	        togglerDiv.append(togglerBtn);
+
+	        _this4.map.addControl(new control.Control({
+	          element: togglerDiv
+	        }));
+	      };
+
+	      addPegmanControl();
+
+	      if (this.options.sizeToggler) {
+	        addSizeTogglerControl();
+	      }
 	    }
 	    /**
 	     * @protected
@@ -1352,7 +1424,7 @@
 	  }, {
 	    key: "_updateStreetViewPosition",
 	    value: function _updateStreetViewPosition(coords) {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      var latLon = proj.transform(coords, this.view.getProjection(), 'EPSG:4326').reverse();
 	      var latLonGoogle = {
@@ -1362,15 +1434,13 @@
 	      var streetViewService = new google.maps.StreetViewService();
 	      streetViewService.getPanoramaByLocation(latLonGoogle, SV_MAX_DISTANCE_METERS, function (_, status) {
 	        if (status === google.maps.StreetViewStatus.OK) {
-	          _this4._panorama.setPosition(latLonGoogle);
+	          _this5._panorama.setPosition(latLonGoogle);
 
-	          _this4._panorama.setVisible(true);
+	          _this5._panorama.setVisible(true);
 	        } else {
-	          _this4._showNoDataMode();
+	          _this5._showNoDataMode();
 
-	          _this4._updatePegmanPosition(coords,
-	          /** transform = */
-	          false);
+	          _this5._updatePegmanPosition(coords, false);
 	        }
 	      });
 	    }
@@ -1393,6 +1463,15 @@
 
 	      this._pegmanFeature.getGeometry().setCoordinates(this._pegmanSelectedCoords);
 
+	      this._centerMapToPegman();
+	    }
+	    /**
+	     * @protected
+	     */
+
+	  }, {
+	    key: "_centerMapToPegman",
+	    value: function _centerMapToPegman() {
 	      this.view.animate({
 	        center: this._pegmanSelectedCoords,
 	        duration: 100
@@ -1405,7 +1484,7 @@
 	  }, {
 	    key: "_initStreetView",
 	    value: function _initStreetView() {
-	      var _this5 = this;
+	      var _this6 = this;
 
 	      this._panorama = new google.maps.StreetViewPanorama(this.streetViewPanoramaDiv, {
 	        pov: {
@@ -1416,19 +1495,21 @@
 	        visible: false,
 	        motionTracking: false,
 	        motionTrackingControl: false,
-	        radius: SV_MAX_DISTANCE_METERS
+	        radius: SV_MAX_DISTANCE_METERS,
+	        enableCloseButton: false,
+	        fullscreenControl: false
 	      });
 
 	      this._panorama.addListener('position_changed', function () {
-	        var position = _this5._panorama.getPosition();
+	        var position = _this6._panorama.getPosition();
 
-	        _this5._updatePegmanPosition(position);
+	        _this6._updatePegmanPosition(position);
 	      });
 
 	      this._panorama.addListener('pov_changed', function () {
-	        _this5._pegmanHeading = _this5._panorama.getPov().heading;
+	        _this6._pegmanHeading = _this6._panorama.getPov().heading;
 
-	        _this5._pegmanLayer.getSource().changed();
+	        _this6._pegmanLayer.getSource().changed();
 	      });
 
 	      var exitControlST = this.exitControlUI.cloneNode(true);
@@ -1490,12 +1571,12 @@
 	  }, {
 	    key: "_addClickListener",
 	    value: function _addClickListener() {
-	      var _this6 = this;
+	      var _this7 = this;
 
 	      var clickListener = function clickListener(evt) {
-	        var position = _this6.map.getCoordinateFromPixel(evt.pixel);
+	        var position = _this7.map.getCoordinateFromPixel(evt.pixel);
 
-	        _this6._updateStreetViewPosition(position);
+	        _this7._updateStreetViewPosition(position);
 
 	        evt.preventDefault();
 	        evt.stopPropagation();
@@ -1510,9 +1591,11 @@
 	  }, {
 	    key: "_refreshMap",
 	    value: function _refreshMap() {
+	      var centerToPegman = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 	      // Force refresh the layers
 	      this.map.updateSize();
 	      window.dispatchEvent(new Event('resize'));
+	      if (centerToPegman) this._centerMapToPegman();
 	    }
 	    /**
 	     * Show Street View mode
@@ -1522,7 +1605,13 @@
 	  }, {
 	    key: "showStreetView",
 	    value: function showStreetView() {
-	      // Only init one time
+	      if (this._lastHeight) {
+	        this.viewport.style.height = this._lastHeight;
+
+	        this._refreshMap(false);
+	      } // Only init one time
+
+
 	      if (!this._isInitialized) {
 	        this._initStreetView();
 	      }
@@ -1551,11 +1640,13 @@
 	      this._pegmanSelectedCoords = []; // Remove SV Layer
 
 	      this.map.removeLayer(this._streetViewXyzLayer);
-	      document.body.classList.remove('ol-street-view--activated'); // Restore height if it was resized
+	      document.body.classList.remove('ol-street-view--activated'); // Store height for later
+
+	      this._lastHeight = this.viewport.style.height; // Restore height if it was resized
 
 	      this.viewport.style.height = null;
 
-	      this._refreshMap();
+	      this._refreshMap(false);
 
 	      this._panorama.setVisible(false);
 

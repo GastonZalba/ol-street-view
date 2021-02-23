@@ -1,8 +1,20 @@
+/* Ol general fixes */
+.ol-control button {
+    cursor: pointer;
+}
+.ol-control.ol-attribution {
+	font-size: 11px;
+}
+.ol-control.ol-attribution a {
+	color: #000;
+}
+.ol-control.ol-attribution a:hover {
+	color: #0076ff;
+}
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
 */
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,

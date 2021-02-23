@@ -36,6 +36,7 @@ export default class StreetView {
     protected _translatePegman: Translate;
     protected _streetViewInitEvt: Event;
     protected _streetViewExitEvt: Event;
+    protected _lastHeight: string;
     constructor(map: PluggableMap, opt_options?: Options);
     /**
      * @protected
@@ -48,7 +49,11 @@ export default class StreetView {
     /**
      * @protected
      */
-    _createControl(): void;
+    _prepareLayout(): void;
+    /**
+     * @protected
+     */
+    _createMapControls(): void;
     /**
      * @protected
      */
@@ -61,6 +66,10 @@ export default class StreetView {
      * @protected
      */
     _updatePegmanPosition(coords: Coordinate | google.maps.LatLng, isGoogleFormat?: boolean): void;
+    /**
+     * @protected
+     */
+    _centerMapToPegman(): void;
     /**
      * @protected
      */
@@ -82,7 +91,7 @@ export default class StreetView {
     /**
      * @protected
      */
-    _refreshMap(): void;
+    _refreshMap(centerToPegman?: boolean): void;
     /**
      * Show Street View mode
      * @public
@@ -104,6 +113,8 @@ interface i18n {
     dragToInit: string;
     noImages: string;
     termsOfService: string;
+    expand: string;
+    minimize: string;
 }
 /**
  * **_[interface]_** - StreetView Options specified when creating an instance
@@ -113,14 +124,33 @@ interface i18n {
  * {
  *   apiKey: null;
  *   size: 'lg';
+ *   resizable: true;
+ *   sizeToggler: true;
  *   language: 'en';
  * }
  * ```
  */
 interface Options {
+    /**
+     * Google Maps Api Key
+     * If not provided, the map will be in inverted colors withe the message "For development purposes only"
+     */
     apiKey: string;
+    /**
+     * Size of the Pegman Control in the map
+     */
     size: 'sm' | 'md' | 'lg';
-    language: 'es' | 'en';
+    /**
+     * To display a handler that enable dragging changing the height of the layout
+     */
     resizable: boolean;
+    /**
+     * Control displayed once Street View is activated, to allow compact/expand the size of the map
+     */
+    sizeToggler: boolean;
+    /**
+     * Language support
+     */
+    language: 'es' | 'en';
 }
 export { Options, i18n };

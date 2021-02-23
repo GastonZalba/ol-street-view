@@ -20,3 +20,8 @@
 
 ## v1.0.4
 * Fixed handler visibility
+
+## v1.0.5
+* Added Control size toggler to show in compact mode
+* Changed Street View map style (to cyan)
+* Added min-height restriction to the map when Street View is active and resizable is enabled

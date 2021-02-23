@@ -5,12 +5,13 @@ Street View implementation for Open Layers.
 Tested with OpenLayers version 5 and 6.
 
 ## Disclaminer
+
 If you are going to use this module, read the Google [Terms of Service](https://www.google.com/help/terms_maps/)
 
 ## Examples
 
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.0.4/examples/basic.html)
+    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.0.5/examples/basic.html)
 
 ## Install
 
@@ -21,13 +22,13 @@ If you are going to use this module, read the Google [Terms of Service](https://
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@1.0.4"></script>
+<script src="https://unpkg.com/ol-street-view@1.0.5"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.0.4/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.0.5/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -59,6 +60,11 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [showStreetView](#showstreetview)
     -   [hideStreetView](#hidestreetview)
 -   [Options](#options)
+    -   [apiKey](#apikey)
+    -   [size](#size)
+    -   [resizable](#resizable)
+    -   [sizeToggler](#sizetoggler)
+    -   [language](#language)
 
 ### StreetView
 
@@ -71,15 +77,15 @@ Street View implementation for Open Layers.
 
 #### showStreetView
 
+Show Street View mode
+
 Returns **void**
 
 #### hideStreetView
 
+Disables Street View mode
+
 Returns **void**
-
-###
-
-transform =
 
 ### Options
 
@@ -91,14 +97,49 @@ Default values:
 {
     apiKey: null;
     size: 'lg';
+    resizable: true;
+    sizeToggler: true;
     language: 'en';
 }
 ```
 
+#### apiKey
+
+Google Maps Api Key
+If not provided, the map will be in inverted colors withe the message "For development purposes only"
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### size
+
+Size of the Pegman Control in the map
+
+Type: (`"sm"` \| `"md"` \| `"lg"`)
+
+#### resizable
+
+To display a handler that enable dragging changing the height of the layout
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
+#### sizeToggler
+
+Control displayed once Street View is activated, to allow compact/expand the size of the map
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
+#### language
+
+Language support
+
+Type: (`"es"` \| `"en"`)
+
 ## Todo
+-   Find the argument in the XYZ request that enables the Photo Spheres in the map
 -   ~~Add resizable screen option~~
 -   Add feedback support when element can't be dropped
 -   Add extra layout (vertical)
+-   ~~Add size toggler~~
 
 ## License
 
