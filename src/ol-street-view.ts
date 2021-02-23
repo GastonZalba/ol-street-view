@@ -881,6 +881,7 @@ interface i18n {
  *   size: 'lg';
  *   resizable: true;
  *   sizeToggler: true;
+ *   defaultMapSize: 'expanded';
  *   language: 'en';
  * }
  * ```
