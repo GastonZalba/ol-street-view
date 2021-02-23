@@ -149,6 +149,10 @@ interface Options {
      */
     sizeToggler: boolean;
     /**
+     * Default size of the map
+     */
+    defaultMapSize: 'expanded' | 'compact';
+    /**
      * Language support
      */
     language: 'es' | 'en';

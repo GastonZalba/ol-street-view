@@ -319,18 +319,21 @@
     border: 2px solid #000;
     overflow: hidden;
 }
+.ol-street-view--transitions .ol-street-view--map {
+    transition: 0.1s height, 0.1s width;
+}
 .ol-street-view--activated.ol-street-view--compact .ol-attribution {
     display: none;
 }
 .ol-street-view--activated.ol-street-view--compact .ol-zoom {
     opacity: 0;
-    transition: linear 0.3s opacity;
+    transition: 0.3s opacity;
 }
 .ol-street-view--activated.ol-street-view--compact
     .ol-street-view--map:hover
     .ol-zoom {
     opacity: 1;
-    transition: linear 0.3s opacity;
+    transition: 0.3s opacity;
 }
 
 #ol-street-view--pegman-button-div {

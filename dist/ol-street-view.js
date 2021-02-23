@@ -954,6 +954,7 @@
 	      size: 'bg',
 	      resizable: true,
 	      sizeToggler: true,
+	      defaultMapSize: 'expanded',
 	      language: 'en'
 	    }, opt_options); // Language support
 
@@ -1044,7 +1045,7 @@
 	        style: function style$1() {
 	          return new style.Style({
 	            image: new style.Icon({
-	              anchor: [0.5, 48],
+	              anchor: [0.5, 32],
 	              anchorXUnits: IconAnchorUnits.FRACTION,
 	              anchorYUnits: IconAnchorUnits.PIXELS,
 	              rotateWithView: true,
@@ -1103,6 +1104,9 @@
 
 	        _this3.viewport.append(scrollHandler);
 
+	        var debounceRefresh = debounce(function () {
+	          _this3._refreshMap(false);
+	        }, 150);
 	        interact__default['default'](_this3.viewport).resizable({
 	          edges: {
 	            top: scrollHandler,
@@ -1111,6 +1115,10 @@
 	            right: false
 	          },
 	          listeners: {
+	            start: function start() {
+	              // If not removed, the resize is very janky
+	              _this3.mapContainer.classList.remove('ol-street-view--transitions');
+	            },
 	            move: function move(event) {
 	              var _event$target$dataset = event.target.dataset,
 	                  x = _event$target$dataset.x,
@@ -1124,11 +1132,12 @@
 	                x: x,
 	                y: y
 	              });
+	              debounceRefresh();
 	            },
 	            end: function end() {
-	              _this3.map.updateSize();
+	              _this3.mapContainer.classList.add('ol-street-view--transitions');
 
-	              window.dispatchEvent(new Event('resize'));
+	              _this3._refreshMap(false);
 	            }
 	          },
 	          modifiers: [interact__default['default'].modifiers.restrictSize({
@@ -1167,7 +1176,8 @@
 	        streetViewNoResultsDiv.appendChild(_this3.exitControlUI);
 	        var parentMap = _this3.viewport.parentElement;
 	        _this3.mapContainer = document.createElement('div');
-	        _this3.mapContainer.id = 'ol-street-view--map-container'; // Move the map element (viewport) inside a new container
+	        _this3.mapContainer.id = 'ol-street-view--map-container';
+	        _this3.mapContainer.className = 'ol-street-view--transitions'; // Move the map element (viewport) inside a new container
 
 	        parentMap.replaceChild(_this3.mapContainer, _this3.viewport);
 
@@ -1274,7 +1284,7 @@
 	            // To compensate if the map is not 100%  width of the browser
 	            var mapDistanceY = _this4.mapContainer.offsetLeft - _this4.mapContainer.scrollLeft + _this4.mapContainer.clientLeft; // Compensate cursor offset
 
-	            var location = _this4.map.getCoordinateFromPixel([e.client.x - mapDistanceY, e.client.y + _this4.pegmanDraggable.clientHeight]);
+	            var location = _this4.map.getCoordinateFromPixel([e.client.x - mapDistanceY, e.client.y + _this4.pegmanDraggable.clientHeight - 10]);
 
 	            _this4._pegmanSelectedCoords = location;
 
@@ -1340,6 +1350,12 @@
 	      };
 
 	      var addSizeTogglerControl = function addSizeTogglerControl() {
+	        var compactClass = 'ol-street-view--compact';
+
+	        if (_this4.options.defaultMapSize === 'compact') {
+	          document.body.classList.add(compactClass);
+	        }
+
 	        var togglerDiv = document.createElement('div');
 	        togglerDiv.className = 'ol-street-view--size-toggler ol-unselectable ol-control';
 	        var togglerBtn = document.createElement('button');
@@ -1347,7 +1363,6 @@
 	        togglerBtn.innerHTML = '<div class="ol-street-view--size-toggler-img"></div>';
 
 	        togglerBtn.onclick = function () {
-	          var compactClass = 'ol-street-view--compact';
 	          document.body.classList.toggle(compactClass);
 
 	          if (document.body.classList.contains(compactClass)) {
@@ -1361,9 +1376,12 @@
 	            // Expanded
 	            togglerBtn.title = _this4._i18n.minimize;
 	            if (_this4._lastHeight) _this4.viewport.style.height = _this4._lastHeight;
-	          }
+	          } // Timeout to allow transition in ccs
 
-	          _this4._refreshMap();
+
+	          setTimeout(function () {
+	            _this4._refreshMap();
+	          }, 150);
 	        };
 
 	        togglerDiv.append(togglerBtn);
@@ -1605,12 +1623,16 @@
 	  }, {
 	    key: "showStreetView",
 	    value: function showStreetView() {
+	      var _this8 = this;
+
 	      if (this._lastHeight) {
 	        this.viewport.style.height = this._lastHeight;
+	      } // Timeout to allow transition in ccs
 
-	        this._refreshMap(false);
-	      } // Only init one time
 
+	      setTimeout(function () {
+	        _this8._refreshMap(false);
+	      }, 150); // Only init one time
 
 	      if (!this._isInitialized) {
 	        this._initStreetView();
@@ -1632,6 +1654,8 @@
 	  }, {
 	    key: "hideStreetView",
 	    value: function hideStreetView() {
+	      var _this9 = this;
+
 	      this._selectPegman.getFeatures().clear();
 
 	      var pegmanLayerSource = this._pegmanLayer.getSource();
@@ -1646,10 +1670,11 @@
 
 	      this.viewport.style.height = null;
 
-	      this._refreshMap(false);
-
 	      this._panorama.setVisible(false);
 
+	      setTimeout(function () {
+	        _this9._refreshMap(false);
+	      }, 150);
 	      Observable.unByKey(this._keyClickOnMap); // Maybe, exit fullscreen
 
 	      if (document.fullscreenElement) document.exitFullscreen();
@@ -1659,6 +1684,24 @@
 
 	  return StreetView;
 	}();
+
+	function debounce(func) {
+	  var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 250;
+	  var timeout;
+	  return function executedFunction() {
+	    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    var later = function later() {
+	      clearTimeout(timeout);
+	      func.apply(void 0, args);
+	    };
+
+	    clearTimeout(timeout);
+	    timeout = setTimeout(later, wait);
+	  };
+	}
 
 	return StreetView;
 

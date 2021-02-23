@@ -85,6 +85,7 @@ export default class StreetView {
             size: 'bg',
             resizable: true,
             sizeToggler: true,
+            defaultMapSize: 'expanded',
             language: 'en',
             ...opt_options
         };
@@ -177,7 +178,7 @@ export default class StreetView {
             style: () =>
                 new Style({
                     image: new Icon({
-                        anchor: [0.5, 48],
+                        anchor: [0.5, 32],
                         anchorXUnits: IconAnchorUnits.FRACTION,
                         anchorYUnits: IconAnchorUnits.PIXELS,
                         rotateWithView: true,
@@ -227,6 +228,10 @@ export default class StreetView {
             scrollHandler.innerHTML = '<span></span>';
             this.viewport.append(scrollHandler);
 
+            const debounceRefresh = debounce(() => {
+                this._refreshMap(false);
+            }, 150);
+
             interact(this.viewport).resizable({
                 edges: {
                     top: scrollHandler,
@@ -235,6 +240,12 @@ export default class StreetView {
                     right: false
                 },
                 listeners: {
+                    start: () => {
+                        // If not removed, the resize is very janky
+                        this.mapContainer.classList.remove(
+                            'ol-street-view--transitions'
+                        );
+                    },
                     move: (event) => {
                         let { x, y } = event.target.dataset;
 
@@ -246,10 +257,14 @@ export default class StreetView {
                         });
 
                         Object.assign(event.target.dataset, { x, y });
+
+                        debounceRefresh();
                     },
                     end: () => {
-                        this.map.updateSize();
-                        window.dispatchEvent(new Event('resize'));
+                        this.mapContainer.classList.add(
+                            'ol-street-view--transitions'
+                        );
+                        this._refreshMap(false);
                     }
                 },
                 modifiers: [
@@ -297,6 +312,7 @@ export default class StreetView {
 
             this.mapContainer = document.createElement('div');
             this.mapContainer.id = 'ol-street-view--map-container';
+            this.mapContainer.className = 'ol-street-view--transitions';
 
             // Move the map element (viewport) inside a new container
             parentMap.replaceChild(this.mapContainer, this.viewport);
@@ -429,7 +445,7 @@ export default class StreetView {
                         // Compensate cursor offset
                         const location = this.map.getCoordinateFromPixel([
                             e.client.x - mapDistanceY,
-                            e.client.y + this.pegmanDraggable.clientHeight
+                            e.client.y + this.pegmanDraggable.clientHeight - 10
                         ]);
 
                         this._pegmanSelectedCoords = location;
@@ -508,6 +524,12 @@ export default class StreetView {
         };
 
         const addSizeTogglerControl = (): void => {
+            const compactClass = 'ol-street-view--compact';
+
+            if (this.options.defaultMapSize === 'compact') {
+                document.body.classList.add(compactClass);
+            }
+
             const togglerDiv = document.createElement('div');
             togglerDiv.className =
                 'ol-street-view--size-toggler ol-unselectable ol-control';
@@ -517,8 +539,6 @@ export default class StreetView {
             togglerBtn.innerHTML =
                 '<div class="ol-street-view--size-toggler-img"></div>';
             togglerBtn.onclick = () => {
-                const compactClass = 'ol-street-view--compact';
-
                 document.body.classList.toggle(compactClass);
 
                 if (document.body.classList.contains(compactClass)) {
@@ -535,7 +555,10 @@ export default class StreetView {
                         this.viewport.style.height = this._lastHeight;
                 }
 
-                this._refreshMap();
+                // Timeout to allow transition in ccs
+                setTimeout(() => {
+                    this._refreshMap();
+                }, 150);
             };
 
             togglerDiv.append(togglerBtn);
@@ -753,8 +776,12 @@ export default class StreetView {
     showStreetView(): void {
         if (this._lastHeight) {
             this.viewport.style.height = this._lastHeight;
-            this._refreshMap(false);
         }
+
+        // Timeout to allow transition in ccs
+        setTimeout(() => {
+            this._refreshMap(false);
+        }, 150);
 
         // Only init one time
         if (!this._isInitialized) {
@@ -791,9 +818,11 @@ export default class StreetView {
         // Restore height if it was resized
         this.viewport.style.height = null;
 
-        this._refreshMap(false);
-
         this._panorama.setVisible(false);
+
+        setTimeout(() => {
+            this._refreshMap(false);
+        }, 150);
 
         unByKey(this._keyClickOnMap);
 
@@ -802,6 +831,30 @@ export default class StreetView {
 
         this.viewport.dispatchEvent(this._streetViewExitEvt);
     }
+}
+
+/**
+ * https://levelup.gitconnected.com/debounce-in-javascript-improve-your-applications-performance-5b01855e086
+ *
+ * Returns a function, that, as long as it continues to be invoked, will not
+ * be triggered. The function will be called after it stops being called for
+ * `wait` milliseconds.
+ * @protected
+ * @param func
+ * @param wait
+ */
+function debounce(func, wait = 250) {
+    let timeout: ReturnType<typeof setTimeout>;
+
+    return function executedFunction(...args): void {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 /**
@@ -853,6 +906,11 @@ interface Options {
      * Control displayed once Street View is activated, to allow compact/expand the size of the map
      */
     sizeToggler: boolean;
+
+    /**
+     * Default size of the map
+     */
+    defaultMapSize: 'expanded' | 'compact';
 
     /**
      * Language support

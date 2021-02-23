@@ -25,3 +25,9 @@
 * Added Control size toggler to show in compact mode
 * Changed Street View map style (to cyan)
 * Added min-height restriction to the map when Street View is active and resizable is enabled
+
+## v1.0.6
+* Better anchor point position in Pegman Feature
+* Added defaultMapSize option
+* Added CSS transitions on resize
+* Added debounce refreh while resizing layout

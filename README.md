@@ -64,6 +64,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [size](#size)
     -   [resizable](#resizable)
     -   [sizeToggler](#sizetoggler)
+    -   [defaultMapSize](#defaultmapsize)
     -   [language](#language)
 
 ### StreetView
@@ -128,6 +129,12 @@ Control displayed once Street View is activated, to allow compact/expand the siz
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
+#### defaultMapSize
+
+Default size of the map
+
+Type: (`"expanded"` \| `"compact"`)
+
 #### language
 
 Language support
@@ -135,6 +142,7 @@ Language support
 Type: (`"es"` \| `"en"`)
 
 ## Todo
+
 -   Find the argument in the XYZ request that enables the Photo Spheres in the map
 -   ~~Add resizable screen option~~
 -   Add feedback support when element can't be dropped

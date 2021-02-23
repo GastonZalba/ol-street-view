@@ -26,7 +26,8 @@
             language: 'en',
             size: 'md',
             resizable: true,
-            sizeToggler: true
+            sizeToggler: true,
+            defaultMapSize: 'expanded'
         }
     );
 
