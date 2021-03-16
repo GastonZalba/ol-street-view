@@ -88,6 +88,10 @@ Disables Street View mode
 
 Returns **void**
 
+###
+
+For Ol5
+
 ### Options
 
 **_[interface]_** - StreetView Options specified when creating an instance
@@ -96,11 +100,12 @@ Default values:
 
 ```javascript
 {
-    apiKey: null,
-    size: 'lg',
-    resizable: true,
-    sizeToggler: true,
-    language: 'en'
+  apiKey: null,
+  size: 'lg',
+  resizable: true,
+  sizeToggler: true,
+  defaultMapSize: 'expanded',
+  language: 'en'
 }
 ```
 
