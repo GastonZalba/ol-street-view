@@ -436,7 +436,6 @@ export default class StreetView {
                         pTarget.setAttribute('data-y', y);
                     },
                     onend: (e) => {
-
                         const viewportOffset = this.mapContainer.getBoundingClientRect();
 
                         // To compensate if the map is not 100%  width of the browser
@@ -446,7 +445,10 @@ export default class StreetView {
                         // Compensate cursor offset
                         const location = this.map.getCoordinateFromPixel([
                             e.client.x - mapDistanceX,
-                            e.client.y - mapDistanceY + this.pegmanDraggable.clientHeight - 10 
+                            e.client.y -
+                                mapDistanceY +
+                                this.pegmanDraggable.clientHeight -
+                                10
                         ]);
 
                         this._pegmanSelectedCoords = location;
