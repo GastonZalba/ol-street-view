@@ -1281,10 +1281,13 @@
 	            pTarget.setAttribute('data-y', y);
 	          },
 	          onend: function onend(e) {
-	            // To compensate if the map is not 100%  width of the browser
-	            var mapDistanceY = _this4.mapContainer.offsetLeft - _this4.mapContainer.scrollLeft + _this4.mapContainer.clientLeft; // Compensate cursor offset
+	            var viewportOffset = _this4.mapContainer.getBoundingClientRect(); // To compensate if the map is not 100%  width of the browser
 
-	            var location = _this4.map.getCoordinateFromPixel([e.client.x - mapDistanceY, e.client.y + _this4.pegmanDraggable.clientHeight - 10]);
+
+	            var mapDistanceX = viewportOffset.left;
+	            var mapDistanceY = viewportOffset.top; // Compensate cursor offset
+
+	            var location = _this4.map.getCoordinateFromPixel([e.client.x - mapDistanceX, e.client.y - mapDistanceY + _this4.pegmanDraggable.clientHeight - 10]);
 
 	            _this4._pegmanSelectedCoords = location;
 
@@ -1345,6 +1348,8 @@
 	        var controlParams = {
 	          element: _this4.pegmanDivControl,
 	          target: _this4.map.getTargetElement()
+	          /** For Ol5 */
+
 	        };
 
 	        _this4.map.addControl(new control.Control(controlParams));

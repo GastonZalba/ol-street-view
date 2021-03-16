@@ -35,3 +35,6 @@
 ## v1.0.7
 * Updated example CDN
 * Fixed bug when dragging pegman on OL 5
+
+## v1.0.8
+* Improved compensation of the viewport top and left offsets, when it's not 100% width and/or height

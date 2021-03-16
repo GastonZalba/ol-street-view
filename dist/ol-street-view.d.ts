@@ -122,12 +122,12 @@ interface i18n {
  * Default values:
  * ```javascript
  * {
- *   apiKey: null;
- *   size: 'lg';
- *   resizable: true;
- *   sizeToggler: true;
- *   defaultMapSize: 'expanded';
- *   language: 'en';
+ *   apiKey: null,
+ *   size: 'lg',
+ *   resizable: true,
+ *   sizeToggler: true,
+ *   defaultMapSize: 'expanded',
+ *   language: 'en'
  * }
  * ```
  */

@@ -31,7 +31,7 @@
 #ol-street-view--pegman-button-div {
     display: none;
     position: absolute;
-    top: 475px;
+    top: 470px;
     right: 20px;
     z-index: 10;
     width: 51px;
@@ -86,7 +86,7 @@
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button,
 #ol-street-view--pegman-draggable {
     will-change: transform;
-    transform-origin: center right;
+    transform-origin: top right;
 }
 
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button,
@@ -294,7 +294,7 @@
         overflow-y: inherit !important;
     }
     #ol-street-view--pegman-button-div {
-        top: 435px;
+        top: 315px;
     }
 }
 
