@@ -31,3 +31,7 @@
 * Added defaultMapSize option
 * Added CSS transitions on resize
 * Added debounce refreh while resizing layout
+
+## v1.0.7
+* Updated example CDN
+* Fixed bug when dragging pegman on OL 5

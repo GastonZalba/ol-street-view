@@ -37,6 +37,11 @@
     width: 51px;
     height: 51px;
 }
+#ol-street-view--pegman-button-div,
+#ol-street-view--pegman-button-div * {
+    pointer-events: auto; /* Ol 5 */
+}
+
 .ol-street-view--activated #ol-street-view--pegman-button-div {
     display: none;
 }

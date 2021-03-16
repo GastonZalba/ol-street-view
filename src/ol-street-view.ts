@@ -79,6 +79,7 @@ export default class StreetView {
     protected _lastHeight: string;
 
     constructor(map: PluggableMap, opt_options?: Options) {
+
         // Default options
         this.options = {
             apiKey: null,
@@ -162,9 +163,8 @@ export default class StreetView {
         this._streetViewXyzLayer = new TileLayer({
             zIndex: 10,
             source: new XYZ({
-                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">${
-                    this._i18n.termsOfService
-                }</a>`,
+                attributions: `&copy; ${new Date().getFullYear()} Google Maps <a href="https://www.google.com/help/terms_maps/" target="_blank">${this._i18n.termsOfService
+                    }</a>`,
                 maxZoom: 19,
                 url:
                     'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
@@ -514,10 +514,13 @@ export default class StreetView {
             this.pegmanDivControl.append(this.pegmanDraggable);
             this.pegmanDivControl.append(pegmanBtn);
 
+            const controlParams = { 
+                element: this.pegmanDivControl,
+                target: this.map.getTargetElement() /** For Ol5 */
+            }
+
             this.map.addControl(
-                new Control({
-                    element: this.pegmanDivControl
-                })
+                new Control(controlParams)
             );
 
             addPegmanInteraction();

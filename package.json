@@ -1,6 +1,6 @@
 {
   "name": "ol-street-view",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Street View implementation for Open Layers",
   "browser": "dist/ol-street-view.min.js",
   "main": "dist/ol-street-view.js",

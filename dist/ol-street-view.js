@@ -1342,9 +1342,12 @@
 
 	        _this4.pegmanDivControl.append(pegmanBtn);
 
-	        _this4.map.addControl(new control.Control({
-	          element: _this4.pegmanDivControl
-	        }));
+	        var controlParams = {
+	          element: _this4.pegmanDivControl,
+	          target: _this4.map.getTargetElement()
+	        };
+
+	        _this4.map.addControl(new control.Control(controlParams));
 
 	        addPegmanInteraction();
 	      };
