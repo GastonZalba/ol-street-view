@@ -38,3 +38,6 @@
 
 ## v1.0.8
 * Improved compensation of the viewport top and left offsets, when it's not 100% width and/or height
+
+## v1.0.9
+* Fixed minor css

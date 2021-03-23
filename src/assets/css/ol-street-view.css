@@ -1,6 +1,5 @@
 #ol-street-view--map-container {
     position: absolute;
-    z-index: 99;
     left: 0;
     bottom: 0;
     top: 0;
@@ -295,6 +294,13 @@
     }
     #ol-street-view--pegman-button-div {
         top: 315px;
+    }
+}
+
+@media all and (max-width: 960px) {
+    #ol-street-view--pegman-button-div {
+        top: 315px;
+        right: 10px;
     }
 }
 
