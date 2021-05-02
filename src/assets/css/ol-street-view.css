@@ -85,7 +85,7 @@
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button,
 #ol-street-view--pegman-draggable {
     will-change: transform;
-    transform-origin: top right;
+    transform-origin: center right;
 }
 
 #ol-street-view--pegman-button-div #ol-street-view--pegman-button,
@@ -263,12 +263,13 @@
     left: 10px;
     bottom: 10px;
 }
-.ol-street-view--size-toggler button {
+.ol-control.ol-street-view--size-toggler button {
     background-color: #ffffff !important;
     box-shadow: 0px 1px 4px rgb(0 0 0 / 30%);
     overflow: hidden;
     height: 31px;
     width: 31px;
+    margin: 0;
     padding-left: 3px;
 }
 
