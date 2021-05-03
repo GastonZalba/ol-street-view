@@ -955,7 +955,8 @@
 	      resizable: true,
 	      sizeToggler: true,
 	      defaultMapSize: 'expanded',
-	      language: 'en'
+	      language: 'en',
+	      target: null
 	    }, opt_options); // Language support
 
 	    this._i18n = languages[this.options.language];
@@ -1347,9 +1348,7 @@
 
 	        var controlParams = {
 	          element: _this4.pegmanDivControl,
-	          target: _this4.map.getTargetElement()
-	          /** For Ol5 */
-
+	          target: _this4.options.target
 	        };
 
 	        _this4.map.addControl(new control.Control(controlParams));

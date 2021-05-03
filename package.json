@@ -1,6 +1,6 @@
 {
   "name": "ol-street-view",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Street View implementation for Open Layers",
   "browser": "dist/ol-street-view.min.js",
   "main": "dist/ol-street-view.js",
@@ -18,7 +18,7 @@
     "format": "eslint --fix src/*.ts && prettier --write src",
     "lint": "eslint src/*.ts && prettier --check src",
     "copy-assets": "ncp src/assets/ tmp-dist/assets/ && ncp src/assets/ tmp-lib/assets/",
-    "build": "npm run precleanstart && tsc --pretty --project ./tsconfig.json && tsc --pretty --project ./tsconfig-dist.json && npm run copy-assets && rollup --config rollup.config.dist.js && rollup --config rollup.config.js",
+    "build": "npm run lint && npm run precleanstart && tsc --pretty --project ./tsconfig.json && tsc --pretty --project ./tsconfig-dist.json && npm run copy-assets && rollup --config rollup.config.dist.js && rollup --config rollup.config.js",
     "postbuild": "ncp tmp-lib/ol-street-view.d.ts dist/ol-street-view.d.ts && ncp tmp-lib/ol-street-view.d.ts lib/ol-street-view.d.ts && del-cli tmp-dist tmp-lib"
   },
   "keywords": [

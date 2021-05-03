@@ -28,7 +28,8 @@ var streetView;
             size: 'md',
             resizable: true,
             sizeToggler: true,
-            defaultMapSize: 'expanded'
+            defaultMapSize: 'expanded',
+            target: 'map'
         }
     );
 

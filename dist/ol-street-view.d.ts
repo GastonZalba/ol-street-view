@@ -154,6 +154,12 @@ interface Options {
      */
     defaultMapSize: 'expanded' | 'compact';
     /**
+     * Specify a target if you want the control to be rendered outside of the map's viewport.
+     * For Ol5, you must set a target to prevent the control from being rendered at the default
+     * target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
+     */
+    target: HTMLElement | string;
+    /**
      * Language support
      */
     language: 'es' | 'en';

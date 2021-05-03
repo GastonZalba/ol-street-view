@@ -2,7 +2,7 @@
 
 Street View implementation for Open Layers.
 
-Tested with OpenLayers version 5 and 6.
+Tested with OpenLayers version 5 and 6. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
 
 ## Disclaminer
 
@@ -11,7 +11,7 @@ If you are going to use this module, read the Google [Terms of Service](https://
 ## Examples
 
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.0.9/examples/basic.html)
+    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.1.0/examples/basic.html)
 
 ## Install
 
@@ -22,13 +22,13 @@ If you are going to use this module, read the Google [Terms of Service](https://
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@1.0.9"></script>
+<script src="https://unpkg.com/ol-street-view@1.1.0"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.0.9/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.0/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.

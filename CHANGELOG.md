@@ -34,10 +34,13 @@
 
 ## v1.0.7
 * Updated example CDN
-* Fixed bug when dragging pegman on OL 5
+* Fixed bug when dragging pegman on Ol5
 
 ## v1.0.8
 * Improved compensation of the viewport top and left offsets, when it's not 100% width and/or height
 
 ## v1.0.9
 * Fixed minor css
+
+## v1.1.0
+* Added customizable "target". If necessary, the control can be rendered outside the map. This allows a customizable workaround for Ol5, because the default target ("ol-overlaycontainer-stopevent") messes up the events in the control.

@@ -87,6 +87,7 @@ export default class StreetView {
             sizeToggler: true,
             defaultMapSize: 'expanded',
             language: 'en',
+            target: null,
             ...opt_options
         };
 
@@ -519,7 +520,7 @@ export default class StreetView {
 
             const controlParams = {
                 element: this.pegmanDivControl,
-                target: this.map.getTargetElement() /** For Ol5 */
+                target: this.options.target
             };
 
             this.map.addControl(new Control(controlParams));
@@ -916,6 +917,13 @@ interface Options {
      * Default size of the map
      */
     defaultMapSize: 'expanded' | 'compact';
+
+    /**
+     * Specify a target if you want the control to be rendered outside of the map's viewport.
+     * For Ol5, you must set a target to prevent the control from being rendered at the default
+     * target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
+     */
+    target: HTMLElement | string;
 
     /**
      * Language support
