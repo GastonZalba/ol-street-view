@@ -11,7 +11,7 @@ If you are going to use this module, read the Google [Terms of Service](https://
 ## Examples
 
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.1.0/examples/basic.html)
+    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.1.1/examples/basic.html)
 
 ## Install
 
@@ -22,13 +22,13 @@ If you are going to use this module, read the Google [Terms of Service](https://
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@1.1.0"></script>
+<script src="https://unpkg.com/ol-street-view@1.1.1"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.0/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.1/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -65,7 +65,9 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [resizable](#resizable)
     -   [sizeToggler](#sizetoggler)
     -   [defaultMapSize](#defaultmapsize)
+    -   [target](#target)
     -   [language](#language)
+    -   [i18n](#i18n)
 
 ### StreetView
 
@@ -88,10 +90,6 @@ Disables Street View mode
 
 Returns **void**
 
-###
-
-For Ol5
-
 ### Options
 
 **_[interface]_** - StreetView Options specified when creating an instance
@@ -105,7 +103,8 @@ Default values:
   resizable: true,
   sizeToggler: true,
   defaultMapSize: 'expanded',
-  language: 'en'
+  language: 'en',
+  i18n: {...} // Translations according to selected language
 }
 ```
 
@@ -140,11 +139,25 @@ Default size of the map
 
 Type: (`"expanded"` \| `"compact"`)
 
+#### target
+
+Specify a target if you want the control to be rendered outside of the map's viewport.
+For Ol5, you must set a target to prevent the control from being rendered at the default
+target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
+
+Type: ([HTMLElement](https://developer.mozilla.org/docs/Web/HTML/Element) \| [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String))
+
 #### language
 
 Language support
 
 Type: (`"es"` \| `"en"`)
+
+#### i18n
+
+Add custom translations
+
+Type: i18n
 
 ## Todo
 

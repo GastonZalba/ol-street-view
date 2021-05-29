@@ -82,17 +82,25 @@ export default class StreetView {
         // Default options
         this.options = {
             apiKey: null,
-            size: 'bg',
+            size: 'lg',
             resizable: true,
             sizeToggler: true,
             defaultMapSize: 'expanded',
             language: 'en',
             target: null,
-            ...opt_options
+            ...opt_options // Merge user options
         };
 
-        // Language support
-        this._i18n = languages[this.options.language];
+        // If language selector is provided and translation exists...
+        this._i18n =
+            languages[
+                this.options.language in languages
+                    ? this.options.language
+                    : 'en'
+            ];
+
+        // Merge custom translations
+        this._i18n = Object.assign(this._i18n, opt_options.i18n || {});
 
         this.map = map;
         this.view = map.getView();
@@ -887,7 +895,8 @@ interface i18n {
  *   resizable: true,
  *   sizeToggler: true,
  *   defaultMapSize: 'expanded',
- *   language: 'en'
+ *   language: 'en',
+ *   i18n: {...} // Translations according to selected language
  * }
  * ```
  */
@@ -901,34 +910,39 @@ interface Options {
     /**
      * Size of the Pegman Control in the map
      */
-    size: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'md' | 'lg';
 
     /**
      * To display a handler that enable dragging changing the height of the layout
      */
-    resizable: boolean;
+    resizable?: boolean;
 
     /**
      * Control displayed once Street View is activated, to allow compact/expand the size of the map
      */
-    sizeToggler: boolean;
+    sizeToggler?: boolean;
 
     /**
      * Default size of the map
      */
-    defaultMapSize: 'expanded' | 'compact';
+    defaultMapSize?: 'expanded' | 'compact';
 
     /**
      * Specify a target if you want the control to be rendered outside of the map's viewport.
      * For Ol5, you must set a target to prevent the control from being rendered at the default
      * target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
      */
-    target: HTMLElement | string;
+    target?: HTMLElement | string;
 
     /**
      * Language support
      */
-    language: 'es' | 'en';
+    language?: 'es' | 'en';
+
+    /**
+     * Add custom translations
+     */
+    i18n?: i18n;
 }
 
 export { Options, i18n };

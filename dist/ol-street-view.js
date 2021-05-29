@@ -951,15 +951,18 @@
 	    // Default options
 	    this.options = Object.assign({
 	      apiKey: null,
-	      size: 'bg',
+	      size: 'lg',
 	      resizable: true,
 	      sizeToggler: true,
 	      defaultMapSize: 'expanded',
 	      language: 'en',
 	      target: null
-	    }, opt_options); // Language support
+	    }, opt_options // Merge user options
+	    ); // If language selector is provided and translation exists...
 
-	    this._i18n = languages[this.options.language];
+	    this._i18n = languages[this.options.language in languages ? this.options.language : 'en']; // Merge custom translations
+
+	    this._i18n = Object.assign(this._i18n, opt_options.i18n || {});
 	    this.map = map;
 	    this.view = map.getView();
 	    this.viewport = map.getTargetElement();
@@ -1334,7 +1337,7 @@
 	      var addPegmanControl = function addPegmanControl() {
 	        _this4.pegmanDivControl = document.createElement('div');
 	        _this4.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-	        _this4.pegmanDivControl.className = "ol-street-view--".concat(_this4.options.size, "-btn");
+	        _this4.pegmanDivControl.className = "ol-control ol-street-view--".concat(_this4.options.size, "-btn");
 	        _this4.pegmanDivControl.title = _this4._i18n.dragToInit;
 	        _this4.pegmanDraggable = document.createElement('div');
 	        _this4.pegmanDraggable.id = 'ol-street-view--pegman-draggable';

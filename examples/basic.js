@@ -29,7 +29,10 @@ var streetView;
             resizable: true,
             sizeToggler: true,
             defaultMapSize: 'expanded',
-            target: 'map'
+            target: 'map',
+            i18n: {
+                dragToInit: 'Drag and drop me'
+            }
         }
     );
 
