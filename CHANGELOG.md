@@ -45,6 +45,6 @@
 ## v1.1.0
 * Added customizable "target". If necessary, the control can be rendered outside the map. This allows a customizable workaround for Ol5, because the default target ("ol-overlaycontainer-stopevent") messes up the events in the control.
 
-## v1.1.1
+## v1.1.2
 * Added Option property 'i18n' to allow custom translations
 * Fixed some properties in interface Options (required to optional)
