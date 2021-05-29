@@ -504,7 +504,7 @@ export default class StreetView {
         const addPegmanControl = (): void => {
             this.pegmanDivControl = document.createElement('div');
             this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-            this.pegmanDivControl.className = `ol-street-view--${this.options.size}-btn`;
+            this.pegmanDivControl.className = `ol-control ol-street-view--${this.options.size}-btn`;
             this.pegmanDivControl.title = this._i18n.dragToInit;
 
             this.pegmanDraggable = document.createElement('div');
