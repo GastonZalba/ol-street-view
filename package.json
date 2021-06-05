@@ -1,6 +1,6 @@
 {
   "name": "ol-street-view",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Street View implementation for Open Layers",
   "browser": "dist/ol-street-view.min.js",
   "main": "dist/ol-street-view.js",
@@ -39,9 +39,7 @@
   "homepage": "https://github.com/GastonZalba/ol-street-view#readme",
   "dependencies": {},
   "peerDependencies": {
-    "ol": ">=5.0.0",
-    "interactjs": ">=1.10.0",
-    "google-maps": ">=4.0.0"
+    "ol": ">=5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",

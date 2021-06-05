@@ -48,3 +48,7 @@
 ## v1.1.2
 * Added Option property 'i18n' to allow custom translations
 * Fixed some properties in interface Options (required to optional)
+
+## v1.1.3
+* Improved README
+* Removed some peerDependencies

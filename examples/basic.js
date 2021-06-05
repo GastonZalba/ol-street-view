@@ -1,4 +1,3 @@
-var streetView;
 (function () {
 
     var map = new ol.Map({
@@ -21,7 +20,7 @@ var streetView;
         })
     });
 
-    streetView = new StreetView(map,
+    var streetView = new StreetView(map,
         {
             apiKey: null,
             language: 'en',

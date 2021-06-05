@@ -11,7 +11,25 @@ If you are going to use this module, read the Google [Terms of Service](https://
 ## Examples
 
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.1.2/examples/basic.html)
+    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.1.3/examples/basic.html)
+
+## Usage
+
+```js
+// Default options
+var opt_options = {
+    apiKey: null, // Must be provided to remove "For development purposes only" message
+    language: 'en',
+    i18n: {...}, // Custom translations. Default is according to selected language
+    size: 'md',
+    resizable: true,
+    sizeToggler: true,
+    defaultMapSize: 'expanded',
+    target: 'map' // Important for OL 5
+}
+
+var streetView = new StreetView(map, opt_options);
+```
 
 ## Install
 
@@ -22,32 +40,38 @@ If you are going to use this module, read the Google [Terms of Service](https://
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@1.1.2"></script>
+<script src="https://unpkg.com/ol-street-view@1.1.3"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.2/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.3/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
 
 NPM package: [ol-street-view](https://www.npmjs.com/package/ol-street-view).
 
-#### JS
-
 Install the package via `npm`
 
     npm install ol-street-view --save-dev
 
+#### JS
+
+```js
+import StreetView from 'ol-street-view';
+```
+
 #### CSS
 
-The CSS files can be found in `./node_modules/ol-street-view/lib`
+```js
+import 'ol-street-view/dist/css/ol-street-view.min.css';
+```
 
 ##### TypeScript type definition
 
-TypeScript types are shipped with the project in the dist directory and should be automatically used in a TypeScript project. Interfaces are provided for Wfst Options.
+TypeScript types are shipped with the project in the dist directory and should be automatically used in a TypeScript project. Interfaces are provided for the Options.
 
 ## API
 
