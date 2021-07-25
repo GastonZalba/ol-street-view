@@ -52,3 +52,7 @@
 ## v1.1.3
 * Improved README
 * Removed some peerDependencies
+
+## v1.1.4
+* Moved some devDependencies to dependencies
+* `npm audit fix`
