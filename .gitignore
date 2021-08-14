@@ -1,8 +1,8 @@
 node_modules
 .cache
 package-lock.json
-tmp-dist
-tmp-lib
+*/tsconfig.tsbuildinfo
+.rollup.cache
 local_test
 keys.json
 images_dev

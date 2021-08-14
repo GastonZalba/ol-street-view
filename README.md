@@ -11,7 +11,7 @@ If you are going to use this module, read the Google [Terms of Service](https://
 ## Examples
 
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.1.4/examples/basic.html)
+    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v1.1.5/examples/basic.html)
 
 ## Usage
 
@@ -40,13 +40,13 @@ var streetView = new StreetView(map, opt_options);
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@1.1.4"></script>
+<script src="https://unpkg.com/ol-street-view@1.1.5"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.4/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.5/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -99,7 +99,7 @@ Street View implementation for Open Layers.
 
 #### Parameters
 
--   `map` **[PluggableMap](https://openlayers.org/en/latest/apidoc/module-ol_PluggableMap-PluggableMap.html)** Instance of the created map
+-   `map` **PluggableMap** Instance of the created map
 -   `opt_options` **[Options](#options)?** StreetView options, see [StreetView Options](#options) for more details.
 
 #### showStreetView
@@ -116,7 +116,7 @@ Returns **void**
 
 ### Options
 
-**_[interface]_** - StreetView Options specified when creating an instance
+**_\[interface]_** - StreetView Options specified when creating an instance
 
 Default values:
 
@@ -143,7 +143,7 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 Size of the Pegman Control in the map
 
-Type: (`"sm"` \| `"md"` \| `"lg"`)
+Type: (`"sm"` | `"md"` | `"lg"`)
 
 #### resizable
 
@@ -161,7 +161,7 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 Default size of the map
 
-Type: (`"expanded"` \| `"compact"`)
+Type: (`"expanded"` | `"compact"`)
 
 #### target
 
@@ -169,13 +169,13 @@ Specify a target if you want the control to be rendered outside of the map's vie
 For Ol5, you must set a target to prevent the control from being rendered at the default
 target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
 
-Type: ([HTMLElement](https://developer.mozilla.org/docs/Web/HTML/Element) \| [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String))
+Type: ([HTMLElement](https://developer.mozilla.org/docs/Web/HTML/Element) | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String))
 
 #### language
 
 Language support
 
-Type: (`"es"` \| `"en"`)
+Type: (`"es"` | `"en"`)
 
 #### i18n
 
@@ -186,10 +186,10 @@ Type: i18n
 ## Todo
 
 -   Find the argument in the XYZ request that enables the Photo Spheres in the map
--   ~~Add resizable screen option~~
+-   \~~Add resizable screen option~~
 -   Add feedback support when element can't be dropped
 -   Add extra layout (vertical)
--   ~~Add size toggler~~
+-   \~~Add size toggler~~
 
 ## License
 

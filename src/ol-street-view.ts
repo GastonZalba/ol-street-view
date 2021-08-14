@@ -20,7 +20,7 @@ import { Loader } from 'google-maps';
 import pegmanMarkerSprites from './assets/images/pegman_marker.png';
 import noImagesSvg from './assets/images/no_images.svg';
 
-import * as languages from './assets/i18n/index';
+import * as languages from './components/i18n/index';
 
 // Css
 import './assets/css/ol-street-view.css';

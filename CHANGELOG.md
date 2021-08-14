@@ -56,3 +56,9 @@
 ## v1.1.4
 * Moved some devDependencies to dependencies
 * `npm audit fix`
+
+## v1.1.5
+* Improved typescript and rollup configuration
+* Added "watch" script
+* Updated dependencies
+* Added Source Maps

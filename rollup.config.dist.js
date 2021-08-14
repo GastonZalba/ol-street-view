@@ -7,6 +7,10 @@ import { terser } from "rollup-plugin-terser";
 import css from 'rollup-plugin-css-only';
 import { mkdirSync, writeFileSync } from 'fs';
 import CleanCss from 'clean-css';
+import typescript from '@rollup/plugin-typescript';
+import del from 'rollup-plugin-delete';
+import serve from 'rollup-plugin-serve';
+import livereload from 'rollup-plugin-livereload';
 
 let globals = {
     'ol': 'ol',
@@ -34,76 +38,109 @@ let globals = {
     'google-maps': 'google-maps'
 };
 
-module.exports = {
-    input: 'tmp-dist/ol-street-view.js',
-    output: [
-        {
-            file: pkg.main,
-            format: 'umd',
-            name: 'StreetView',
-            globals: globals
-        },
-        {
-            file: pkg.browser,
-            format: 'umd',
-            plugins: [terser()],
-            name: 'StreetView',
-            globals: globals
-        }
-    ],
-    plugins: [
-        resolve(),
-        commonjs(),
-        babel({
-            babelrc: false,
-            plugins: ["@babel/plugin-transform-runtime"],
-            babelHelpers: 'runtime',
-            exclude: 'node_modules/**',
-            presets: [
-                [
-                    '@babel/preset-env',
-                    {                        
-                        targets: {
-                            browsers: [
-                                "Chrome >= 52",
-                                "FireFox >= 44",
-                                "Safari >= 7",
-                                "Explorer 11",
-                                "last 4 Edge versions"
-                            ]
-                        }
-                    }
-                ]
-            ]
-        }),
-        image(),
-        css({
-            output: function (styles, styleNodes) {
-                mkdirSync('dist/css', { recursive: true });
-                writeFileSync('dist/css/ol-street-view.css', styles)
-                const compressed = new CleanCss().minify(styles).styles;
-                writeFileSync('dist/css/ol-street-view.min.css', compressed)
+export default function (commandOptions) {
+    return {
+        input: 'src/ol-street-view.ts',
+        output: [
+            {
+                dir: 'dist',
+                format: 'umd',
+                name: 'StreetView',
+                globals: globals,
+                sourcemap: true
+            },
+            !commandOptions.dev && {
+                file: pkg.browser,
+                format: 'umd',
+                plugins: [terser()],
+                name: 'StreetView',
+                globals: globals,
+                sourcemap: true
             }
-        })
-    ],
-    external: [
-        'ol',
-        'ol/Map',
-        'ol/source',
-        'ol/layer',
-        'ol/geom',
-        'ol/Feature',
-        'ol/Overlay',
-        'ol/Control',
-        'ol/style',
-        'ol/control',
-        'ol/proj',
-        'ol/Observable',
-        'ol/format',
-        'ol/events',
-        'ol/interaction',
-        'ol/coordinate',
-        'ol/interaction/Translate',
-        'interactjs'
-    ]
-};
+        ],
+        plugins: [
+            del({ targets: 'dist/*' }),
+            typescript(
+                {
+                    outDir: './dist',
+                    declarationDir: './dist',
+                    outputToFilesystem: true
+                }
+            ),
+            resolve(),
+            commonjs(),
+            babel({
+                babelrc: false,
+                plugins: ["@babel/plugin-transform-runtime"],
+                babelHelpers: 'runtime',
+                exclude: 'node_modules/**',
+                presets: [
+                    [
+                        '@babel/preset-env',
+                        {
+                            targets: {
+                                browsers: [
+                                    "Chrome >= 52",
+                                    "FireFox >= 44",
+                                    "Safari >= 7",
+                                    "Explorer 11",
+                                    "last 4 Edge versions"
+                                ]
+                            }
+                        }
+                    ]
+                ]
+            }),
+            image(),
+            css({
+                output: function (styles) {
+                    mkdirSync('dist/css', { recursive: true });
+                    writeFileSync('dist/css/ol-street-view.css', styles);
+                    if (!commandOptions.dev) {
+                        const compressed = new CleanCss().minify(styles).styles;
+                        writeFileSync('dist/css/ol-street-view.min.css', compressed);
+                    }
+                }
+            }),
+            commandOptions.dev && serve({
+                open: false,
+                verbose: true,
+                contentBase: ['', 'examples'],
+                historyApiFallback: '/basic.html',
+                host: 'localhost',
+                port: 3000,
+                // execute function after server has begun listening
+                onListening: function (server) {
+                    const address = server.address()
+                    // by using a bound function, we can access options as `this`
+                    const protocol = this.https ? 'https' : 'http'
+                    console.log(`Server listening at ${protocol}://localhost:${address.port}/`)
+                }
+            }),
+            commandOptions.dev && livereload({
+                watch: ['src'],
+                delay: 500
+            })
+        ],
+        external: [
+            'ol',
+            'ol/Map',
+            'ol/source',
+            'ol/layer',
+            'ol/geom',
+            'ol/Feature',
+            'ol/Overlay',
+            'ol/Control',
+            'ol/style',
+            'ol/control',
+            'ol/proj',
+            'ol/Observable',
+            'ol/format',
+            'ol/events',
+            'ol/interaction',
+            'ol/coordinate',
+            'ol/interaction/Translate',
+            'interactjs'
+        ]
+    }
+}

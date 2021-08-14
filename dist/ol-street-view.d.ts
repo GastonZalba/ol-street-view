@@ -170,3 +170,4 @@ interface Options {
     i18n?: i18n;
 }
 export { Options, i18n };
+//# sourceMappingURL=ol-street-view.d.ts.map

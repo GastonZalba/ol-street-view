@@ -1,44 +1,26 @@
-import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
 import image from '@rollup/plugin-image';
 import css from 'rollup-plugin-css-only'
 import { mkdirSync, writeFileSync } from 'fs';
+import typescript from '@rollup/plugin-typescript';
+import del from 'rollup-plugin-delete';
 
 module.exports = {
-    input: 'tmp-lib/ol-street-view.js',
+    input: 'src/ol-street-view.ts',
     output: [
         {
-            file: pkg.module,
+            dir: 'lib',
             format: 'es',
-            name: 'StreetView',
-            globals: {
-                'ol': 'ol',
-                'ol/Map': 'ol.Map',
-                'ol/source': 'ol.source',
-                'ol/layer': 'ol.layer',
-                'ol/layer/VectorTile': 'ol.layer.VectorTile',
-                'ol/geom': 'ol.geom',
-                'ol/geom/Polygon': 'ol.geom.Polygon',
-                'ol/Feature': 'ol.Feature',
-                'ol/Overlay': 'ol.Overlay',
-                'ol/style': 'ol.style',
-                'ol/control': 'ol.control',
-                'ol/proj': 'ol.proj',
-                'ol/extent': 'ol.extent',
-                'ol/Observable': 'ol.Observable',
-                'ol/format': 'ol.format',
-                'ol/events': 'ol.events',
-                'ol/interaction': 'ol.interaction',
-                'ol/TileState': 'ol.TileState',
-                'ol/coordinate': 'ol.coordinate',
-                'ol/style/IconAnchorUnits': 'ol.style.IconAnchorUnits',
-                'ol/interaction/Translate': 'ol.interaction.Translate',
-                'interactjs': 'interactjs',
-                'google-maps': 'google-maps'
-            }
+            sourcemap: true
         }
     ],
     plugins: [
+        del({ targets: 'lib/*' }),
+        typescript({
+            outDir: './lib',
+            declarationDir: './lib',
+            outputToFilesystem: true
+        }),
         image(),
         babel({
             presets: [
@@ -53,7 +35,7 @@ module.exports = {
             ],
             babelHelpers: 'bundled',
             exclude: ["node_modules/**", "src/assets/**"]
-        }),        
+        }),
         css({
             output: function (styles, styleNodes) {
                 mkdirSync('lib/css', { recursive: true });
