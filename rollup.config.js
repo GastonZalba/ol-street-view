@@ -4,6 +4,7 @@ import css from 'rollup-plugin-css-only'
 import { mkdirSync, writeFileSync } from 'fs';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
+import path from 'path';
 
 module.exports = {
     input: 'src/ol-street-view.ts',
@@ -43,25 +44,5 @@ module.exports = {
             }
         })
     ],
-    external: [
-        'ol',
-        'ol/Map',
-        'ol/source',
-        'ol/layer',
-        'ol/geom',
-        'ol/Feature',
-        'ol/Overlay',
-        'ol/style',
-        'ol/control',
-        'ol/proj',
-        'ol/Observable',
-        'ol/format',
-        'ol/events',
-        'ol/interaction',
-        'ol/coordinate',
-        'ol/style/IconAnchorUnits',
-        'ol/interaction/Translate',
-        'interactjs',
-        'google-maps'
-    ]
+    external: id => !(path.isAbsolute(id) || id.startsWith("."))
 };

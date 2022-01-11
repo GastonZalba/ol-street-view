@@ -62,3 +62,9 @@
 * Added "watch" script
 * Updated dependencies
 * Added Source Maps
+
+## v1.1.7
+* Updated dependencies
+* Fixed resizable scrollbar (css)
+* Added .gitattributes
+* Fixed example link on README
