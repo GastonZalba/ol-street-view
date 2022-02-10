@@ -28,7 +28,8 @@ var opt_options = {
     target: 'map' // Important for OL 5
 }
 
-var streetView = new StreetView(map, opt_options);
+var streetView = new StreetView(opt_options);
+map.addControl(streetView);
 ```
 
 ## Install
@@ -40,13 +41,13 @@ var streetView = new StreetView(map, opt_options);
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@1.1.7"></script>
+<script src="https://unpkg.com/ol-street-view@2.0.0"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@1.1.7/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.0/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -66,7 +67,9 @@ import StreetView from 'ol-street-view';
 #### CSS
 
 ```js
-import 'ol-street-view/dist/css/ol-street-view.min.css';
+import 'ol-street-view/lib/style/css/ol-street-view.css';
+//or
+import 'ol-street-view/lib/style/scss/ol-street-view.scss';
 ```
 
 ##### TypeScript type definition
@@ -81,7 +84,9 @@ TypeScript types are shipped with the project in the dist directory and should b
 
 -   [StreetView](#streetview)
     -   [Parameters](#parameters)
+    -   [getStreetViewPanorama](#getstreetviewpanorama)
     -   [showStreetView](#showstreetview)
+        -   [Parameters](#parameters-1)
     -   [hideStreetView](#hidestreetview)
 -   [Options](#options)
     -   [apiKey](#apikey)
@@ -95,18 +100,30 @@ TypeScript types are shipped with the project in the dist directory and should b
 
 ### StreetView
 
+**Extends ol/control/Control~Control**
+
 Street View implementation for Open Layers.
 
 #### Parameters
 
--   `map` **PluggableMap** Instance of the created map
 -   `opt_options` **[Options](#options)?** StreetView options, see [StreetView Options](#options) for more details.
+
+#### getStreetViewPanorama
+
+This is useful if wou wanna add a custom icon on the panorama instance,
+add custom listeners, etc
+
+Returns **google.maps.StreetViewPanorama**
 
 #### showStreetView
 
 Show Street View mode
 
-Returns **void**
+##### Parameters
+
+-   `coords` **Coordinate** Must be in the map projection format
+
+Returns **google.maps.StreetViewPanorama**
 
 #### hideStreetView
 
@@ -135,7 +152,7 @@ Default values:
 #### apiKey
 
 Google Maps Api Key
-If not provided, the map will be in inverted colors withe the message "For development purposes only"
+If not provided, the map will be in inverted colors with the message "For development purposes only"
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
@@ -159,9 +176,9 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 #### defaultMapSize
 
-Default size of the map
+Default size of the map when the Street View is activated
 
-Type: (`"expanded"` | `"compact"`)
+Type: (`"expanded"` | `"compact"` | `"hidden"`)
 
 #### target
 
@@ -189,8 +206,9 @@ Type: i18n
 -   \~~Add resizable screen option~~
 -   Add feedback support when element can't be dropped
 -   Add extra layout (vertical)
--   Add scss
+-   r~~Add scss~~
 -   \~~Add size toggler~~
+-   Improve scss style (add some variables)
 
 ## License
 

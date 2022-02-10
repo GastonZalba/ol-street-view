@@ -68,3 +68,12 @@
 * Fixed resizable scrollbar (css)
 * Added .gitattributes
 * Fixed example link on README
+
+## v2.0.0
+* Refactored code: class extends class ol.control.Control (breaking changes)
+* Added method `getStreetViewPanorama` to allow get the Google Maps Panorama instance
+* Added/fixed method `showStreetView` to initialize panorama mode programatically
+* Added event 'loadPano'
+* Added example to add custom icon on the OpenLayers map and in the Street View Panorama
+* Added mapsSize 'hidden' to allow Street View on full screen mode
+* Removed interactjs from dependencies

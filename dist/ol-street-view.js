@@ -147,15 +147,23 @@
 
     let google;
     const SV_MAX_DISTANCE_METERS = 100;
+    const controlElement = document.createElement('div');
     /**
      * Street View implementation for Open Layers.
      *
      * @constructor
-     * @param map Instance of the created map
+     * @fires loadLib
+     * @fires streetViewExit
+     * @fires streetViewInit
      * @param opt_options StreetView options, see [StreetView Options](#options) for more details.
+     * @extends {ol/control/Control~Control}
      */
-    class StreetView {
-        constructor(map, opt_options) {
+    class StreetView extends control.Control {
+        constructor(opt_options) {
+            super({
+                element: controlElement,
+                target: opt_options.target
+            });
             // Default options
             this.options = Object.assign({ apiKey: null, size: 'lg', resizable: true, sizeToggler: true, defaultMapSize: 'expanded', language: 'en', target: null }, opt_options // Merge user options
             );
@@ -166,18 +174,19 @@
                     : 'en'];
             // Merge custom translations
             this._i18n = Object.assign(this._i18n, opt_options.i18n || {});
-            this.map = map;
-            this.view = map.getView();
-            this.viewport = map.getTargetElement();
             this._pegmanSelectedCoords = [];
             this._pegmanHeading = 180;
-            this._streetViewInitEvt = new Event('streetViewInit');
-            this._streetViewExitEvt = new Event('streetViewExit');
-            this._prepareLayers();
-            this._addMapInteractions();
-            this._createMapControls();
-            this._prepareLayout();
             this._loadStreetView();
+            // @ts-expect-error
+            this.on('loadLib', () => {
+                this._map = super.getMap();
+                this._view = this._map.getView();
+                this._viewport = this._map.getTargetElement();
+                this._prepareLayers();
+                this._addMapInteractions();
+                this._createMapControls();
+                this._prepareLayout();
+            });
         }
         /**
          * @protected
@@ -264,7 +273,7 @@
                     })
                 })
             });
-            this.map.addLayer(this._pegmanLayer);
+            this._map.addLayer(this._pegmanLayer);
         }
         /**
          * @protected
@@ -279,7 +288,7 @@
                 features: this._selectPegman.getFeatures()
             });
             this._translatePegman.on('translateend', translatePegmanHandler);
-            this.map.addInteraction(this._translatePegman);
+            this._map.addInteraction(this._translatePegman);
         }
         /**
          * @protected
@@ -294,11 +303,11 @@
                 const scrollHandler = document.createElement('div');
                 scrollHandler.className = 'ol-street-view--scroll-handler';
                 scrollHandler.innerHTML = '<span></span>';
-                this.viewport.append(scrollHandler);
+                this._viewport.append(scrollHandler);
                 const debounceRefresh = debounce(() => {
                     this._refreshMap(false);
                 }, 150);
-                interact__default['default'](this.viewport).resizable({
+                interact__default['default'](this._viewport).resizable({
                     edges: {
                         top: scrollHandler,
                         left: false,
@@ -361,15 +370,15 @@
                 //this.exitControlUI.index = 1;
                 this.exitControlUI.onclick = this.hideStreetView.bind(this);
                 streetViewNoResultsDiv.appendChild(this.exitControlUI);
-                const parentMap = this.viewport.parentElement;
+                const parentMap = this._viewport.parentElement;
                 this.mapContainer = document.createElement('div');
                 this.mapContainer.id = 'ol-street-view--map-container';
                 this.mapContainer.className = 'ol-street-view--transitions';
                 // Move the map element (viewport) inside a new container
-                parentMap.replaceChild(this.mapContainer, this.viewport);
+                parentMap.replaceChild(this.mapContainer, this._viewport);
                 this.mapContainer.appendChild(this.streetViewPanoramaDiv);
-                this.mapContainer.appendChild(this.viewport);
-                this.viewport.classList.add('ol-street-view--map');
+                this.mapContainer.appendChild(this._viewport);
+                this._viewport.classList.add('ol-street-view--map');
                 if (this.options.resizable) {
                     addHandlerResizable();
                 }
@@ -413,7 +422,7 @@
                     this.pegmanDraggable.removeAttribute('data-x');
                     this.pegmanDraggable.removeAttribute('data-y');
                     // Remove Dropzone Feedback
-                    this.viewport.classList.remove('ol-street-view--drop-active', 'ol-street-view--drop-target');
+                    this._viewport.classList.remove('ol-street-view--drop-active', 'ol-street-view--drop-target');
                     document.removeEventListener('mousemove', onMouseMove);
                 };
                 // Add Escape support to abort the dragging
@@ -421,7 +430,7 @@
                     if (this._isDragging && key === 'Escape') {
                         stopInteract();
                         terminateDragging();
-                        this.map.removeLayer(this._streetViewXyzLayer);
+                        this._map.removeLayer(this._streetViewXyzLayer);
                     }
                 });
                 interact__default['default']('.ol-street-view--draggable')
@@ -449,7 +458,7 @@
                         const mapDistanceX = viewportOffset.left;
                         const mapDistanceY = viewportOffset.top;
                         // Compensate cursor offset
-                        const location = this.map.getCoordinateFromPixel([
+                        const location = this._map.getCoordinateFromPixel([
                             e.client.x - mapDistanceX,
                             e.client.y -
                                 mapDistanceY +
@@ -462,22 +471,21 @@
                 })
                     .styleCursor(false);
                 // Enable Draggables to be Dropped into this Container
-                interact__default['default'](this.viewport).dropzone({
+                interact__default['default'](this._viewport).dropzone({
                     accept: '.ol-street-view--draggable',
                     overlap: 0.75,
                     ondropactivate: () => {
-                        this.viewport.classList.add('ol-street-view--drop-active');
+                        this._viewport.classList.add('ol-street-view--drop-active');
                     },
                     ondragenter: () => {
-                        // Add Stree View Layer showing areas wheres StreetView exists
-                        this.map.addLayer(this._streetViewXyzLayer);
+                        this._addStreetViewLayer();
                         document.body.classList.add('ol-street-view--activated-on-dragging');
                         this.pegmanDraggable.classList.add('ol-street-view--active', 'ol-street-view--can-drop');
-                        this.viewport.classList.add('ol-street-view--drop-target');
+                        this._viewport.classList.add('ol-street-view--drop-target');
                     },
                     ondragleave: () => {
                         // Remove the Drop Feedback Style
-                        this.viewport.classList.remove('ol-street-view--drop-target');
+                        this._viewport.classList.remove('ol-street-view--drop-target');
                         this.pegmanDraggable.classList.remove('ol-street-view--can-drop');
                     },
                     ondrop: () => {
@@ -490,9 +498,9 @@
              * @protected
              */
             const addPegmanControl = () => {
-                this.pegmanDivControl = document.createElement('div');
+                this.pegmanDivControl = controlElement;
                 this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-                this.pegmanDivControl.className = `ol-control ol-street-view--${this.options.size}-btn`;
+                this.pegmanDivControl.className = `ol-street-view--${this.options.size}-btn`;
                 this.pegmanDivControl.title = this._i18n.dragToInit;
                 this.pegmanDraggable = document.createElement('div');
                 this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
@@ -502,17 +510,16 @@
                 pegmanBtn.id = 'ol-street-view--pegman-button';
                 this.pegmanDivControl.append(this.pegmanDraggable);
                 this.pegmanDivControl.append(pegmanBtn);
-                const controlParams = {
-                    element: this.pegmanDivControl,
-                    target: this.options.target
-                };
-                this.map.addControl(new control.Control(controlParams));
                 addPegmanInteraction();
             };
             const addSizeTogglerControl = () => {
-                const compactClass = 'ol-street-view--compact';
+                const CLASS_COMPACT = 'ol-street-view--compact';
+                const CLASS_HIDDEN = 'ol-street-view--hidden';
                 if (this.options.defaultMapSize === 'compact') {
-                    document.body.classList.add(compactClass);
+                    document.body.classList.add(CLASS_COMPACT);
+                }
+                else if (this.options.defaultMapSize === 'hidden') {
+                    document.body.classList.add(CLASS_HIDDEN);
                 }
                 const togglerDiv = document.createElement('div');
                 togglerDiv.className =
@@ -522,20 +529,20 @@
                 togglerBtn.innerHTML =
                     '<div class="ol-street-view--size-toggler-img"></div>';
                 togglerBtn.onclick = () => {
-                    document.body.classList.toggle(compactClass);
-                    if (document.body.classList.contains(compactClass)) {
+                    document.body.classList.toggle(CLASS_COMPACT);
+                    if (document.body.classList.contains(CLASS_COMPACT)) {
                         // Minimized
                         togglerBtn.title = this._i18n.expand;
                         // Store height for later
-                        this._lastHeight = this.viewport.style.height;
+                        this._lastHeight = this._viewport.style.height;
                         // Restore height if it was resized
-                        this.viewport.style.height = null;
+                        this._viewport.style.height = null;
                     }
                     else {
                         // Expanded
                         togglerBtn.title = this._i18n.minimize;
                         if (this._lastHeight)
-                            this.viewport.style.height = this._lastHeight;
+                            this._viewport.style.height = this._lastHeight;
                     }
                     // Timeout to allow transition in ccs
                     setTimeout(() => {
@@ -543,7 +550,7 @@
                     }, 150);
                 };
                 togglerDiv.append(togglerBtn);
-                this.map.addControl(new control.Control({
+                this._map.addControl(new control.Control({
                     element: togglerDiv
                 }));
             };
@@ -554,14 +561,19 @@
         }
         /**
          * @protected
+         * @fires load
          */
         _loadStreetView() {
+            const _super = Object.create(null, {
+                dispatchEvent: { get: () => super.dispatchEvent }
+            });
             return __awaiter(this, void 0, void 0, function* () {
                 const loader = new Loader(this.options.apiKey, {
                     language: this.options.language
                 });
                 try {
                     google = yield loader.load();
+                    _super.dispatchEvent.call(this, 'loadLib');
                 }
                 catch (err) {
                     console.error(err);
@@ -572,7 +584,7 @@
          * @protected
          */
         _updateStreetViewPosition(coords) {
-            const latLon = proj.transform(coords, this.view.getProjection(), 'EPSG:4326').reverse();
+            const latLon = proj.transform(coords, this._view.getProjection(), 'EPSG:4326').reverse();
             const latLonGoogle = { lat: latLon[0], lng: latLon[1] };
             const streetViewService = new google.maps.StreetViewService();
             streetViewService.getPanoramaByLocation(latLonGoogle, SV_MAX_DISTANCE_METERS, (_, status) => {
@@ -596,7 +608,7 @@
                 coords = proj.transform([
                     coords.lng(),
                     coords.lat()
-                ], 'EPSG:4326', this.view.getProjection());
+                ], 'EPSG:4326', this._view.getProjection());
             }
             this._pegmanSelectedCoords = coords;
             this._pegmanFeature.getGeometry().setCoordinates(this._pegmanSelectedCoords);
@@ -606,7 +618,7 @@
          * @protected
          */
         _centerMapToPegman() {
-            this.view.animate({
+            this._view.animate({
                 center: this._pegmanSelectedCoords,
                 duration: 100
             });
@@ -649,20 +661,20 @@
             if (!document.body.classList.contains('ol-street-view--activated')) {
                 document.body.classList.add('ol-street-view--activated');
                 // Update Map Size
-                this.map.updateSize();
+                this._map.updateSize();
             }
             this._selectPegman.getFeatures().clear();
             if (!Object.keys(this._pegmanSelectedCoords))
-                this._pegmanSelectedCoords = this.view.getCenter();
+                this._pegmanSelectedCoords = this._view.getCenter();
             this._pegmanFeature = new ol.Feature({
                 name: 'Pegman',
                 geometry: new geom.Point(this._pegmanSelectedCoords)
             });
             this._pegmanLayer.getSource().addFeature(this._pegmanFeature);
             this._selectPegman.getFeatures().push(this._pegmanFeature);
-            this.view.setCenter(this._pegmanSelectedCoords);
-            this.view.setZoom(18);
-            this.showStreetView();
+            this._view.setCenter(this._pegmanSelectedCoords);
+            this._view.setZoom(18);
+            this._showStreetView(this._pegmanSelectedCoords);
         }
         /**
          * @protected
@@ -677,30 +689,31 @@
          */
         _addClickListener() {
             const clickListener = (evt) => {
-                const position = this.map.getCoordinateFromPixel(evt.pixel);
+                const position = this._map.getCoordinateFromPixel(evt.pixel);
                 this._updateStreetViewPosition(position);
                 evt.preventDefault();
                 evt.stopPropagation();
             };
-            this._keyClickOnMap = this.map.on('click', clickListener);
+            this._keyClickOnMap = this._map.on('click', clickListener);
         }
         /**
          * @protected
          */
         _refreshMap(centerToPegman = true) {
             // Force refresh the layers
-            this.map.updateSize();
+            this._map.updateSize();
             window.dispatchEvent(new Event('resize'));
             if (centerToPegman)
                 this._centerMapToPegman();
         }
         /**
          * Show Street View mode
-         * @public
+         * @param coords Muste be im the map projection format
+         * @protected
          */
-        showStreetView() {
+        _showStreetView(coords) {
             if (this._lastHeight) {
-                this.viewport.style.height = this._lastHeight;
+                this._viewport.style.height = this._lastHeight;
             }
             // Timeout to allow transition in ccs
             setTimeout(() => {
@@ -710,13 +723,48 @@
             if (!this._isInitialized) {
                 this._initStreetView();
             }
-            this._updateStreetViewPosition(this._pegmanSelectedCoords);
+            this._updateStreetViewPosition(coords);
             this._panorama.setVisible(true);
             this._addClickListener();
-            this.viewport.dispatchEvent(this._streetViewInitEvt);
+            super.dispatchEvent('streetViewInit');
+        }
+        /**
+         * Add Stree View Layer showing areas wheres StreetView exists
+         * @protected
+         */
+        _addStreetViewLayer() {
+            this._map.addLayer(this._streetViewXyzLayer);
+        }
+        /**
+         * This is useful if wou wanna add a custom icon on the panorama instance,
+         * add custom listeners, etc
+         * @public
+         * @returns
+         */
+        getStreetViewPanorama() {
+            return this._panorama;
+        }
+        /**
+         * Show Street View mode
+         * @param coords Must be in the map projection format
+         * @returns
+         * @public
+         */
+        showStreetView(coords) {
+            if (!coords) {
+                console.error('Coords are empty');
+                return;
+            }
+            this._addStreetViewLayer();
+            this._view.setCenter(coords);
+            this._view.setZoom(18);
+            this._pegmanSelectedCoords = coords;
+            this._initPegmanOnMap();
+            return this.getStreetViewPanorama();
         }
         /**
          * Disables Street View mode
+         * @fires streetViewExit
          * @public
          */
         hideStreetView() {
@@ -725,12 +773,12 @@
             pegmanLayerSource.clear();
             this._pegmanSelectedCoords = [];
             // Remove SV Layer
-            this.map.removeLayer(this._streetViewXyzLayer);
+            this._map.removeLayer(this._streetViewXyzLayer);
             document.body.classList.remove('ol-street-view--activated');
             // Store height for later
-            this._lastHeight = this.viewport.style.height;
+            this._lastHeight = this._viewport.style.height;
             // Restore height if it was resized
-            this.viewport.style.height = null;
+            this._viewport.style.height = null;
             this._panorama.setVisible(false);
             setTimeout(() => {
                 this._refreshMap(false);
@@ -739,7 +787,7 @@
             // Maybe, exit fullscreen
             if (document.fullscreenElement)
                 document.exitFullscreen();
-            this.viewport.dispatchEvent(this._streetViewExitEvt);
+            super.dispatchEvent('streetViewExit');
         }
     }
     /**
