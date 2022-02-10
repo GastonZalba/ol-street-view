@@ -39,116 +39,117 @@ let globals = {
 
 export default function (commandOptions) {
 
-    return [
-        {
-            input: 'src/ol-street-view.ts',
-            output: [
+    const outputs = [{
+        input: 'src/ol-street-view.ts',
+        output: [
+            {
+                dir: 'dist',
+                format: 'umd',
+                name: 'StreetView',
+                globals: globals,
+                sourcemap: true
+            },
+            !commandOptions.dev && {
+                file: pkg.browser,
+                format: 'umd',
+                plugins: [terser()],
+                name: 'StreetView',
+                globals: globals,
+                sourcemap: true
+            }
+        ],
+        plugins: [
+            del({ targets: 'dist/*' }),
+            typescript(
                 {
-                    dir: 'dist',
-                    format: 'umd',
-                    name: 'StreetView',
-                    globals: globals,
-                    sourcemap: true
-                },
-                !commandOptions.dev && {
-                    file: pkg.browser,
-                    format: 'umd',
-                    plugins: [terser()],
-                    name: 'StreetView',
-                    globals: globals,
-                    sourcemap: true
+                    outDir: './dist',
+                    declarationDir: './dist',
+                    outputToFilesystem: true
                 }
-            ],
-            plugins: [
-                del({ targets: 'dist/*' }),
-                typescript(
-                    {
-                        outDir: './dist',
-                        declarationDir: './dist',
-                        outputToFilesystem: true
-                    }
-                ),
-                resolve(),
-                commonjs(),
-                babel({
-                    babelrc: false,
-                    plugins: ["@babel/plugin-transform-runtime"],
-                    babelHelpers: 'runtime',
-                    exclude: 'node_modules/**',
-                    presets: [
-                        [
-                            '@babel/preset-env',
-                            {
-                                targets: {
-                                    browsers: [
-                                        "Chrome >= 52",
-                                        "FireFox >= 44",
-                                        "Safari >= 7",
-                                        "Explorer 11",
-                                        "last 4 Edge versions"
-                                    ]
-                                }
+            ),
+            resolve(),
+            commonjs(),
+            babel({
+                babelrc: false,
+                plugins: ["@babel/plugin-transform-runtime"],
+                babelHelpers: 'runtime',
+                exclude: 'node_modules/**',
+                presets: [
+                    [
+                        '@babel/preset-env',
+                        {
+                            targets: {
+                                browsers: [
+                                    "Chrome >= 52",
+                                    "FireFox >= 44",
+                                    "Safari >= 7",
+                                    "Explorer 11",
+                                    "last 4 Edge versions"
+                                ]
                             }
-                        ]
-                    ]
-                }),
-                image(),
-                postcss({
-                    extensions: ['.css', '.sass', '.scss'],
-                    inject: commandOptions.dev ? true : false,
-                    extract: commandOptions.dev ? false : path.resolve('dist/css/ol-street-view.css'),
-                    sourceMap: commandOptions.dev  ? true : false,
-                    minimize: false,
-                    config: {
-                        path: './postcss.config.js',
-                        ctx: {
-                            isDev: commandOptions.dev ? true : false
                         }
+                    ]
+                ]
+            }),
+            image(),
+            postcss({
+                extensions: ['.css', '.sass', '.scss'],
+                inject: commandOptions.dev ? true : false,
+                extract: commandOptions.dev ? false : path.resolve('dist/css/ol-street-view.css'),
+                sourceMap: commandOptions.dev ? true : false,
+                minimize: false,
+                config: {
+                    path: './postcss.config.js',
+                    ctx: {
+                        isDev: commandOptions.dev ? true : false
                     }
-                }),
-                commandOptions.dev && serve({
-                    open: false,
-                    verbose: true,
-                    contentBase: ['', 'examples'],
-                    historyApiFallback: '/basic.html',
-                    host: 'localhost',
-                    port: 3000,
-                    // execute function after server has begun listening
-                    onListening: function (server) {
-                        const address = server.address()
-                        // by using a bound function, we can access options as `this`
-                        const protocol = this.https ? 'https' : 'http'
-                        console.log(`Server listening at ${protocol}://localhost:${address.port}/`)
-                    }
-                }),
-                commandOptions.dev && livereload({
-                    watch: ['src'],
-                    delay: 500
-                })
-            ],
-            external: [
-                'ol',
-                'ol/Map',
-                'ol/source',
-                'ol/layer',
-                'ol/geom',
-                'ol/Feature',
-                'ol/Overlay',
-                'ol/Control',
-                'ol/style',
-                'ol/control',
-                'ol/proj',
-                'ol/Observable',
-                'ol/format',
-                'ol/events',
-                'ol/interaction',
-                'ol/coordinate',
-                'ol/interaction/Translate',
-                'interactjs'
-            ]
-        },
-        // Minified css
-        {
+                }
+            }),
+            commandOptions.dev && serve({
+                open: false,
+                verbose: true,
+                contentBase: ['', 'examples'],
+                historyApiFallback: '/basic.html',
+                host: 'localhost',
+                port: 3000,
+                // execute function after server has begun listening
+                onListening: function (server) {
+                    const address = server.address()
+                    // by using a bound function, we can access options as `this`
+                    const protocol = this.https ? 'https' : 'http'
+                    console.log(`Server listening at ${protocol}://localhost:${address.port}/`)
+                }
+            }),
+            commandOptions.dev && livereload({
+                watch: ['src'],
+                delay: 500
+            })
+        ],
+        external: [
+            'ol',
+            'ol/Map',
+            'ol/source',
+            'ol/layer',
+            'ol/geom',
+            'ol/Feature',
+            'ol/Overlay',
+            'ol/Control',
+            'ol/style',
+            'ol/control',
+            'ol/proj',
+            'ol/Observable',
+            'ol/format',
+            'ol/events',
+            'ol/interaction',
+            'ol/coordinate',
+            'ol/interaction/Translate',
+            'interactjs'
+        ]
+    }]
+
+    // Minified css
+    if (!commandOptions.dev)
+        outputs.push({
             input: path.resolve('dist/css/ol-street-view.css'),
             plugins: [
                 postcss({
@@ -169,5 +170,7 @@ export default function (commandOptions) {
                 if (warning.code === 'FILE_NAME_CONFLICT') return
                 warn(warning)
             }
-        }]
+        })
+
+    return outputs;
 }
