@@ -1,8 +1,20 @@
 # OpenLayers Street View
 
+<p align="center">
+    <a href="https://www.npmjs.com/package/ol-street-view">
+        <img src="https://img.shields.io/npm/v/ol-street-view.svg" alt="npm version">
+    </a>
+    <a href="https://img.shields.io/npm/dm/ol-street-view">
+        <img alt="npm" src="https://img.shields.io/npm/dm/ol-street-view">
+    </a>
+    <a href="https://github.com/gastonzalba/ol-street-view/blob/master/LICENSE">
+        <img src="https://img.shields.io/npm/l/ol-street-view.svg" alt="license">
+    </a>
+</p>
+
 Street View implementation for Open Layers.
 
-Tested with OpenLayers version 5 and 6. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
+Tested with OpenLayers version 5, 6 and 7. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
 
 ## Disclaminer
 
@@ -41,13 +53,13 @@ map.addControl(streetView);
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.0.0"></script>
+<script src="https://unpkg.com/ol-street-view@2.0.1"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.0/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.1/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -113,7 +125,7 @@ Street View implementation for Open Layers.
 This is useful if wou wanna add a custom icon on the panorama instance,
 add custom listeners, etc
 
-Returns **google.maps.StreetViewPanorama**
+Returns **google.maps.StreetViewPanorama**&#x20;
 
 #### showStreetView
 
@@ -123,13 +135,13 @@ Show Street View mode
 
 -   `coords` **Coordinate** Must be in the map projection format
 
-Returns **google.maps.StreetViewPanorama**
+Returns **google.maps.StreetViewPanorama**&#x20;
 
 #### hideStreetView
 
 Disables Street View mode
 
-Returns **void**
+Returns **void**&#x20;
 
 ### Options
 

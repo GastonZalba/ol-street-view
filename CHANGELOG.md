@@ -77,3 +77,7 @@
 * Added example to add custom icon on the OpenLayers map and in the Street View Panorama
 * Added mapsSize 'hidden' to allow Street View on full screen mode
 * Removed interactjs from dependencies
+
+## v2.0.1
+* Ol7 compatibility
+* Updated CDNs in examples

@@ -1,4 +1,4 @@
-import { Feature, PluggableMap, View } from 'ol';
+import { Feature, Map, View } from 'ol';
 import { transform } from 'ol/proj';
 import { Style, Icon } from 'ol/style';
 import { Vector as VectorSource, XYZ } from 'ol/source';
@@ -8,7 +8,6 @@ import { Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
 import { unByKey } from 'ol/Observable';
 import { EventsKey } from 'ol/events';
-import IconAnchorUnits from 'ol/style/IconAnchorUnits';
 import { TranslateEvent } from 'ol/interaction/Translate';
 import { Control } from 'ol/control';
 
@@ -45,7 +44,7 @@ export default class StreetView extends Control {
     protected _i18n: i18n;
 
     // Ol
-    public _map: PluggableMap;
+    public _map: Map;
     public _view: View;
     public _viewport: HTMLElement;
 
@@ -63,8 +62,8 @@ export default class StreetView extends Control {
     protected _keyClickOnMap: EventsKey | EventsKey[];
 
     // Layers
-    protected _streetViewXyzLayer: TileLayer;
-    protected _pegmanLayer: VectorLayer;
+    protected _streetViewXyzLayer: TileLayer<XYZ>;
+    protected _pegmanLayer: VectorLayer<VectorSource>;
 
     protected _panorama: google.maps.StreetViewPanorama;
 
@@ -181,8 +180,7 @@ export default class StreetView extends Control {
                     this._i18n.termsOfService
                 }</a>`,
                 maxZoom: 19,
-                url:
-                    'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
+                url: 'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
             })
         });
 
@@ -194,8 +192,8 @@ export default class StreetView extends Control {
                 new Style({
                     image: new Icon({
                         anchor: [0.5, 32],
-                        anchorXUnits: IconAnchorUnits.FRACTION,
-                        anchorYUnits: IconAnchorUnits.PIXELS,
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
                         rotateWithView: true,
                         opacity: 1.0,
                         src: pegmanMarkerSprites as string,
@@ -444,14 +442,16 @@ export default class StreetView extends Control {
                                     0) + e.dy;
 
                         // Translate the Element
-                        pTarget.style.webkitTransform = pTarget.style.transform = `translate(${x}px, ${y}px)`;
+                        pTarget.style.webkitTransform =
+                            pTarget.style.transform = `translate(${x}px, ${y}px)`;
 
                         // Update the Posiion Attributes
                         pTarget.setAttribute('data-x', x);
                         pTarget.setAttribute('data-y', y);
                     },
                     onend: (e) => {
-                        const viewportOffset = this.mapContainer.getBoundingClientRect();
+                        const viewportOffset =
+                            this.mapContainer.getBoundingClientRect();
 
                         // To compensate if the map is not 100%  width of the browser
                         const mapDistanceX = viewportOffset.left;
@@ -705,9 +705,8 @@ export default class StreetView extends Control {
         });
 
         const exitControlST = this.exitControlUI.cloneNode(true);
-        (exitControlST as HTMLButtonElement).onclick = this.hideStreetView.bind(
-            this
-        );
+        (exitControlST as HTMLButtonElement).onclick =
+            this.hideStreetView.bind(this);
 
         this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(
             exitControlST
