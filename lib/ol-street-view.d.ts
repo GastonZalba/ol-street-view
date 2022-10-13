@@ -1,5 +1,7 @@
 /// <reference types="googlemaps" />
-import { Feature, PluggableMap, View } from 'ol';
+/// <reference types="googlemaps" />
+import { Feature, Map, View } from 'ol';
+import { Vector as VectorSource, XYZ } from 'ol/source';
 import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
 import { Select, Translate } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
@@ -19,7 +21,7 @@ import './assets/scss/ol-street-view.scss';
 export default class StreetView extends Control {
     protected options: Options;
     protected _i18n: i18n;
-    _map: PluggableMap;
+    _map: Map;
     _view: View;
     _viewport: HTMLElement;
     protected _isInitialized: boolean;
@@ -30,8 +32,8 @@ export default class StreetView extends Control {
     protected streetViewPanoramaDiv: HTMLElement;
     protected mapContainer: HTMLElement;
     protected _keyClickOnMap: EventsKey | EventsKey[];
-    protected _streetViewXyzLayer: TileLayer;
-    protected _pegmanLayer: VectorLayer;
+    protected _streetViewXyzLayer: TileLayer<XYZ>;
+    protected _pegmanLayer: VectorLayer<VectorSource>;
     protected _panorama: google.maps.StreetViewPanorama;
     protected _pegmanFeature: Feature;
     protected _pegmanSelectedCoords: Coordinate;
