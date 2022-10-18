@@ -60,6 +60,7 @@
             size: 'md',
             resizable: true,
             sizeToggler: true,
+            zoomOnInit: 18,
             defaultMapSize: 'expanded',
             i18n: {
                 dragToInit: 'Drag and drop me'

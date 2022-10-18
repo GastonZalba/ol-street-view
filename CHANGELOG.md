@@ -89,3 +89,8 @@
 * Some minimal improvements in Documentation
 * Example refactoring
 * Added LICENSE file
+
+## v2.0.3
+* Added methods `getPegmanLayer` and `getStreetViewLayer`
+* Removed unnecesary `Select` interaction
+* Added `zoomOnInit` option

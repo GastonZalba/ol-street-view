@@ -53,13 +53,13 @@ map.addControl(streetView);
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.0.2"></script>
+<script src="https://unpkg.com/ol-street-view@2.0.3"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.2/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.3/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -97,6 +97,8 @@ TypeScript types are shipped with the project in the dist directory and should b
 -   [StreetView](#streetview)
     -   [Parameters](#parameters)
     -   [getStreetViewPanorama](#getstreetviewpanorama)
+    -   [getPegmanLayer](#getpegmanlayer)
+    -   [getStreetViewLayer](#getstreetviewlayer)
     -   [showStreetView](#showstreetview)
         -   [Parameters](#parameters-1)
     -   [hideStreetView](#hidestreetview)
@@ -112,6 +114,7 @@ TypeScript types are shipped with the project in the dist directory and should b
 -   [Options](#options)
     -   [apiKey](#apikey)
     -   [size](#size)
+    -   [zoomOnInit](#zoomoninit)
     -   [resizable](#resizable)
     -   [sizeToggler](#sizetoggler)
     -   [defaultMapSize](#defaultmapsize)
@@ -135,6 +138,18 @@ This is useful if wou wanna add a custom icon on the panorama instance,
 add custom listeners, etc
 
 Returns **google.maps.StreetViewPanorama**&#x20;
+
+#### getPegmanLayer
+
+Get the Vector Layer in wich the Pegman is displayer
+
+Returns **VectorLayer\<VectorSource>**&#x20;
+
+#### getStreetViewLayer
+
+Get the background Raster layer that display the existing zones with Street View available
+
+Returns **TileLayer\<XYZ>**&#x20;
 
 #### showStreetView
 
@@ -214,6 +229,7 @@ Default values:
 {
   apiKey: null,
   size: 'lg',
+  zoomOnInit: 18,
   resizable: true,
   sizeToggler: true,
   defaultMapSize: 'expanded',
@@ -234,6 +250,12 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 Size of the Pegman Control in the map
 
 Type: (`"sm"` | `"md"` | `"lg"`)
+
+#### zoomOnInit
+
+Zoom level on the map when init the Panorama
+
+Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
 
 #### resizable
 

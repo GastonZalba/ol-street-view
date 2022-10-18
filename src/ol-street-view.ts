@@ -1,9 +1,9 @@
-import { Feature, Map, MapBrowserEvent, View } from 'ol';
+import { Collection, Feature, Map, MapBrowserEvent, View } from 'ol';
 import { transform } from 'ol/proj';
 import { Style, Icon } from 'ol/style';
 import { Vector as VectorSource, XYZ } from 'ol/source';
 import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
-import { Select, Translate } from 'ol/interaction';
+import { Translate } from 'ol/interaction';
 import { Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
 import {
@@ -79,13 +79,14 @@ export default class StreetView extends Control {
     protected _pegmanFeature: Feature<Point>;
     protected _pegmanSelectedCoords: Coordinate;
     protected _pegmanHeading: number;
-    protected _selectPegman: Select;
     protected _translatePegman: Translate;
 
     // State
     protected _lastHeight: string;
 
     protected _streetViewService = null;
+
+    protected _isPositionFired;
 
     declare on: OnSignature<
         EventTypes | StreetViewEventTypes,
@@ -135,6 +136,7 @@ export default class StreetView extends Control {
             defaultMapSize: 'expanded',
             language: 'en',
             target: null,
+            zoomOnInit: 18,
             ...opt_options // Merge user options
         };
 
@@ -160,7 +162,6 @@ export default class StreetView extends Control {
             this._viewport = this._map.getTargetElement();
 
             this._prepareLayers();
-            this._addMapInteractions();
             this._createMapControls();
             this._prepareLayout();
 
@@ -254,16 +255,18 @@ export default class StreetView extends Control {
     /**
      * @protected
      */
-    _addMapInteractions(): void {
+    _addTranslateInteraction(): void {
+        if (this._translatePegman) {
+            return this._translatePegman.setActive(true);
+        }
+
         const translatePegmanHandler = (evt: TranslateEvent): void => {
             this._pegmanSelectedCoords = evt.coordinate;
             this._updateStreetViewPosition(this._pegmanSelectedCoords);
         };
 
-        this._selectPegman = new Select();
-
         this._translatePegman = new Translate({
-            features: this._selectPegman.getFeatures()
+            features: new Collection([this._pegmanFeature])
         });
 
         this._translatePegman.on('translateend', translatePegmanHandler);
@@ -735,13 +738,19 @@ export default class StreetView extends Control {
             }
         );
 
-        const updatePegman = debounce(() => {
+        this._panorama.addListener('position_changed', () => {
+            if (this._isPositionFired) {
+                return;
+            }
+
+            setTimeout(() => {
+                this._isPositionFired = null;
+            }, 400);
+
+            this._isPositionFired = true;
+
             const position = this._panorama.getPosition();
             this._updatePegmanPosition(position, true);
-        }, 450);
-
-        this._panorama.addListener('position_changed', () => {
-            updatePegman();
         });
 
         this._panorama.addListener('pov_changed', () => {
@@ -781,22 +790,26 @@ export default class StreetView extends Control {
             this._map.updateSize();
         }
 
-        this._selectPegman.getFeatures().clear();
-
         if (!Object.keys(this._pegmanSelectedCoords))
             this._pegmanSelectedCoords = this._view.getCenter();
 
-        this._pegmanFeature = new Feature({
-            name: 'Pegman',
-            geometry: new Point(this._pegmanSelectedCoords)
-        });
+        if (!this._pegmanFeature) {
+            this._pegmanFeature = new Feature({
+                name: 'Pegman',
+                geometry: new Point(this._pegmanSelectedCoords)
+            });
+        } else {
+            this._pegmanFeature
+                .getGeometry()
+                .setCoordinates(this._pegmanSelectedCoords);
+        }
 
         this._pegmanLayer.getSource().addFeature(this._pegmanFeature);
 
-        this._selectPegman.getFeatures().push(this._pegmanFeature);
+        this._addTranslateInteraction();
 
         this._view.setCenter(this._pegmanSelectedCoords);
-        this._view.setZoom(18);
+        this._view.setZoom(this.options.zoomOnInit);
         this._showStreetView(this._pegmanSelectedCoords);
     }
 
@@ -878,6 +891,24 @@ export default class StreetView extends Control {
     }
 
     /**
+     * Get the Vector Layer in wich the Pegman is displayer
+     * @public
+     * @returns
+     */
+    getPegmanLayer(): VectorLayer<VectorSource> {
+        return this._pegmanLayer;
+    }
+
+    /**
+     * Get the background Raster layer that display the existing zones with Street View available
+     * @public
+     * @returns
+     */
+    getStreetViewLayer(): TileLayer<XYZ> {
+        return this._streetViewXyzLayer;
+    }
+
+    /**
      * Show Street View mode
      * @param coords Must be in the map projection format
      * @returns
@@ -907,7 +938,7 @@ export default class StreetView extends Control {
      * @public
      */
     hideStreetView(): void {
-        this._selectPegman.getFeatures().clear();
+        this._translatePegman.setActive(false);
 
         const pegmanLayerSource = this._pegmanLayer.getSource();
 
@@ -1029,6 +1060,7 @@ type StreetViewEventTypes =
  * {
  *   apiKey: null,
  *   size: 'lg',
+ *   zoomOnInit: 18,
  *   resizable: true,
  *   sizeToggler: true,
  *   defaultMapSize: 'expanded',
@@ -1048,6 +1080,11 @@ interface Options {
      * Size of the Pegman Control in the map
      */
     size?: 'sm' | 'md' | 'lg';
+
+    /**
+     * Zoom level on the map when init the Panorama
+     */
+    zoomOnInit?: number;
 
     /**
      * To display a handler that enable dragging changing the height of the layout
