@@ -1,6 +1,6 @@
 {
   "name": "ol-street-view",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Street View implementation for Open Layers",
   "browser": "dist/ol-street-view.min.js",
   "main": "dist/ol-street-view.js",
@@ -41,8 +41,8 @@
     "google-maps": "^4.3.3"
   },
   "peerDependencies": {
-    "ol": ">=5.0.0",
-    "interactjs": ">=1.10.0"
+    "interactjs": ">=1.10.0",
+    "ol": ">=5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -58,7 +58,6 @@
     "@typescript-eslint/parser": "^5.9.1",
     "autoprefixer": "^10.4.2",
     "clean-css": "^5.2.4",
-    "cssnano": "^5.0.17",
     "del-cli": "^3.0.1",
     "documentation": "^14.0.0",
     "eslint": "^8.6.0",

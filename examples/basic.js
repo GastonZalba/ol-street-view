@@ -2,6 +2,7 @@
 
     var coordsIcon = [-6451474.93, -4153206.94];
     var coordsView = [-6451484.76, -4153214.08];
+    var iconUrl = 'http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=star|FF0000';
 
     var map = new ol.Map({
         layers: [
@@ -11,6 +12,35 @@
                     maxZoom: 19,
                     url: 'https://mt{0-3}.google.com/vt/?lyrs=r&x={x}&y={y}&z={z}'
                     // url: 'https://mt{0-3}.google.com/vt/?lyrs=y&x={x}&y={y}&z={z}' // Sat Hybrid
+                })
+            }),
+            // Add icon layer to OpenLayers map
+            new ol.layer.Vector({
+                zIndex: 15,
+                style: new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, 1],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'fraction',
+                        src: iconUrl
+                    })
+                }),
+                source: new ol.source.Vector({
+                    features: [
+                        new ol.Feature({
+                            name: 'Star',
+                            geometry: new ol.geom.Point(coordsIcon),
+                            style: new ol.style.Style({
+                                image: new ol.style.Icon({
+                                    anchor: [0.5, 46],
+                                    anchorXUnits: 'fraction',
+                                    anchorYUnits: 'pixels',
+                                    src: iconUrl,
+                                    crossOrigin: 'anonymous'
+                                })
+                            })
+                        })
+                    ]
                 })
             })
         ],
@@ -38,40 +68,6 @@
     );
 
     map.addControl(streetView);
-
-    var iconUrl = 'http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=star|FF0000';
-
-    // Add icon to OpenLayers map
-    map.addLayer(
-        new ol.layer.Vector({
-            zIndex: 15,
-            style: new ol.style.Style({
-                image: new ol.style.Icon({
-                    anchor: [0.5, 1],
-                    anchorXUnits: 'fraction',
-                    anchorYUnits: 'fraction',
-                    src: iconUrl
-                })
-            }),
-            source: new ol.source.Vector({
-                features: [
-                    new ol.Feature({
-                        name: 'Star',
-                        geometry: new ol.geom.Point(coordsIcon),
-                        style: new ol.style.Style({
-                            image: new ol.style.Icon({
-                                anchor: [0.5, 46],
-                                anchorXUnits: 'fraction',
-                                anchorYUnits: 'pixels',
-                                src: iconUrl,
-                                crossOrigin: 'anonymous'
-                            })
-                        })
-                    })
-                ]
-            })
-        })
-    );
 
     // Init panorama programatically after the lib is loaded
     streetView.once('loadLib', function () {

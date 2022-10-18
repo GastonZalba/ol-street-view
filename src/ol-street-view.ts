@@ -1,4 +1,4 @@
-import { Feature, Map, View } from 'ol';
+import { Feature, Map, MapBrowserEvent, View } from 'ol';
 import { transform } from 'ol/proj';
 import { Style, Icon } from 'ol/style';
 import { Vector as VectorSource, XYZ } from 'ol/source';
@@ -6,10 +6,18 @@ import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
 import { Select, Translate } from 'ol/interaction';
 import { Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
-import { unByKey } from 'ol/Observable';
+import {
+    CombinedOnSignature,
+    EventTypes,
+    OnSignature,
+    unByKey
+} from 'ol/Observable';
 import { EventsKey } from 'ol/events';
 import { TranslateEvent } from 'ol/interaction/Translate';
 import { Control } from 'ol/control';
+import BaseEvent from 'ol/events/Event';
+import { ObjectEvent } from 'ol/Object';
+import { Types as ObjectEventTypes } from 'ol/ObjectEventType';
 
 // External
 import interact from 'interactjs';
@@ -68,7 +76,7 @@ export default class StreetView extends Control {
     protected _panorama: google.maps.StreetViewPanorama;
 
     // Pegman
-    protected _pegmanFeature: Feature;
+    protected _pegmanFeature: Feature<Point>;
     protected _pegmanSelectedCoords: Coordinate;
     protected _pegmanHeading: number;
     protected _selectPegman: Select;
@@ -76,6 +84,41 @@ export default class StreetView extends Control {
 
     // State
     protected _lastHeight: string;
+
+    protected _streetViewService = null;
+
+    declare on: OnSignature<
+        EventTypes | StreetViewEventTypes,
+        BaseEvent,
+        EventsKey
+    > &
+        OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> &
+        CombinedOnSignature<
+            StreetViewEventTypes | ObjectEventTypes | EventTypes,
+            EventsKey
+        >;
+
+    declare once: OnSignature<
+        EventTypes | StreetViewEventTypes,
+        BaseEvent,
+        EventsKey
+    > &
+        OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> &
+        CombinedOnSignature<
+            StreetViewEventTypes | ObjectEventTypes | EventTypes,
+            EventsKey
+        >;
+
+    declare un: OnSignature<
+        EventTypes | StreetViewEventTypes,
+        BaseEvent,
+        void
+    > &
+        OnSignature<ObjectEventTypes, ObjectEvent, void> &
+        CombinedOnSignature<
+            StreetViewEventTypes | ObjectEventTypes | EventTypes,
+            void
+        >;
 
     constructor(opt_options?: Options) {
         super({
@@ -111,8 +154,7 @@ export default class StreetView extends Control {
 
         this._loadStreetView();
 
-        // @ts-expect-error
-        this.on('loadLib', () => {
+        this.on(SVEventTypes.LOAD_LIB, () => {
             this._map = super.getMap();
             this._view = this._map.getView();
             this._viewport = this._map.getTargetElement();
@@ -121,6 +163,8 @@ export default class StreetView extends Control {
             this._addMapInteractions();
             this._createMapControls();
             this._prepareLayout();
+
+            this._streetViewService = new google.maps.StreetViewService();
         });
     }
 
@@ -180,7 +224,8 @@ export default class StreetView extends Control {
                     this._i18n.termsOfService
                 }</a>`,
                 maxZoom: 19,
-                url: 'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
+                url:
+                    'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
             })
         });
 
@@ -442,16 +487,14 @@ export default class StreetView extends Control {
                                     0) + e.dy;
 
                         // Translate the Element
-                        pTarget.style.webkitTransform =
-                            pTarget.style.transform = `translate(${x}px, ${y}px)`;
+                        pTarget.style.webkitTransform = pTarget.style.transform = `translate(${x}px, ${y}px)`;
 
                         // Update the Posiion Attributes
                         pTarget.setAttribute('data-x', x);
                         pTarget.setAttribute('data-y', y);
                     },
                     onend: (e) => {
-                        const viewportOffset =
-                            this.mapContainer.getBoundingClientRect();
+                        const viewportOffset = this.mapContainer.getBoundingClientRect();
 
                         // To compensate if the map is not 100%  width of the browser
                         const mapDistanceX = viewportOffset.left;
@@ -602,7 +645,7 @@ export default class StreetView extends Control {
 
         try {
             google = await loader.load();
-            super.dispatchEvent('loadLib');
+            super.dispatchEvent(SVEventTypes.LOAD_LIB);
         } catch (err) {
             console.error(err);
         }
@@ -620,9 +663,7 @@ export default class StreetView extends Control {
 
         const latLonGoogle = { lat: latLon[0], lng: latLon[1] };
 
-        const streetViewService = new google.maps.StreetViewService();
-
-        streetViewService.getPanoramaByLocation(
+        this._streetViewService.getPanoramaByLocation(
             latLonGoogle,
             SV_MAX_DISTANCE_METERS,
             (_, status) => {
@@ -659,9 +700,9 @@ export default class StreetView extends Control {
 
         this._pegmanSelectedCoords = coords as Coordinate;
 
-        (this._pegmanFeature.getGeometry() as Point).setCoordinates(
-            this._pegmanSelectedCoords
-        );
+        this._pegmanFeature
+            .getGeometry()
+            .setCoordinates(this._pegmanSelectedCoords);
 
         this._centerMapToPegman();
     }
@@ -694,19 +735,28 @@ export default class StreetView extends Control {
             }
         );
 
-        this._panorama.addListener('position_changed', () => {
+        const updatePegman = debounce(() => {
             const position = this._panorama.getPosition();
-            this._updatePegmanPosition(position);
+            this._updatePegmanPosition(position, true);
+        }, 450);
+
+        this._panorama.addListener('position_changed', () => {
+            updatePegman();
         });
 
         this._panorama.addListener('pov_changed', () => {
-            this._pegmanHeading = this._panorama.getPov().heading;
-            this._pegmanLayer.getSource().changed();
+            const heading = this._panorama.getPov().heading;
+            // Add this check to prevent firing multiple times
+            if (heading !== this._pegmanHeading) {
+                this._pegmanHeading = heading;
+                this._pegmanLayer.getSource().changed();
+            }
         });
 
         const exitControlST = this.exitControlUI.cloneNode(true);
-        (exitControlST as HTMLButtonElement).onclick =
-            this.hideStreetView.bind(this);
+        (exitControlST as HTMLButtonElement).onclick = this.hideStreetView.bind(
+            this
+        );
 
         this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(
             exitControlST
@@ -763,9 +813,8 @@ export default class StreetView extends Control {
      * @protected
      */
     _addClickListener(): void {
-        const clickListener = (evt) => {
-            const position = this._map.getCoordinateFromPixel(evt.pixel);
-            this._updateStreetViewPosition(position);
+        const clickListener = (evt: MapBrowserEvent<MouseEvent>) => {
+            this._updateStreetViewPosition(evt.coordinate);
             evt.preventDefault();
             evt.stopPropagation();
         };
@@ -807,7 +856,7 @@ export default class StreetView extends Control {
         this._updateStreetViewPosition(coords);
         this._panorama.setVisible(true);
         this._addClickListener();
-        super.dispatchEvent('streetViewInit');
+        super.dispatchEvent(SVEventTypes.STREET_VIEW_INIT);
     }
 
     /**
@@ -888,7 +937,7 @@ export default class StreetView extends Control {
         // Maybe, exit fullscreen
         if (document.fullscreenElement) document.exitFullscreen();
 
-        super.dispatchEvent('streetViewExit');
+        super.dispatchEvent(SVEventTypes.STREET_VIEW_EXIT);
     }
 }
 
@@ -918,17 +967,59 @@ function debounce(func, wait = 250) {
 
 /**
  * **_[interface]_** - Custom Language
- * @protected
+ * @public
  */
 interface i18n {
+    /**
+     * Exit Street View visualization label
+     */
     exit?: string;
+
+    /**
+     * Exit Street View visualization title label
+     */
     exitView?: string;
+
+    /**
+     * Pegman icon title label on mouse hovering
+     */
     dragToInit?: string;
+
+    /**
+     * No images information
+     */
     noImages?: string;
+
+    /**
+     * Terms of Service
+     */
     termsOfService?: string;
+
+    /**
+     * Expand map
+     */
     expand?: string;
+
+    /**
+     * Minimize Map
+     */
     minimize?: string;
 }
+
+enum SVEventTypes {
+    LOAD_LIB = 'loadLib',
+    STREET_VIEW_INIT = 'streetViewInit',
+    STREET_VIEW_EXIT = 'streetViewExit'
+}
+
+/**
+ * Street View Event Types
+ * @public
+ */
+type StreetViewEventTypes =
+    | SVEventTypes.LOAD_LIB
+    | SVEventTypes.STREET_VIEW_EXIT
+    | SVEventTypes.STREET_VIEW_INIT;
 
 /**
  * **_[interface]_** - StreetView Options specified when creating an instance
@@ -991,4 +1082,4 @@ interface Options {
     i18n?: i18n;
 }
 
-export { Options, i18n };
+export { Options, i18n, StreetViewEventTypes };

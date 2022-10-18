@@ -53,13 +53,13 @@ map.addControl(streetView);
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.0.1"></script>
+<script src="https://unpkg.com/ol-street-view@2.0.2"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.1/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.2/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -68,7 +68,7 @@ NPM package: [ol-street-view](https://www.npmjs.com/package/ol-street-view).
 
 Install the package via `npm`
 
-    npm install ol-street-view --save-dev
+    npm install ol-street-view
 
 #### JS
 
@@ -100,6 +100,15 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [showStreetView](#showstreetview)
         -   [Parameters](#parameters-1)
     -   [hideStreetView](#hidestreetview)
+-   [i18n](#i18n)
+    -   [exit](#exit)
+    -   [exitView](#exitview)
+    -   [dragToInit](#dragtoinit)
+    -   [noImages](#noimages)
+    -   [termsOfService](#termsofservice)
+    -   [expand](#expand)
+    -   [minimize](#minimize)
+-   [StreetViewEventTypes](#streetvieweventtypes)
 -   [Options](#options)
     -   [apiKey](#apikey)
     -   [size](#size)
@@ -108,7 +117,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [defaultMapSize](#defaultmapsize)
     -   [target](#target)
     -   [language](#language)
-    -   [i18n](#i18n)
+    -   [i18n](#i18n-1)
 
 ### StreetView
 
@@ -142,6 +151,58 @@ Returns **google.maps.StreetViewPanorama**&#x20;
 Disables Street View mode
 
 Returns **void**&#x20;
+
+### i18n
+
+**_\[interface]_** - Custom Language
+
+#### exit
+
+Exit Street View visualization label
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### exitView
+
+Exit Street View visualization title label
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### dragToInit
+
+Pegman icon title label on mouse hovering
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### noImages
+
+No images information
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### termsOfService
+
+Terms of Service
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### expand
+
+Expand map
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### minimize
+
+Minimize Map
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### StreetViewEventTypes
+
+Street View Event Types
+
+Type: (SVEventTypes.LOAD_LIB | SVEventTypes.STREET_VIEW_EXIT | SVEventTypes.STREET_VIEW_INIT)
 
 ### Options
 
@@ -210,7 +271,7 @@ Type: (`"es"` | `"en"`)
 
 Add custom translations
 
-Type: i18n
+Type: [i18n](#i18n)
 
 ## Todo
 
@@ -221,7 +282,3 @@ Type: i18n
 -   r~~Add scss~~
 -   \~~Add size toggler~~
 -   Improve scss style (add some variables)
-
-## License
-
-MIT (c) Gastón Zalba.

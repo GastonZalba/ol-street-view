@@ -81,3 +81,11 @@
 ## v2.0.1
 * Ol7 compatibility
 * Updated CDNs in examples
+
+## v2.0.2
+* Fixed panorama 'position_changed' event: prevent multiples fires at the same time
+* Fixed panorama 'pov_changed' event: prevent triggers when no heading is changed
+* Fixed typescript events
+* Some minimal improvements in Documentation
+* Example refactoring
+* Added LICENSE file
