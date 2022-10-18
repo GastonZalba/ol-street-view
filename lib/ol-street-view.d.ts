@@ -2,7 +2,7 @@
 import { Feature, Map, View } from 'ol';
 import { Vector as VectorSource, XYZ } from 'ol/source';
 import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
-import { Select, Translate } from 'ol/interaction';
+import { Translate } from 'ol/interaction';
 import { Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
 import { CombinedOnSignature, EventTypes, OnSignature } from 'ol/Observable';
@@ -42,10 +42,10 @@ export default class StreetView extends Control {
     protected _pegmanFeature: Feature<Point>;
     protected _pegmanSelectedCoords: Coordinate;
     protected _pegmanHeading: number;
-    protected _selectPegman: Select;
     protected _translatePegman: Translate;
     protected _lastHeight: string;
     protected _streetViewService: any;
+    protected _isPositionFired: any;
     on: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, EventsKey>;
     once: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, EventsKey>;
     un: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, void> & OnSignature<ObjectEventTypes, ObjectEvent, void> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, void>;
@@ -57,7 +57,7 @@ export default class StreetView extends Control {
     /**
      * @protected
      */
-    _addMapInteractions(): void;
+    _addTranslateInteraction(): void;
     /**
      * @protected
      */
@@ -124,6 +124,18 @@ export default class StreetView extends Control {
      */
     getStreetViewPanorama(): google.maps.StreetViewPanorama;
     /**
+     * Get the Vector Layer in wich the Pegman is displayer
+     * @public
+     * @returns
+     */
+    getPegmanLayer(): VectorLayer<VectorSource>;
+    /**
+     * Get the background Raster layer that display the existing zones with Street View available
+     * @public
+     * @returns
+     */
+    getStreetViewLayer(): TileLayer<XYZ>;
+    /**
      * Show Street View mode
      * @param coords Must be in the map projection format
      * @returns
@@ -189,6 +201,7 @@ declare type StreetViewEventTypes = SVEventTypes.LOAD_LIB | SVEventTypes.STREET_
  * {
  *   apiKey: null,
  *   size: 'lg',
+ *   zoomOnInit: 18,
  *   resizable: true,
  *   sizeToggler: true,
  *   defaultMapSize: 'expanded',
@@ -207,6 +220,10 @@ interface Options {
      * Size of the Pegman Control in the map
      */
     size?: 'sm' | 'md' | 'lg';
+    /**
+     * Zoom level on the map when init the Panorama
+     */
+    zoomOnInit?: number;
     /**
      * To display a handler that enable dragging changing the height of the layout
      */

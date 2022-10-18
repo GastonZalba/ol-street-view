@@ -146,7 +146,7 @@
             });
             this._streetViewService = null;
             // Default options
-            this.options = Object.assign({ apiKey: null, size: 'lg', resizable: true, sizeToggler: true, defaultMapSize: 'expanded', language: 'en', target: null }, opt_options // Merge user options
+            this.options = Object.assign({ apiKey: null, size: 'lg', resizable: true, sizeToggler: true, defaultMapSize: 'expanded', language: 'en', target: null, zoomOnInit: 18 }, opt_options // Merge user options
             );
             // If language selector is provided and translation exists...
             this._i18n =
@@ -163,7 +163,6 @@
                 this._view = this._map.getView();
                 this._viewport = this._map.getTargetElement();
                 this._prepareLayers();
-                this._addMapInteractions();
                 this._createMapControls();
                 this._prepareLayout();
                 this._streetViewService = new google.maps.StreetViewService();
@@ -259,14 +258,16 @@
         /**
          * @protected
          */
-        _addMapInteractions() {
+        _addTranslateInteraction() {
+            if (this._translatePegman) {
+                return this._translatePegman.setActive(true);
+            }
             const translatePegmanHandler = (evt) => {
                 this._pegmanSelectedCoords = evt.coordinate;
                 this._updateStreetViewPosition(this._pegmanSelectedCoords);
             };
-            this._selectPegman = new interaction.Select();
             this._translatePegman = new interaction.Translate({
-                features: this._selectPegman.getFeatures()
+                features: new ol.Collection([this._pegmanFeature])
             });
             this._translatePegman.on('translateend', translatePegmanHandler);
             this._map.addInteraction(this._translatePegman);
@@ -619,12 +620,16 @@
                 enableCloseButton: false,
                 fullscreenControl: false
             });
-            const updatePegman = debounce(() => {
+            this._panorama.addListener('position_changed', () => {
+                if (this._isPositionFired) {
+                    return;
+                }
+                setTimeout(() => {
+                    this._isPositionFired = null;
+                }, 400);
+                this._isPositionFired = true;
                 const position = this._panorama.getPosition();
                 this._updatePegmanPosition(position, true);
-            }, 450);
-            this._panorama.addListener('position_changed', () => {
-                updatePegman();
             });
             this._panorama.addListener('pov_changed', () => {
                 const heading = this._panorama.getPov().heading;
@@ -652,17 +657,23 @@
                 // Update Map Size
                 this._map.updateSize();
             }
-            this._selectPegman.getFeatures().clear();
             if (!Object.keys(this._pegmanSelectedCoords))
                 this._pegmanSelectedCoords = this._view.getCenter();
-            this._pegmanFeature = new ol.Feature({
-                name: 'Pegman',
-                geometry: new geom.Point(this._pegmanSelectedCoords)
-            });
+            if (!this._pegmanFeature) {
+                this._pegmanFeature = new ol.Feature({
+                    name: 'Pegman',
+                    geometry: new geom.Point(this._pegmanSelectedCoords)
+                });
+            }
+            else {
+                this._pegmanFeature
+                    .getGeometry()
+                    .setCoordinates(this._pegmanSelectedCoords);
+            }
             this._pegmanLayer.getSource().addFeature(this._pegmanFeature);
-            this._selectPegman.getFeatures().push(this._pegmanFeature);
+            this._addTranslateInteraction();
             this._view.setCenter(this._pegmanSelectedCoords);
-            this._view.setZoom(18);
+            this._view.setZoom(this.options.zoomOnInit);
             this._showStreetView(this._pegmanSelectedCoords);
         }
         /**
@@ -733,6 +744,22 @@
             return this._panorama;
         }
         /**
+         * Get the Vector Layer in wich the Pegman is displayer
+         * @public
+         * @returns
+         */
+        getPegmanLayer() {
+            return this._pegmanLayer;
+        }
+        /**
+         * Get the background Raster layer that display the existing zones with Street View available
+         * @public
+         * @returns
+         */
+        getStreetViewLayer() {
+            return this._streetViewXyzLayer;
+        }
+        /**
          * Show Street View mode
          * @param coords Must be in the map projection format
          * @returns
@@ -756,7 +783,7 @@
          * @public
          */
         hideStreetView() {
-            this._selectPegman.getFeatures().clear();
+            this._translatePegman.setActive(false);
             const pegmanLayerSource = this._pegmanLayer.getSource();
             pegmanLayerSource.clear();
             this._pegmanSelectedCoords = [];
