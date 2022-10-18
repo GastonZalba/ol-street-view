@@ -1,12 +1,16 @@
 /// <reference types="googlemaps" />
-/// <reference types="googlemaps" />
 import { Feature, Map, View } from 'ol';
 import { Vector as VectorSource, XYZ } from 'ol/source';
 import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
 import { Select, Translate } from 'ol/interaction';
+import { Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
+import { CombinedOnSignature, EventTypes, OnSignature } from 'ol/Observable';
 import { EventsKey } from 'ol/events';
 import { Control } from 'ol/control';
+import BaseEvent from 'ol/events/Event';
+import { ObjectEvent } from 'ol/Object';
+import { Types as ObjectEventTypes } from 'ol/ObjectEventType';
 import './assets/scss/ol-street-view.scss';
 /**
  * Street View implementation for Open Layers.
@@ -35,12 +39,16 @@ export default class StreetView extends Control {
     protected _streetViewXyzLayer: TileLayer<XYZ>;
     protected _pegmanLayer: VectorLayer<VectorSource>;
     protected _panorama: google.maps.StreetViewPanorama;
-    protected _pegmanFeature: Feature;
+    protected _pegmanFeature: Feature<Point>;
     protected _pegmanSelectedCoords: Coordinate;
     protected _pegmanHeading: number;
     protected _selectPegman: Select;
     protected _translatePegman: Translate;
     protected _lastHeight: string;
+    protected _streetViewService: any;
+    on: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, EventsKey>;
+    once: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, EventsKey>;
+    un: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, void> & OnSignature<ObjectEventTypes, ObjectEvent, void> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, void>;
     constructor(opt_options?: Options);
     /**
      * @protected
@@ -131,17 +139,48 @@ export default class StreetView extends Control {
 }
 /**
  * **_[interface]_** - Custom Language
- * @protected
+ * @public
  */
 interface i18n {
+    /**
+     * Exit Street View visualization label
+     */
     exit?: string;
+    /**
+     * Exit Street View visualization title label
+     */
     exitView?: string;
+    /**
+     * Pegman icon title label on mouse hovering
+     */
     dragToInit?: string;
+    /**
+     * No images information
+     */
     noImages?: string;
+    /**
+     * Terms of Service
+     */
     termsOfService?: string;
+    /**
+     * Expand map
+     */
     expand?: string;
+    /**
+     * Minimize Map
+     */
     minimize?: string;
 }
+declare enum SVEventTypes {
+    LOAD_LIB = "loadLib",
+    STREET_VIEW_INIT = "streetViewInit",
+    STREET_VIEW_EXIT = "streetViewExit"
+}
+/**
+ * Street View Event Types
+ * @public
+ */
+declare type StreetViewEventTypes = SVEventTypes.LOAD_LIB | SVEventTypes.STREET_VIEW_EXIT | SVEventTypes.STREET_VIEW_INIT;
 /**
  * **_[interface]_** - StreetView Options specified when creating an instance
  *
@@ -195,5 +234,5 @@ interface Options {
      */
     i18n?: i18n;
 }
-export { Options, i18n };
+export { Options, i18n, StreetViewEventTypes };
 //# sourceMappingURL=ol-street-view.d.ts.map
