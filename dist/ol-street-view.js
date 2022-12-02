@@ -125,7 +125,6 @@
         en: en
     });
 
-    let google;
     const SV_MAX_DISTANCE_METERS = 100;
     const controlElement = document.createElement('div');
     /**
@@ -144,9 +143,8 @@
                 element: controlElement,
                 target: opt_options.target
             });
-            this._streetViewService = null;
             // Default options
-            this.options = Object.assign({ apiKey: null, size: 'lg', resizable: true, sizeToggler: true, defaultMapSize: 'expanded', language: 'en', target: null, zoomOnInit: 18 }, opt_options // Merge user options
+            this.options = Object.assign({ apiKey: null, size: 'lg', resizable: true, sizeToggler: true, defaultMapSize: 'expanded', language: 'en', target: null, zoomOnInit: 18, autoLoadGoogleMaps: true }, opt_options // Merge user options
             );
             // If language selector is provided and translation exists...
             this._i18n =
@@ -157,16 +155,64 @@
             this._i18n = Object.assign(this._i18n, opt_options.i18n || {});
             this._pegmanSelectedCoords = [];
             this._pegmanHeading = 180;
-            this._loadStreetView();
-            this.on(SVEventTypes.LOAD_LIB, () => {
-                this._map = super.getMap();
-                this._view = this._map.getView();
-                this._viewport = this._map.getTargetElement();
-                this._prepareLayers();
-                this._createMapControls();
-                this._prepareLayout();
-                this._streetViewService = new google.maps.StreetViewService();
+            if (this.options.autoLoadGoogleMaps) {
+                this.on(SVEventTypes.LOAD_LIB, () => {
+                    this.init();
+                });
+                this._loadStreetView();
+            }
+        }
+        /**
+         * Call this function after the Google Maps library is loaded if autoLoadGoogleMaps is `false`.
+         * Otherwise it will called automatically after the Maps Library is loaded.
+         * @public
+         */
+        init() {
+            this._streetViewService = new google.maps.StreetViewService();
+            this._panorama = new google.maps.StreetViewPanorama(this.streetViewPanoramaDiv, {
+                pov: { heading: 165, pitch: 0 },
+                zoom: 1,
+                visible: false,
+                motionTracking: false,
+                motionTrackingControl: false,
+                enableCloseButton: false,
+                fullscreenControl: false
             });
+            this._panorama.addListener('position_changed', () => {
+                if (this._isPositionFired) {
+                    return;
+                }
+                setTimeout(() => {
+                    this._isPositionFired = null;
+                }, 400);
+                this._isPositionFired = true;
+                const position = this._panorama.getPosition();
+                this._updatePegmanPosition(position, true);
+            });
+            this._panorama.addListener('pov_changed', () => {
+                const heading = this._panorama.getPov().heading;
+                // Add this check to prevent firing multiple times
+                if (heading !== this._pegmanHeading) {
+                    this._pegmanHeading = heading;
+                    this._pegmanLayer.getSource().changed();
+                }
+            });
+            const exitControlST = this.exitControlUI.cloneNode(true);
+            exitControlST.onclick = this.hideStreetView.bind(this);
+            this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(exitControlST);
+        }
+        /**
+         * @protected
+         * @param map
+         */
+        setMap(map) {
+            super.setMap(map);
+            this._map = super.getMap();
+            this._view = this._map.getView();
+            this._viewport = this._map.getTargetElement();
+            this._prepareLayers();
+            this._createMapControls();
+            this._prepareLayout();
         }
         /**
          * @protected
@@ -554,7 +600,7 @@
                     language: this.options.language
                 });
                 try {
-                    google = yield loader.load();
+                    yield loader.load();
                     _super.dispatchEvent.call(this, SVEventTypes.LOAD_LIB);
                 }
                 catch (err) {
@@ -605,44 +651,6 @@
                 center: this._pegmanSelectedCoords,
                 duration: 100
             });
-        }
-        /**
-         * @protected
-         */
-        _initStreetView() {
-            this._panorama = new google.maps.StreetViewPanorama(this.streetViewPanoramaDiv, {
-                pov: { heading: 165, pitch: 0 },
-                zoom: 1,
-                visible: false,
-                motionTracking: false,
-                motionTrackingControl: false,
-                radius: SV_MAX_DISTANCE_METERS,
-                enableCloseButton: false,
-                fullscreenControl: false
-            });
-            this._panorama.addListener('position_changed', () => {
-                if (this._isPositionFired) {
-                    return;
-                }
-                setTimeout(() => {
-                    this._isPositionFired = null;
-                }, 400);
-                this._isPositionFired = true;
-                const position = this._panorama.getPosition();
-                this._updatePegmanPosition(position, true);
-            });
-            this._panorama.addListener('pov_changed', () => {
-                const heading = this._panorama.getPov().heading;
-                // Add this check to prevent firing multiple times
-                if (heading !== this._pegmanHeading) {
-                    this._pegmanHeading = heading;
-                    this._pegmanLayer.getSource().changed();
-                }
-            });
-            const exitControlST = this.exitControlUI.cloneNode(true);
-            exitControlST.onclick = this.hideStreetView.bind(this);
-            this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(exitControlST);
-            this._isInitialized = true;
         }
         /**
          * @protected
@@ -707,7 +715,7 @@
         }
         /**
          * Show Street View mode
-         * @param coords Muste be im the map projection format
+         * @param coords Must be in the map projection format
          * @protected
          */
         _showStreetView(coords) {
@@ -718,10 +726,6 @@
             setTimeout(() => {
                 this._refreshMap(false);
             }, 150);
-            // Only init one time
-            if (!this._isInitialized) {
-                this._initStreetView();
-            }
             this._updateStreetViewPosition(coords);
             this._panorama.setVisible(true);
             this._addClickListener();

@@ -28,7 +28,6 @@ export default class StreetView extends Control {
     _map: Map;
     _view: View;
     _viewport: HTMLElement;
-    protected _isInitialized: boolean;
     protected _isDragging: boolean;
     protected pegmanDivControl: HTMLElement;
     protected exitControlUI: HTMLButtonElement;
@@ -39,17 +38,28 @@ export default class StreetView extends Control {
     protected _streetViewXyzLayer: TileLayer<XYZ>;
     protected _pegmanLayer: VectorLayer<VectorSource>;
     protected _panorama: google.maps.StreetViewPanorama;
+    protected _streetViewService: google.maps.StreetViewService;
     protected _pegmanFeature: Feature<Point>;
     protected _pegmanSelectedCoords: Coordinate;
     protected _pegmanHeading: number;
     protected _translatePegman: Translate;
     protected _lastHeight: string;
-    protected _streetViewService: any;
-    protected _isPositionFired: any;
+    protected _isPositionFired: boolean;
     on: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, EventsKey>;
     once: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, EventsKey>;
     un: OnSignature<EventTypes | StreetViewEventTypes, BaseEvent, void> & OnSignature<ObjectEventTypes, ObjectEvent, void> & CombinedOnSignature<StreetViewEventTypes | ObjectEventTypes | EventTypes, void>;
     constructor(opt_options?: Options);
+    /**
+     * Call this function after the Google Maps library is loaded if autoLoadGoogleMaps is `false`.
+     * Otherwise it will called automatically after the Maps Library is loaded.
+     * @public
+     */
+    init(): void;
+    /**
+     * @protected
+     * @param map
+     */
+    setMap(map: Map): void;
     /**
      * @protected
      */
@@ -86,10 +96,6 @@ export default class StreetView extends Control {
     /**
      * @protected
      */
-    _initStreetView(): void;
-    /**
-     * @protected
-     */
     _initPegmanOnMap(): void;
     /**
      * @protected
@@ -107,7 +113,7 @@ export default class StreetView extends Control {
     _refreshMap(centerToPegman?: boolean): void;
     /**
      * Show Street View mode
-     * @param coords Muste be im the map projection format
+     * @param coords Must be in the map projection format
      * @protected
      */
     _showStreetView(coords: Coordinate): void;
@@ -205,6 +211,7 @@ declare type StreetViewEventTypes = SVEventTypes.LOAD_LIB | SVEventTypes.STREET_
  *   resizable: true,
  *   sizeToggler: true,
  *   defaultMapSize: 'expanded',
+ *   autoLoadGoogleMaps: true,
  *   language: 'en',
  *   i18n: {...} // Translations according to selected language
  * }
@@ -236,6 +243,11 @@ interface Options {
      * Default size of the map when the Street View is activated
      */
     defaultMapSize?: 'expanded' | 'compact' | 'hidden';
+    /**
+     * To configure if the Google Maps Library should be called automatically.
+     * `false` if you are going to load it on your own. If so, you must run the `init` method AFTER the library is loaded. In this case the event 'loadLib' will not be fired.
+     */
+    autoLoadGoogleMaps?: boolean;
     /**
      * Specify a target if you want the control to be rendered outside of the map's viewport.
      * For Ol5, you must set a target to prevent the control from being rendered at the default
