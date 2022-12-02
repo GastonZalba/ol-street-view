@@ -32,8 +32,6 @@ import * as languages from './components/i18n/index';
 // Css
 import './assets/scss/ol-street-view.scss';
 
-let google;
-
 const SV_MAX_DISTANCE_METERS = 100;
 const controlElement = document.createElement('div');
 
@@ -56,7 +54,6 @@ export default class StreetView extends Control {
     public _view: View;
     public _viewport: HTMLElement;
 
-    protected _isInitialized: boolean;
     protected _isDragging: boolean;
 
     // Control
@@ -74,6 +71,7 @@ export default class StreetView extends Control {
     protected _pegmanLayer: VectorLayer<VectorSource>;
 
     protected _panorama: google.maps.StreetViewPanorama;
+    protected _streetViewService: google.maps.StreetViewService;
 
     // Pegman
     protected _pegmanFeature: Feature<Point>;
@@ -84,9 +82,7 @@ export default class StreetView extends Control {
     // State
     protected _lastHeight: string;
 
-    protected _streetViewService = null;
-
-    protected _isPositionFired;
+    protected _isPositionFired: boolean;
 
     declare on: OnSignature<
         EventTypes | StreetViewEventTypes,
@@ -137,6 +133,7 @@ export default class StreetView extends Control {
             language: 'en',
             target: null,
             zoomOnInit: 18,
+            autoLoadGoogleMaps: true,
             ...opt_options // Merge user options
         };
 
@@ -154,19 +151,83 @@ export default class StreetView extends Control {
         this._pegmanSelectedCoords = [];
         this._pegmanHeading = 180;
 
-        this._loadStreetView();
+        if (this.options.autoLoadGoogleMaps) {
+            this.on(SVEventTypes.LOAD_LIB, () => {
+                this.init();
+            });
 
-        this.on(SVEventTypes.LOAD_LIB, () => {
-            this._map = super.getMap();
-            this._view = this._map.getView();
-            this._viewport = this._map.getTargetElement();
+            this._loadStreetView();
+        }
+    }
 
-            this._prepareLayers();
-            this._createMapControls();
-            this._prepareLayout();
+    /**
+     * Call this function after the Google Maps library is loaded if autoLoadGoogleMaps is `false`.
+     * Otherwise it will called automatically after the Maps Library is loaded.
+     * @public
+     */
+    init(): void {
+        this._streetViewService = new google.maps.StreetViewService();
+        this._panorama = new google.maps.StreetViewPanorama(
+            this.streetViewPanoramaDiv as HTMLElement,
+            {
+                pov: { heading: 165, pitch: 0 },
+                zoom: 1,
+                visible: false,
+                motionTracking: false,
+                motionTrackingControl: false,
+                enableCloseButton: false,
+                fullscreenControl: false
+            }
+        );
 
-            this._streetViewService = new google.maps.StreetViewService();
+        this._panorama.addListener('position_changed', () => {
+            if (this._isPositionFired) {
+                return;
+            }
+
+            setTimeout(() => {
+                this._isPositionFired = null;
+            }, 400);
+
+            this._isPositionFired = true;
+
+            const position = this._panorama.getPosition();
+            this._updatePegmanPosition(position, true);
         });
+
+        this._panorama.addListener('pov_changed', () => {
+            const heading = this._panorama.getPov().heading;
+            // Add this check to prevent firing multiple times
+            if (heading !== this._pegmanHeading) {
+                this._pegmanHeading = heading;
+                this._pegmanLayer.getSource().changed();
+            }
+        });
+
+        const exitControlST = this.exitControlUI.cloneNode(true);
+        (exitControlST as HTMLButtonElement).onclick = this.hideStreetView.bind(
+            this
+        );
+
+        this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(
+            exitControlST
+        );
+    }
+
+    /**
+     * @protected
+     * @param map
+     */
+    setMap(map: Map): void {
+        super.setMap(map);
+
+        this._map = super.getMap();
+        this._view = this._map.getView();
+        this._viewport = this._map.getTargetElement();
+
+        this._prepareLayers();
+        this._createMapControls();
+        this._prepareLayout();
     }
 
     /**
@@ -647,7 +708,7 @@ export default class StreetView extends Control {
         });
 
         try {
-            google = await loader.load();
+            await loader.load();
             super.dispatchEvent(SVEventTypes.LOAD_LIB);
         } catch (err) {
             console.error(err);
@@ -718,60 +779,6 @@ export default class StreetView extends Control {
             center: this._pegmanSelectedCoords,
             duration: 100
         });
-    }
-
-    /**
-     * @protected
-     */
-    _initStreetView(): void {
-        this._panorama = new google.maps.StreetViewPanorama(
-            this.streetViewPanoramaDiv as HTMLElement,
-            {
-                pov: { heading: 165, pitch: 0 },
-                zoom: 1,
-                visible: false,
-                motionTracking: false,
-                motionTrackingControl: false,
-                radius: SV_MAX_DISTANCE_METERS,
-                enableCloseButton: false,
-                fullscreenControl: false
-            }
-        );
-
-        this._panorama.addListener('position_changed', () => {
-            if (this._isPositionFired) {
-                return;
-            }
-
-            setTimeout(() => {
-                this._isPositionFired = null;
-            }, 400);
-
-            this._isPositionFired = true;
-
-            const position = this._panorama.getPosition();
-            this._updatePegmanPosition(position, true);
-        });
-
-        this._panorama.addListener('pov_changed', () => {
-            const heading = this._panorama.getPov().heading;
-            // Add this check to prevent firing multiple times
-            if (heading !== this._pegmanHeading) {
-                this._pegmanHeading = heading;
-                this._pegmanLayer.getSource().changed();
-            }
-        });
-
-        const exitControlST = this.exitControlUI.cloneNode(true);
-        (exitControlST as HTMLButtonElement).onclick = this.hideStreetView.bind(
-            this
-        );
-
-        this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(
-            exitControlST
-        );
-
-        this._isInitialized = true;
     }
 
     /**
@@ -848,7 +855,7 @@ export default class StreetView extends Control {
 
     /**
      * Show Street View mode
-     * @param coords Muste be im the map projection format
+     * @param coords Must be in the map projection format
      * @protected
      */
     _showStreetView(coords: Coordinate): void {
@@ -860,11 +867,6 @@ export default class StreetView extends Control {
         setTimeout(() => {
             this._refreshMap(false);
         }, 150);
-
-        // Only init one time
-        if (!this._isInitialized) {
-            this._initStreetView();
-        }
 
         this._updateStreetViewPosition(coords);
         this._panorama.setVisible(true);
@@ -1064,6 +1066,7 @@ type StreetViewEventTypes =
  *   resizable: true,
  *   sizeToggler: true,
  *   defaultMapSize: 'expanded',
+ *   autoLoadGoogleMaps: true,
  *   language: 'en',
  *   i18n: {...} // Translations according to selected language
  * }
@@ -1100,6 +1103,12 @@ interface Options {
      * Default size of the map when the Street View is activated
      */
     defaultMapSize?: 'expanded' | 'compact' | 'hidden';
+
+    /**
+     * To configure if the Google Maps Library should be called automatically.
+     * `false` if you are going to load it on your own. If so, you must run the `init` method AFTER the library is loaded. In this case the event 'loadLib' will not be fired.
+     */
+    autoLoadGoogleMaps?: boolean;
 
     /**
      * Specify a target if you want the control to be rendered outside of the map's viewport.

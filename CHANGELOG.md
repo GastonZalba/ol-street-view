@@ -94,3 +94,7 @@
 * Added methods `getPegmanLayer` and `getStreetViewLayer`
 * Removed unnecesary `Select` interaction
 * Added `zoomOnInit` option
+
+## v2.0.4
+* Added `autoLoadGoogleMaps` attribute and `init` method to allow loading the Google Maps Library externally.
+* Some internal refactoring to use `setMap` method

@@ -37,6 +37,7 @@ var opt_options = {
     resizable: true,
     sizeToggler: true,
     defaultMapSize: 'expanded',
+    autoLoadGoogleMaps: true,
     target: 'map' // Important for OL 5
 }
 
@@ -53,13 +54,13 @@ map.addControl(streetView);
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.0.3"></script>
+<script src="https://unpkg.com/ol-street-view@2.0.4"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.3/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.4/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -96,6 +97,7 @@ TypeScript types are shipped with the project in the dist directory and should b
 
 -   [StreetView](#streetview)
     -   [Parameters](#parameters)
+    -   [init](#init)
     -   [getStreetViewPanorama](#getstreetviewpanorama)
     -   [getPegmanLayer](#getpegmanlayer)
     -   [getStreetViewLayer](#getstreetviewlayer)
@@ -118,6 +120,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [resizable](#resizable)
     -   [sizeToggler](#sizetoggler)
     -   [defaultMapSize](#defaultmapsize)
+    -   [autoLoadGoogleMaps](#autoloadgooglemaps)
     -   [target](#target)
     -   [language](#language)
     -   [i18n](#i18n-1)
@@ -131,6 +134,13 @@ Street View implementation for Open Layers.
 #### Parameters
 
 -   `opt_options` **[Options](#options)?** StreetView options, see [StreetView Options](#options) for more details.
+
+#### init
+
+Call this function after the Google Maps library is loaded if autoLoadGoogleMaps is `false`.
+Otherwise it will called automatically after the Maps Library is loaded.
+
+Returns **void**&#x20;
 
 #### getStreetViewPanorama
 
@@ -233,6 +243,7 @@ Default values:
   resizable: true,
   sizeToggler: true,
   defaultMapSize: 'expanded',
+  autoLoadGoogleMaps: true,
   language: 'en',
   i18n: {...} // Translations according to selected language
 }
@@ -274,6 +285,13 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 Default size of the map when the Street View is activated
 
 Type: (`"expanded"` | `"compact"` | `"hidden"`)
+
+#### autoLoadGoogleMaps
+
+To configure if the Google Maps Library should be called automatically.
+`false` if you are going to load it on your own. If so, you must run the `init` method AFTER the library is loaded. In this case the event 'loadLib' will not be fired.
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
 #### target
 
