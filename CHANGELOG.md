@@ -98,3 +98,9 @@
 ## v2.0.4
 * Added `autoLoadGoogleMaps` attribute and `init` method to allow loading the Google Maps Library externally.
 * Some internal refactoring to use `setMap` method
+
+## v2.0.5
+* Fixed bug on manual resizing the map using the scroll handler (missing css flex property)
+* Added `ol-control` class to primary button
+* Updated dependencies
+* Some refactoring on rollup.config globals

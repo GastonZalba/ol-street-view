@@ -1,10 +1,19 @@
-import { Collection, Feature, Map, MapBrowserEvent, View } from 'ol';
+import View from 'ol/View';
+import Map from 'ol/Map';
+import Feature from 'ol/Feature';
+import Collection from 'ol/Collection';
+import Icon from 'ol/style/Icon';
+import Style from 'ol/style/Style';
+import VectorSource from 'ol/source/Vector';
+import XYZ from 'ol/source/XYZ';
+import Point from 'ol/geom/Point';
+import Control from 'ol/control/Control';
+import BaseEvent from 'ol/events/Event';
+import { MapBrowserEvent } from 'ol';
 import { transform } from 'ol/proj';
-import { Style, Icon } from 'ol/style';
-import { Vector as VectorSource, XYZ } from 'ol/source';
-import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
-import { Translate } from 'ol/interaction';
-import { Point } from 'ol/geom';
+import VectorLayer from 'ol/layer/Vector';
+import TileLayer from 'ol/layer/Tile';
+import Translate from 'ol/interaction/Translate';
 import { Coordinate } from 'ol/coordinate';
 import {
     CombinedOnSignature,
@@ -14,8 +23,6 @@ import {
 } from 'ol/Observable';
 import { EventsKey } from 'ol/events';
 import { TranslateEvent } from 'ol/interaction/Translate';
-import { Control } from 'ol/control';
-import BaseEvent from 'ol/events/Event';
 import { ObjectEvent } from 'ol/Object';
 import { Types as ObjectEventTypes } from 'ol/ObjectEventType';
 
@@ -205,9 +212,8 @@ export default class StreetView extends Control {
         });
 
         const exitControlST = this.exitControlUI.cloneNode(true);
-        (exitControlST as HTMLButtonElement).onclick = this.hideStreetView.bind(
-            this
-        );
+        (exitControlST as HTMLButtonElement).onclick =
+            this.hideStreetView.bind(this);
 
         this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(
             exitControlST
@@ -286,8 +292,7 @@ export default class StreetView extends Control {
                     this._i18n.termsOfService
                 }</a>`,
                 maxZoom: 19,
-                url:
-                    'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
+                url: 'https://mt{0-3}.google.com/vt/?lyrs=svv|cb_client:apiv3&style=50&x={x}&y={y}&z={z}'
             })
         });
 
@@ -369,16 +374,14 @@ export default class StreetView extends Control {
                         );
                     },
                     move: (event) => {
-                        let { x, y } = event.target.dataset;
-
-                        x = (parseFloat(x) || 0) + event.deltaRect.left;
+                        let { y } = event.target.dataset;
                         y = (parseFloat(y) || 0) + event.deltaRect.top;
 
                         Object.assign(event.target.style, {
-                            height: `${event.rect.height}px`
+                            height: `${Math.round(event.rect.height)}px`
                         });
 
-                        Object.assign(event.target.dataset, { x, y });
+                        Object.assign(event.target.dataset, { y });
 
                         debounceRefresh();
                     },
@@ -551,14 +554,16 @@ export default class StreetView extends Control {
                                     0) + e.dy;
 
                         // Translate the Element
-                        pTarget.style.webkitTransform = pTarget.style.transform = `translate(${x}px, ${y}px)`;
+                        pTarget.style.webkitTransform =
+                            pTarget.style.transform = `translate(${x}px, ${y}px)`;
 
                         // Update the Posiion Attributes
                         pTarget.setAttribute('data-x', x);
                         pTarget.setAttribute('data-y', y);
                     },
                     onend: (e) => {
-                        const viewportOffset = this.mapContainer.getBoundingClientRect();
+                        const viewportOffset =
+                            this.mapContainer.getBoundingClientRect();
 
                         // To compensate if the map is not 100%  width of the browser
                         const mapDistanceX = viewportOffset.left;
@@ -624,7 +629,7 @@ export default class StreetView extends Control {
         const addPegmanControl = (): void => {
             this.pegmanDivControl = controlElement;
             this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-            this.pegmanDivControl.className = `ol-street-view--${this.options.size}-btn`;
+            this.pegmanDivControl.className = `ol-street-view--${this.options.size}-btn ol-control`;
             this.pegmanDivControl.title = this._i18n.dragToInit;
 
             this.pegmanDraggable = document.createElement('div');

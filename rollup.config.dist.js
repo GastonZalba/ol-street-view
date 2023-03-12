@@ -11,31 +11,22 @@ import livereload from 'rollup-plugin-livereload';
 import postcss from 'rollup-plugin-postcss';
 import path from 'path';
 
-let globals = {
-    'ol': 'ol',
-    'ol/Map': 'ol.Map',
-    'ol/source': 'ol.source',
-    'ol/layer': 'ol.layer',
-    'ol/layer/VectorTile': 'ol.layer.VectorTile',
-    'ol/geom': 'ol.geom',
-    'ol/geom/Polygon': 'ol.geom.Polygon',
-    'ol/Feature': 'ol.Feature',
-    'ol/Overlay': 'ol.Overlay',
-    'ol/style': 'ol.style',
-    'ol/control': 'ol.control',
-    'ol/proj': 'ol.proj',
-    'ol/extent': 'ol.extent',
-    'ol/Observable': 'ol.Observable',
-    'ol/format': 'ol.format',
-    'ol/events': 'ol.events',
-    'ol/interaction': 'ol.interaction',
-    'ol/TileState': 'ol.TileState',
-    'ol/coordinate': 'ol.coordinate',
-    'ol/style/IconAnchorUnits': 'ol.style.IconAnchorUnits',
-    'ol/interaction/Translate': 'ol.interaction.Translate',
-    'interactjs': 'interact',
-    'google-maps': 'google-maps'
-};
+const globals = (id) => {
+
+    const globals = {
+        'interactjs': 'interact',
+        'google-maps': 'google-maps'
+    }
+
+    if (/ol(\\|\/)/.test(id)) {
+        return id.replace(/\//g, '.').replace('.js', '');
+    } else if (id in globals) {
+        return globals[id];
+    }
+
+    return id;
+}
+
 
 export default function (commandOptions) {
 
