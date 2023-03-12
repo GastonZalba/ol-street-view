@@ -26,6 +26,7 @@
 
 .ol-street-view--map {
     position: relative;
+    flex: 0 0 auto;
 }
 
 #ol-street-view--panorama canvas:focus {
@@ -41,6 +42,7 @@
     width: 51px;
     height: 51px;
     pointer-events: auto;
+    background-color: transparent;
 
     /* Ol 5 */
 
@@ -242,7 +244,6 @@
     z-index: 99;
     border-radius: 4px;
     border: 2px solid #000;
-    cursor: grab;
     padding: 3px 10px;
     touch-action: none;
     box-sizing: border-box;

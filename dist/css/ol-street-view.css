@@ -7,8 +7,11 @@
 }
 
 #ol-street-view--panorama {
-  display: none;
   background-color: #555555 !important;
+}
+
+#ol-street-view--panorama {
+  display: none;
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
@@ -25,6 +28,7 @@
 
 .ol-street-view--map {
   position: relative;
+  flex: 0 0 auto;
 }
 
 #ol-street-view--panorama canvas:focus {
@@ -40,6 +44,7 @@
   width: 51px;
   height: 51px;
   pointer-events: auto;
+  background-color: transparent;
   /* Ol 5 */
 }
 #ol-street-view--pegman-button-div * {
@@ -130,6 +135,8 @@
 }
 #ol-street-view--pegman-draggable.ol-street-view--active {
   opacity: 1 !important;
+}
+#ol-street-view--pegman-draggable.ol-street-view--active {
   /* Pegman Marker Icon */
   cursor: -webkit-grabbing;
   cursor: grabbing;
@@ -150,7 +157,7 @@
   border: 1px dotted rgba(51, 51, 51, 0.9);
   background-color: rgba(105, 185, 70, 0.7);
   border-radius: 30px;
-  box-shadow: 3px 10px 25px #69b946;
+  box-shadow: 3px 10px 25px rgb(105, 185, 70);
   animation: pulse 1.5s infinite;
 }
 #ol-street-view--pegman-draggable.ol-street-view--active.ol-street-view--can-drop.ol-street-view--left::before {
@@ -202,8 +209,6 @@
   z-index: 99;
   border-radius: 4px;
   border: 2px solid #000;
-  cursor: -webkit-grab;
-  cursor: grab;
   padding: 3px 10px;
   touch-action: none;
   box-sizing: border-box;
@@ -264,6 +269,9 @@
 
 .ol-control.ol-street-view--size-toggler button {
   background-color: #ffffff !important;
+}
+
+.ol-control.ol-street-view--size-toggler button {
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   height: 31px;
@@ -286,10 +294,11 @@
 }
 @media all and (max-width: 1280px) {
   .ol-street-view--activated .ol-street-view--map {
-    height: 180px;
     overflow-y: inherit !important;
   }
-
+  .ol-street-view--activated .ol-street-view--map {
+    height: 180px;
+  }
   #ol-street-view--pegman-button-div {
     top: 315px;
   }
@@ -314,13 +323,17 @@
   display: flex;
 }
 .ol-street-view--activated .ol-street-view--map {
-  height: 250px;
   overflow-y: inherit !important;
+}
+.ol-street-view--activated .ol-street-view--map {
+  height: 250px;
+}
+.ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
+  height: 150px !important;
 }
 .ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
   position: absolute;
   width: 250px;
-  height: 150px !important;
   left: 20px;
   bottom: 40px;
   z-index: 99;
@@ -354,7 +367,7 @@
 
 /* Google */
 .gm-control-exit {
-  background: none #222222;
+  background: none rgb(34, 34, 34);
   border: 0px;
   margin: 10px;
   padding: 0px;

@@ -1,14 +1,20 @@
 /// <reference types="googlemaps" />
-import { Feature, Map, View } from 'ol';
-import { Vector as VectorSource, XYZ } from 'ol/source';
-import { Vector as VectorLayer, Tile as TileLayer } from 'ol/layer';
-import { Translate } from 'ol/interaction';
-import { Point } from 'ol/geom';
+/// <reference types="googlemaps" />
+/// <reference types="googlemaps" />
+import View from 'ol/View';
+import Map from 'ol/Map';
+import Feature from 'ol/Feature';
+import VectorSource from 'ol/source/Vector';
+import XYZ from 'ol/source/XYZ';
+import Point from 'ol/geom/Point';
+import Control from 'ol/control/Control';
+import BaseEvent from 'ol/events/Event';
+import VectorLayer from 'ol/layer/Vector';
+import TileLayer from 'ol/layer/Tile';
+import Translate from 'ol/interaction/Translate';
 import { Coordinate } from 'ol/coordinate';
 import { CombinedOnSignature, EventTypes, OnSignature } from 'ol/Observable';
 import { EventsKey } from 'ol/events';
-import { Control } from 'ol/control';
-import BaseEvent from 'ol/events/Event';
 import { ObjectEvent } from 'ol/Object';
 import { Types as ObjectEventTypes } from 'ol/ObjectEventType';
 import './assets/scss/ol-street-view.scss';
@@ -198,7 +204,7 @@ declare enum SVEventTypes {
  * Street View Event Types
  * @public
  */
-declare type StreetViewEventTypes = SVEventTypes.LOAD_LIB | SVEventTypes.STREET_VIEW_EXIT | SVEventTypes.STREET_VIEW_INIT;
+type StreetViewEventTypes = SVEventTypes.LOAD_LIB | SVEventTypes.STREET_VIEW_EXIT | SVEventTypes.STREET_VIEW_INIT;
 /**
  * **_[interface]_** - StreetView Options specified when creating an instance
  *
