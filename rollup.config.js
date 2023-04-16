@@ -9,10 +9,10 @@ import copy from 'rollup-plugin-copy';
 process.env.NODE_ENV = 'production';
 
 module.exports = {
-    input: 'src/ol-street-view.ts',
+    input: 'src/index-es.js',
     output: [
         {
-            dir: 'lib',
+            file: 'lib/ol-street-view.js',
             format: 'es',
             sourcemap: true
         }

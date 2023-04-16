@@ -104,3 +104,9 @@
 * Added `ol-control` class to primary button
 * Updated dependencies
 * Some refactoring on rollup.config globals
+
+## v2.0.6
+* Fix events type
+* Added enums
+* Improved setMap (set to @public, allow null value to clean the control)
+* Improved comments and documentation

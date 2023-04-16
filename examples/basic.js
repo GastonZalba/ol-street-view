@@ -68,6 +68,7 @@ var streetView = new StreetView(
 );
 
 map.addControl(streetView);
+// streetView.setMap(map);
 
 function initiPano() {
     var pano = streetView.showStreetView(coordsView);

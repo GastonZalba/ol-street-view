@@ -18,7 +18,7 @@ Tested with OpenLayers version 5, 6 and 7. For Ol5, you must set a custom "targe
 
 ## Disclaminer
 
-If you are going to use this module, read the Google [Terms of Service](https://www.google.com/help/terms_maps/)
+If you are going to use this module, read the Google [Terms of Service](https://www.google.com/help/terms_maps/).
 
 ## Examples
 
@@ -29,20 +29,127 @@ If you are going to use this module, read the Google [Terms of Service](https://
 
 ```js
 // Default options
-var opt_options = {
-    apiKey: null, // Must be provided to remove "For development purposes only" message
-    language: 'en',
-    i18n: {...}, // Custom translations. Default is according to selected language
-    size: 'md',
+const opt_options = {
+    /**
+     * Official Google Maps Api Key
+     * If not provided, the map will be in inverted colors with the message "For development purposes only"
+     */
+    apiKey: null,
+
+    /**
+     * Size of the Pegman Control in the map
+     */
+    size: 'lg',
+
+    /**
+     * Zoom level on the map when init the Panorama
+     */
+    zoomOnInit: 18, 
+
+    /**
+     * To display a handler that enable dragging changing the height of the layout
+     */
     resizable: true,
+
+    /**
+     * Control displayed once Street View is activated, to allow compact/expand the size of the map
+     */
     sizeToggler: true,
+    
+    /**
+     * Default size of the map when the Street View is activated
+     */
     defaultMapSize: 'expanded',
+
+    /**
+     * To configure if the Google Maps Library should be called automatically.
+     * `false` if you are going to load it on your own. If so, you must run the `init` method AFTER the library is loaded. In this case the event 'loadLib' will not be fired.
+     */
     autoLoadGoogleMaps: true,
-    target: 'map' // Important for OL 5
+
+    /**
+     * Specify a target if you want the control to be rendered outside of the map's viewport.
+     * For Ol5, you must set a target to prevent the control from being rendered at the default
+     * target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
+     */
+    target: 'map',
+
+    /**
+     * Language support
+     */
+    language: 'en',
+
+    /**
+     * Add custom translations
+     * Default is according to selected language
+     */
+    i18n: {...},
 }
 
-var streetView = new StreetView(opt_options);
-map.addControl(streetView);
+const streetView = new StreetView(opt_options);
+
+map.addControl(streetView); // or streetView.setMap(map);
+
+```
+
+### Methods
+```js
+/**
+ * ONLY use this method if `autoLoadGoogleMaps` is `false`. Call it after the Google Maps library is loaded.
+ * Otherwise it will called automatically after the Maps Library is loaded.
+ * @returns
+ */
+streetView.init()
+
+/**
+ * This is useful if wou wanna add a custom icon on the panorama instance,
+ * add custom listeners, etc
+ * @returns {google.maps.StreetViewPanorama}
+ */
+const googleStreetViewPanorama = streetView.getStreetViewPanorama();
+
+/**
+ * Get the Vector Layer in wich Pegman is displayed
+ * @returns {VectorLayer<VectorSource>}
+ */
+const vectorLayer = streetView.getPegmanLayer();
+
+/**
+ * Get the background Raster layer that displays the existing zones with Street View available
+ * @returns {TileLayer<XYZ>}
+ */
+const rasterLlayer = streetView.getStreetViewLayer();
+
+/**
+ * Show Street View mode
+ * @fires streetViewInit
+ * @param {Coordinate} coords Must be in the map projection format
+ * @returns {google.maps.StreetViewPanorama}
+ */
+const googleStreetViewPanorama = streetView.showStreetView(coords);
+
+/**
+ * Hide Street View, remove layers and clear features
+ * @fires streetViewExit
+ * @returns
+ */
+streetView.hideStreetView();
+
+/**
+ * Remove the control from its current map and attach it to the new map. 
+ * Pass null to just remove the control from the current map. 
+ * @param map
+ * @returns
+ */
+streetView.setMap(null);
+
+```
+
+### Events
+```js
+streetView.once(`loadLib`, () => console.log('Fired once after the Google library is loaded'))
+streetView.on(`streetViewInit`, () => console.log('Fired everytime Street View mode is activated'))
+streetView.on(`streetViewExit`, () => console.log('Fired everytime after is exited'))
 ```
 
 ## Install
@@ -54,13 +161,13 @@ map.addControl(streetView);
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.0.5"></script>
+<script src="https://unpkg.com/ol-street-view@2.0.6"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.5/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.6/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -74,7 +181,7 @@ Install the package via `npm`
 #### JS
 
 ```js
-import StreetView from 'ol-street-view';
+import StreetView, { Options, i18n, SVEventTypes, Language, BtnControlSize, MapSize } from 'ol-street-view';
 ```
 
 #### CSS
@@ -88,230 +195,6 @@ import 'ol-street-view/lib/style/scss/ol-street-view.scss';
 ##### TypeScript type definition
 
 TypeScript types are shipped with the project in the dist directory and should be automatically used in a TypeScript project. Interfaces are provided for the Options.
-
-## API
-
-<!-- Generated by documentation.js. Update this documentation by updating the source code. -->
-
-#### Table of Contents
-
--   [StreetView](#streetview)
-    -   [Parameters](#parameters)
-    -   [init](#init)
-    -   [getStreetViewPanorama](#getstreetviewpanorama)
-    -   [getPegmanLayer](#getpegmanlayer)
-    -   [getStreetViewLayer](#getstreetviewlayer)
-    -   [showStreetView](#showstreetview)
-        -   [Parameters](#parameters-1)
-    -   [hideStreetView](#hidestreetview)
--   [i18n](#i18n)
-    -   [exit](#exit)
-    -   [exitView](#exitview)
-    -   [dragToInit](#dragtoinit)
-    -   [noImages](#noimages)
-    -   [termsOfService](#termsofservice)
-    -   [expand](#expand)
-    -   [minimize](#minimize)
--   [StreetViewEventTypes](#streetvieweventtypes)
--   [Options](#options)
-    -   [apiKey](#apikey)
-    -   [size](#size)
-    -   [zoomOnInit](#zoomoninit)
-    -   [resizable](#resizable)
-    -   [sizeToggler](#sizetoggler)
-    -   [defaultMapSize](#defaultmapsize)
-    -   [autoLoadGoogleMaps](#autoloadgooglemaps)
-    -   [target](#target)
-    -   [language](#language)
-    -   [i18n](#i18n-1)
-
-### StreetView
-
-**Extends ol/control/Control~Control**
-
-Street View implementation for Open Layers.
-
-#### Parameters
-
--   `opt_options` **[Options](#options)?** StreetView options, see [StreetView Options](#options) for more details.
-
-#### init
-
-Call this function after the Google Maps library is loaded if autoLoadGoogleMaps is `false`.
-Otherwise it will called automatically after the Maps Library is loaded.
-
-Returns **void**&#x20;
-
-#### getStreetViewPanorama
-
-This is useful if wou wanna add a custom icon on the panorama instance,
-add custom listeners, etc
-
-Returns **google.maps.StreetViewPanorama**&#x20;
-
-#### getPegmanLayer
-
-Get the Vector Layer in wich the Pegman is displayer
-
-Returns **VectorLayer\<VectorSource>**&#x20;
-
-#### getStreetViewLayer
-
-Get the background Raster layer that display the existing zones with Street View available
-
-Returns **TileLayer\<XYZ>**&#x20;
-
-#### showStreetView
-
-Show Street View mode
-
-##### Parameters
-
--   `coords` **Coordinate** Must be in the map projection format
-
-Returns **google.maps.StreetViewPanorama**&#x20;
-
-#### hideStreetView
-
-Disables Street View mode
-
-Returns **void**&#x20;
-
-### i18n
-
-**_\[interface]_** - Custom Language
-
-#### exit
-
-Exit Street View visualization label
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### exitView
-
-Exit Street View visualization title label
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### dragToInit
-
-Pegman icon title label on mouse hovering
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### noImages
-
-No images information
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### termsOfService
-
-Terms of Service
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### expand
-
-Expand map
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### minimize
-
-Minimize Map
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-### StreetViewEventTypes
-
-Street View Event Types
-
-Type: (SVEventTypes.LOAD_LIB | SVEventTypes.STREET_VIEW_EXIT | SVEventTypes.STREET_VIEW_INIT)
-
-### Options
-
-**_\[interface]_** - StreetView Options specified when creating an instance
-
-Default values:
-
-```javascript
-{
-  apiKey: null,
-  size: 'lg',
-  zoomOnInit: 18,
-  resizable: true,
-  sizeToggler: true,
-  defaultMapSize: 'expanded',
-  autoLoadGoogleMaps: true,
-  language: 'en',
-  i18n: {...} // Translations according to selected language
-}
-```
-
-#### apiKey
-
-Google Maps Api Key
-If not provided, the map will be in inverted colors with the message "For development purposes only"
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### size
-
-Size of the Pegman Control in the map
-
-Type: (`"sm"` | `"md"` | `"lg"`)
-
-#### zoomOnInit
-
-Zoom level on the map when init the Panorama
-
-Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
-
-#### resizable
-
-To display a handler that enable dragging changing the height of the layout
-
-Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
-
-#### sizeToggler
-
-Control displayed once Street View is activated, to allow compact/expand the size of the map
-
-Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
-
-#### defaultMapSize
-
-Default size of the map when the Street View is activated
-
-Type: (`"expanded"` | `"compact"` | `"hidden"`)
-
-#### autoLoadGoogleMaps
-
-To configure if the Google Maps Library should be called automatically.
-`false` if you are going to load it on your own. If so, you must run the `init` method AFTER the library is loaded. In this case the event 'loadLib' will not be fired.
-
-Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
-
-#### target
-
-Specify a target if you want the control to be rendered outside of the map's viewport.
-For Ol5, you must set a target to prevent the control from being rendered at the default
-target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
-
-Type: ([HTMLElement](https://developer.mozilla.org/docs/Web/HTML/Element) | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String))
-
-#### language
-
-Language support
-
-Type: (`"es"` | `"en"`)
-
-#### i18n
-
-Add custom translations
-
-Type: [i18n](#i18n)
 
 ## Todo
 

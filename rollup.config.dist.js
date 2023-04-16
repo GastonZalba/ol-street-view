@@ -1,4 +1,3 @@
-import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
@@ -31,17 +30,17 @@ const globals = (id) => {
 export default function (commandOptions) {
 
     const outputs = [{
-        input: 'src/ol-street-view.ts',
+        input: 'src/index-umd.js',
         output: [
             {
-                dir: 'dist',
+                file: 'dist/ol-street-view.js',
                 format: 'umd',
                 name: 'StreetView',
                 globals: globals,
                 sourcemap: true
             },
             !commandOptions.dev && {
-                file: pkg.browser,
+                file: 'dist/ol-street-view.min.js',
                 format: 'umd',
                 plugins: [terser()],
                 name: 'StreetView',

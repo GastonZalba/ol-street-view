@@ -1,20 +1,18 @@
 {
   "name": "ol-street-view",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Street View implementation for Open Layers",
   "browser": "dist/ol-street-view.min.js",
   "main": "dist/ol-street-view.js",
   "module": "lib/ol-street-view.js",
   "types": "lib/ol-street-view.d.ts",
-  "style": "lib/ol-street-view.css",
+  "style": "lib/style/css/ol-street-view.css",
   "files": [
-    "index.js",
     "lib/**/*",
     "dist/**/*"
   ],
   "scripts": {
     "watch": "rollup -w --config rollup.config.dist.js --dev",
-    "doc": "documentation readme src/ol-street-view.ts --shallow --quiet=true --access=public --access=undefined --section=API --parse-extension ts && node scripts/external-links.js README.md && prettier --write README.md",
     "format": "eslint --fix src/*.ts && prettier --write src",
     "lint": "eslint src/*.ts && prettier --check src",
     "build": "npm run lint && rollup --config rollup.config.dist.js && rollup --config rollup.config.js",
@@ -59,7 +57,6 @@
     "autoprefixer": "^10.4.2",
     "clean-css": "^5.2.4",
     "del-cli": "^3.0.1",
-    "documentation": "^14.0.0",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-import": "^2.25.4",
