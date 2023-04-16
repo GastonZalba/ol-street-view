@@ -161,13 +161,13 @@ streetView.on(`streetViewExit`, () => console.log('Fired everytime after is exit
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.0.6"></script>
+<script src="https://unpkg.com/ol-street-view@2.0.7"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.6/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.0.7/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -202,6 +202,6 @@ TypeScript types are shipped with the project in the dist directory and should b
 -   \~~Add resizable screen option~~
 -   Add feedback support when element can't be dropped
 -   Add extra layout (vertical)
--   r~~Add scss~~
+-   ~~Add scss~~
 -   \~~Add size toggler~~
 -   Improve scss style (add some variables)

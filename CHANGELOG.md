@@ -110,3 +110,6 @@
 * Added enums
 * Improved setMap (set to @public, allow null value to clean the control)
 * Improved comments and documentation
+
+## v2.0.7
+* Fix umd export (missing enums)
