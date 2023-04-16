@@ -113,3 +113,8 @@
 
 ## v2.0.7
 * Fix umd export (missing enums)
+
+## v2.1.0
+* Updated dependencies
+* Removed "browser" attribute from package.json
+* Added "type" module attribute to package.json

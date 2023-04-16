@@ -2,9 +2,9 @@ import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import image from '@rollup/plugin-image';
-import { terser } from "rollup-plugin-terser";
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
+import terser from '@rollup/plugin-terser';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 import postcss from 'rollup-plugin-postcss';
@@ -89,7 +89,7 @@ export default function (commandOptions) {
                 sourceMap: commandOptions.dev ? true : false,
                 minimize: false,
                 config: {
-                    path: './postcss.config.js',
+                    path: './postcss.config.cjs',
                     ctx: {
                         isDev: commandOptions.dev ? true : false
                     }
@@ -146,7 +146,7 @@ export default function (commandOptions) {
                     extract: true,
                     minimize: true,
                     config: {
-                        path: './postcss.config.js',
+                        path: './postcss.config.cjs',
                         ctx: {
                             isDev: commandOptions.dev ? true : false
                         }

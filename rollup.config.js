@@ -8,7 +8,7 @@ import copy from 'rollup-plugin-copy';
 
 process.env.NODE_ENV = 'production';
 
-module.exports = {
+export default {
     input: 'src/index-es.js',
     output: [
         {
