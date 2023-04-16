@@ -30709,7 +30709,7 @@
      * Street View implementation for Open Layers.
      *
      * @constructor
-     * @fires loadLib
+     * @fires loadLib Fired after the Googlelibrary is loaded
      * @fires streetViewExit
      * @fires streetViewInit
      * @param opt_options StreetView options, see [StreetView Options](#options) for more details.
@@ -30721,8 +30721,10 @@
                 element: controlElement,
                 target: opt_options.target
             });
+            this._loadedLib = false;
+            this._initialized = false;
             // Default options
-            this.options = Object.assign({ apiKey: null, size: 'lg', resizable: true, sizeToggler: true, defaultMapSize: 'expanded', language: 'en', target: null, zoomOnInit: 18, autoLoadGoogleMaps: true }, opt_options // Merge user options
+            this.options = Object.assign({ apiKey: null, size: BtnControlSize.Large, resizable: true, sizeToggler: true, defaultMapSize: MapSize.Expanded, language: Language.EN, target: null, zoomOnInit: 18, autoLoadGoogleMaps: true }, opt_options // Merge user options
             );
             // If language selector is provided and translation exists...
             this._i18n =
@@ -30735,17 +30737,21 @@
             this._pegmanHeading = 180;
             if (this.options.autoLoadGoogleMaps) {
                 this.on(SVEventTypes.LOAD_LIB, () => {
+                    this._loadedLib = true;
                     this.init();
                 });
                 this._loadStreetView();
             }
         }
         /**
-         * Call this function after the Google Maps library is loaded if autoLoadGoogleMaps is `false`.
+         * Only use this method if `autoLoadGoogleMaps` is `false`. Call it after the Google Maps library is loaded.
          * Otherwise it will called automatically after the Maps Library is loaded.
          * @public
+         * @returns
          */
         init() {
+            if (!this._map)
+                return;
             this._streetViewService = new google.maps.StreetViewService();
             this._panorama = new google.maps.StreetViewPanorama(this.streetViewPanoramaDiv, {
                 pov: { heading: 165, pitch: 0 },
@@ -30779,19 +30785,31 @@
             exitControlST.onclick =
                 this.hideStreetView.bind(this);
             this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(exitControlST);
+            this._initialized = true;
         }
         /**
-         * @protected
+         * Remove the control from its current map and attach it to the new map.
+         * Pass null to just remove the control from the current map.
          * @param map
+         * @public
          */
         setMap(map) {
             super.setMap(map);
-            this._map = super.getMap();
-            this._view = this._map.getView();
-            this._viewport = this._map.getTargetElement();
-            this._prepareLayers();
-            this._createMapControls();
-            this._prepareLayout();
+            if (map) {
+                this._map = super.getMap();
+                this._view = this._map.getView();
+                this._viewport = this._map.getTargetElement();
+                this._prepareLayers();
+                this._createMapControls();
+                this._prepareLayout();
+                if (this._loadedLib && !this._initialized) {
+                    this.init();
+                }
+            }
+            else {
+                controlElement.remove();
+                this.hideStreetView();
+            }
         }
         /**
          * @protected
@@ -31295,6 +31313,7 @@
         /**
          * Show Street View mode
          * @param coords Must be in the map projection format
+         * @fires streetViewInit
          * @protected
          */
         _showStreetView(coords) {
@@ -31321,31 +31340,32 @@
          * This is useful if wou wanna add a custom icon on the panorama instance,
          * add custom listeners, etc
          * @public
-         * @returns
+         * @returns {google.maps.StreetViewPanorama}
          */
         getStreetViewPanorama() {
             return this._panorama;
         }
         /**
-         * Get the Vector Layer in wich the Pegman is displayer
+         * Get the Vector Layer in wich Pegman is displayed
          * @public
-         * @returns
+         * @returns {VectorLayer<VectorSource>}
          */
         getPegmanLayer() {
             return this._pegmanLayer;
         }
         /**
-         * Get the background Raster layer that display the existing zones with Street View available
+         * Get the background Raster layer that displays the existing zones with Street View available
          * @public
-         * @returns
+         * @returns {TileLayer<XYZ>}
          */
         getStreetViewLayer() {
             return this._streetViewXyzLayer;
         }
         /**
          * Show Street View mode
-         * @param coords Must be in the map projection format
-         * @returns
+         * @fires streetViewInit
+         * @param {Coordinate} coords Must be in the map projection format
+         * @returns {google.maps.StreetViewPanorama}
          * @public
          */
         showStreetView(coords) {
@@ -31361,7 +31381,7 @@
             return this.getStreetViewPanorama();
         }
         /**
-         * Disables Street View mode
+         * Hide Street View, remove layers and clear features
          * @fires streetViewExit
          * @public
          */
@@ -31409,12 +31429,41 @@
             timeout = setTimeout(later, wait);
         };
     }
+    /**
+     * @public
+     */
     var SVEventTypes;
     (function (SVEventTypes) {
         SVEventTypes["LOAD_LIB"] = "loadLib";
         SVEventTypes["STREET_VIEW_INIT"] = "streetViewInit";
         SVEventTypes["STREET_VIEW_EXIT"] = "streetViewExit";
     })(SVEventTypes || (SVEventTypes = {}));
+    /**
+     * @public
+     */
+    var Language;
+    (function (Language) {
+        Language["ES"] = "es";
+        Language["EN"] = "en";
+    })(Language || (Language = {}));
+    /**
+     * @public
+     */
+    var BtnControlSize;
+    (function (BtnControlSize) {
+        BtnControlSize["Small"] = "sm";
+        BtnControlSize["Medium"] = "md";
+        BtnControlSize["Large"] = "lg";
+    })(BtnControlSize || (BtnControlSize = {}));
+    /**
+     * @public
+     */
+    var MapSize;
+    (function (MapSize) {
+        MapSize["Expanded"] = "expanded";
+        MapSize["Compact"] = "compact";
+        MapSize["Hidden"] = "hidden";
+    })(MapSize || (MapSize = {}));
 
     return StreetView;
 
