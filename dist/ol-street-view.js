@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/Feature'), require('ol/proj'), require('ol/interaction/Translate'), require('ol/Observable'), require('interactjs')) :
-    typeof define === 'function' && define.amd ? define(['ol/Feature', 'ol/proj', 'ol/interaction/Translate', 'ol/Observable', 'interactjs'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.StreetView = factory(global.ol.Feature, global.ol.proj, global.ol.interaction.Translate, global.ol.Observable, global.interact));
-})(this, (function (Feature, proj, Translate, Observable$2, interact) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('ol/Feature'), require('ol/proj'), require('ol/interaction/Translate'), require('ol/Observable'), require('interactjs')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'ol/Feature', 'ol/proj', 'ol/interaction/Translate', 'ol/Observable', 'interactjs'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.StreetView = {}, global.ol.Feature, global.ol.proj, global.ol.interaction.Translate, global.ol.Observable, global.interact));
+})(this, (function (exports, Feature, proj, Translate, Observable$2, interact) { 'use strict';
 
     function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -30724,7 +30724,7 @@
             this._loadedLib = false;
             this._initialized = false;
             // Default options
-            this.options = Object.assign({ apiKey: null, size: BtnControlSize.Large, resizable: true, sizeToggler: true, defaultMapSize: MapSize.Expanded, language: Language.EN, target: null, zoomOnInit: 18, autoLoadGoogleMaps: true }, opt_options // Merge user options
+            this.options = Object.assign({ apiKey: null, size: exports.BtnControlSize.Large, resizable: true, sizeToggler: true, defaultMapSize: exports.MapSize.Expanded, language: exports.Language.EN, target: null, zoomOnInit: 18, autoLoadGoogleMaps: true }, opt_options // Merge user options
             );
             // If language selector is provided and translation exists...
             this._i18n =
@@ -30736,7 +30736,7 @@
             this._pegmanSelectedCoords = [];
             this._pegmanHeading = 180;
             if (this.options.autoLoadGoogleMaps) {
-                this.on(SVEventTypes.LOAD_LIB, () => {
+                this.on(exports.SVEventTypes.LOAD_LIB, () => {
                     this._loadedLib = true;
                     this.init();
                 });
@@ -31198,7 +31198,7 @@
                 });
                 try {
                     yield loader.load();
-                    _super.dispatchEvent.call(this, SVEventTypes.LOAD_LIB);
+                    _super.dispatchEvent.call(this, exports.SVEventTypes.LOAD_LIB);
                 }
                 catch (err) {
                     console.error(err);
@@ -31327,7 +31327,7 @@
             this._updateStreetViewPosition(coords);
             this._panorama.setVisible(true);
             this._addClickListener();
-            super.dispatchEvent(SVEventTypes.STREET_VIEW_INIT);
+            super.dispatchEvent(exports.SVEventTypes.STREET_VIEW_INIT);
         }
         /**
          * Add Stree View Layer showing areas wheres StreetView exists
@@ -31405,7 +31405,7 @@
             // Maybe, exit fullscreen
             if (document.fullscreenElement)
                 document.exitFullscreen();
-            super.dispatchEvent(SVEventTypes.STREET_VIEW_EXIT);
+            super.dispatchEvent(exports.SVEventTypes.STREET_VIEW_EXIT);
         }
     }
     /**
@@ -31432,40 +31432,42 @@
     /**
      * @public
      */
-    var SVEventTypes;
+    exports.SVEventTypes = void 0;
     (function (SVEventTypes) {
         SVEventTypes["LOAD_LIB"] = "loadLib";
         SVEventTypes["STREET_VIEW_INIT"] = "streetViewInit";
         SVEventTypes["STREET_VIEW_EXIT"] = "streetViewExit";
-    })(SVEventTypes || (SVEventTypes = {}));
+    })(exports.SVEventTypes || (exports.SVEventTypes = {}));
     /**
      * @public
      */
-    var Language;
+    exports.Language = void 0;
     (function (Language) {
         Language["ES"] = "es";
         Language["EN"] = "en";
-    })(Language || (Language = {}));
+    })(exports.Language || (exports.Language = {}));
     /**
      * @public
      */
-    var BtnControlSize;
+    exports.BtnControlSize = void 0;
     (function (BtnControlSize) {
         BtnControlSize["Small"] = "sm";
         BtnControlSize["Medium"] = "md";
         BtnControlSize["Large"] = "lg";
-    })(BtnControlSize || (BtnControlSize = {}));
+    })(exports.BtnControlSize || (exports.BtnControlSize = {}));
     /**
      * @public
      */
-    var MapSize;
+    exports.MapSize = void 0;
     (function (MapSize) {
         MapSize["Expanded"] = "expanded";
         MapSize["Compact"] = "compact";
         MapSize["Hidden"] = "hidden";
-    })(MapSize || (MapSize = {}));
+    })(exports.MapSize || (exports.MapSize = {}));
 
-    return StreetView;
+    exports["default"] = StreetView;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 //# sourceMappingURL=ol-street-view.js.map
