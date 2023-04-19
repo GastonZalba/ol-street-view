@@ -57,13 +57,13 @@ export default function (commandOptions) {
                     outputToFilesystem: true
                 }
             ),
-            resolve(),
-            commonjs(),
             babel({
-                babelrc: false,
                 plugins: ["@babel/plugin-transform-runtime"],
                 babelHelpers: 'runtime',
-                exclude: 'node_modules/**',
+                include: ['src/**/*'],
+                extensions: [
+                    '.js', '.jsx', '.ts', '.tsx',
+                ],
                 presets: [
                     [
                         '@babel/preset-env',
@@ -81,6 +81,8 @@ export default function (commandOptions) {
                     ]
                 ]
             }),
+            resolve(),
+            commonjs(),
             image(),
             postcss({
                 extensions: ['.css', '.sass', '.scss'],
@@ -115,26 +117,11 @@ export default function (commandOptions) {
                 delay: 500
             })
         ],
-        external: [
-            'ol',
-            'ol/Map',
-            'ol/source',
-            'ol/layer',
-            'ol/geom',
-            'ol/Feature',
-            'ol/Overlay',
-            'ol/Control',
-            'ol/style',
-            'ol/control',
-            'ol/proj',
-            'ol/Observable',
-            'ol/format',
-            'ol/events',
-            'ol/interaction',
-            'ol/coordinate',
-            'ol/interaction/Translate',
-            'interactjs'
-        ]
+        external: (id) => {
+            return /(ol(\\|\/)|interactjs)/.test(
+                id
+            );
+        }
     }]
 
     // Minified css

@@ -118,3 +118,7 @@
 * Updated dependencies
 * Removed "browser" attribute from package.json
 * Added "type" module attribute to package.json
+
+## v2.1.1
+* Improved rollup and ts configs
+

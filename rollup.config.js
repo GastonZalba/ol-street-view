@@ -1,12 +1,9 @@
-import babel from '@rollup/plugin-babel';
 import image from '@rollup/plugin-image';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
 import path from 'path';
 import postcss from 'rollup-plugin-postcss';
 import copy from 'rollup-plugin-copy';
-
-process.env.NODE_ENV = 'production';
 
 export default {
     input: 'src/index-es.js',
@@ -25,20 +22,6 @@ export default {
             outputToFilesystem: true
         }),
         image(),
-        babel({
-            presets: [
-                [
-                    "@babel/preset-env",
-                    {
-                        targets: {
-                            esmodules: true
-                        }
-                    }
-                ]
-            ],
-            babelHelpers: 'bundled',
-            exclude: ["node_modules/**", "src/assets/**"]
-        }),
         postcss({
             extensions: ['.css', '.sass', '.scss'],
             extract: path.resolve('lib/style/css/ol-street-view.css'),
