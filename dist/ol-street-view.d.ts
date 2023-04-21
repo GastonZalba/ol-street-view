@@ -1,22 +1,21 @@
 /// <reference types="googlemaps" />
 /// <reference types="googlemaps" />
 /// <reference types="googlemaps" />
-import View from 'ol/View';
-import Map from 'ol/Map';
-import Feature from 'ol/Feature';
-import VectorSource from 'ol/source/Vector';
-import XYZ from 'ol/source/XYZ';
-import Point from 'ol/geom/Point';
-import Control from 'ol/control/Control';
-import BaseEvent from 'ol/events/Event';
-import VectorLayer from 'ol/layer/Vector';
-import TileLayer from 'ol/layer/Tile';
-import Translate from 'ol/interaction/Translate';
-import { Coordinate } from 'ol/coordinate';
-import { CombinedOnSignature, EventTypes, OnSignature } from 'ol/Observable';
-import { EventsKey } from 'ol/events';
-import { ObjectEvent } from 'ol/Object';
-import { Types as ObjectEventTypes } from 'ol/ObjectEventType';
+import Map from 'ol/Map.js';
+import Feature from 'ol/Feature.js';
+import VectorSource from 'ol/source/Vector.js';
+import XYZ from 'ol/source/XYZ.js';
+import Point from 'ol/geom/Point.js';
+import Control from 'ol/control/Control.js';
+import BaseEvent from 'ol/events/Event.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import TileLayer from 'ol/layer/Tile.js';
+import Translate from 'ol/interaction/Translate.js';
+import { Coordinate } from 'ol/coordinate.js';
+import { CombinedOnSignature, EventTypes, OnSignature } from 'ol/Observable.js';
+import { EventsKey } from 'ol/events.js';
+import { ObjectEvent } from 'ol/Object.js';
+import { Types as ObjectEventTypes } from 'ol/ObjectEventType.js';
 import './assets/scss/ol-street-view.scss';
 /**
  * Street View implementation for Open Layers.
@@ -31,9 +30,9 @@ import './assets/scss/ol-street-view.scss';
 export default class StreetView extends Control {
     protected options: Options;
     protected _i18n: i18n;
-    _map: Map;
-    _view: View;
-    _viewport: HTMLElement;
+    private _map;
+    private _view;
+    private _viewport;
     protected _isDragging: boolean;
     protected pegmanDivControl: HTMLElement;
     protected exitControlUI: HTMLButtonElement;
@@ -42,6 +41,7 @@ export default class StreetView extends Control {
     protected mapContainer: HTMLElement;
     protected _keyClickOnMap: EventsKey | EventsKey[];
     protected _streetViewXyzLayer: TileLayer<XYZ>;
+    protected _addedXyzLayer: boolean;
     protected _pegmanLayer: VectorLayer<VectorSource>;
     protected _panorama: google.maps.StreetViewPanorama;
     protected _streetViewService: google.maps.StreetViewService;
@@ -133,7 +133,11 @@ export default class StreetView extends Control {
      * Add Stree View Layer showing areas wheres StreetView exists
      * @protected
      */
-    _addStreetViewLayer(): void;
+    _addStreetViewXyzLayer(): void;
+    /**
+     * @protected
+     */
+    _removeStreetViewXyzLayer(): void;
     /**
      * This is useful if wou wanna add a custom icon on the panorama instance,
      * add custom listeners, etc
