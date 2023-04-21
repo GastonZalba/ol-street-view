@@ -1,30 +1,30 @@
-import View from 'ol/View';
-import Map from 'ol/Map';
-import Feature from 'ol/Feature';
-import Collection from 'ol/Collection';
-import Icon from 'ol/style/Icon';
-import Style from 'ol/style/Style';
-import VectorSource from 'ol/source/Vector';
-import XYZ from 'ol/source/XYZ';
-import Point from 'ol/geom/Point';
-import Control from 'ol/control/Control';
-import BaseEvent from 'ol/events/Event';
+import View from 'ol/View.js';
+import Map from 'ol/Map.js';
+import Feature from 'ol/Feature.js';
+import Collection from 'ol/Collection.js';
+import Icon from 'ol/style/Icon.js';
+import Style from 'ol/style/Style.js';
+import VectorSource from 'ol/source/Vector.js';
+import XYZ from 'ol/source/XYZ.js';
+import Point from 'ol/geom/Point.js';
+import Control from 'ol/control/Control.js';
+import BaseEvent from 'ol/events/Event.js';
 import { MapBrowserEvent } from 'ol';
-import { transform } from 'ol/proj';
-import VectorLayer from 'ol/layer/Vector';
-import TileLayer from 'ol/layer/Tile';
-import Translate from 'ol/interaction/Translate';
-import { Coordinate } from 'ol/coordinate';
+import { transform } from 'ol/proj.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import TileLayer from 'ol/layer/Tile.js';
+import Translate from 'ol/interaction/Translate.js';
+import { Coordinate } from 'ol/coordinate.js';
 import {
     CombinedOnSignature,
     EventTypes,
     OnSignature,
     unByKey
-} from 'ol/Observable';
-import { EventsKey } from 'ol/events';
-import { TranslateEvent } from 'ol/interaction/Translate';
-import { ObjectEvent } from 'ol/Object';
-import { Types as ObjectEventTypes } from 'ol/ObjectEventType';
+} from 'ol/Observable.js';
+import { EventsKey } from 'ol/events.js';
+import { TranslateEvent } from 'ol/interaction/Translate.js';
+import { ObjectEvent } from 'ol/Object.js';
+import { Types as ObjectEventTypes } from 'ol/ObjectEventType.js';
 
 // External
 import interact from 'interactjs';
@@ -57,9 +57,9 @@ export default class StreetView extends Control {
     protected _i18n: i18n;
 
     // Ol
-    public _map: Map;
-    public _view: View;
-    public _viewport: HTMLElement;
+    private _map: Map;
+    private _view: View;
+    private _viewport: HTMLElement;
 
     protected _isDragging: boolean;
 
@@ -75,6 +75,7 @@ export default class StreetView extends Control {
 
     // Layers
     protected _streetViewXyzLayer: TileLayer<XYZ>;
+    protected _addedXyzLayer = false;
     protected _pegmanLayer: VectorLayer<VectorSource>;
 
     protected _panorama: google.maps.StreetViewPanorama;
@@ -543,7 +544,7 @@ export default class StreetView extends Control {
                 if (this._isDragging && key === 'Escape') {
                     stopInteract();
                     terminateDragging();
-                    this._map.removeLayer(this._streetViewXyzLayer);
+                    this._removeStreetViewXyzLayer();
                 }
             });
 
@@ -608,7 +609,7 @@ export default class StreetView extends Control {
                     this._viewport.classList.add('ol-street-view--drop-active');
                 },
                 ondragenter: () => {
-                    this._addStreetViewLayer();
+                    this._addStreetViewXyzLayer();
 
                     document.body.classList.add(
                         'ol-street-view--activated-on-dragging'
@@ -900,10 +901,18 @@ export default class StreetView extends Control {
      * Add Stree View Layer showing areas wheres StreetView exists
      * @protected
      */
-    _addStreetViewLayer(): void {
-        this._map.addLayer(this._streetViewXyzLayer);
+    _addStreetViewXyzLayer(): void {
+        if (!this._addedXyzLayer) this._map.addLayer(this._streetViewXyzLayer);
+        this._addedXyzLayer = true;
     }
 
+    /**
+     * @protected
+     */
+    _removeStreetViewXyzLayer(): void {
+        this._map.removeLayer(this._streetViewXyzLayer);
+        this._addedXyzLayer = false;
+    }
     /**
      * This is useful if wou wanna add a custom icon on the panorama instance,
      * add custom listeners, etc
@@ -945,7 +954,7 @@ export default class StreetView extends Control {
             return;
         }
 
-        this._addStreetViewLayer();
+        this._addStreetViewXyzLayer();
 
         this._view.setCenter(coords);
         this._view.setZoom(18);
@@ -972,7 +981,7 @@ export default class StreetView extends Control {
         this._pegmanSelectedCoords = [];
 
         // Remove SV Layer
-        this._map.removeLayer(this._streetViewXyzLayer);
+        this._removeStreetViewXyzLayer();
 
         document.body.classList.remove('ol-street-view--activated');
 

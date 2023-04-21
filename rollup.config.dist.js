@@ -1,6 +1,4 @@
-import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
 import image from '@rollup/plugin-image';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
@@ -9,6 +7,9 @@ import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 import postcss from 'rollup-plugin-postcss';
 import path from 'path';
+import banner2 from 'rollup-plugin-banner2'
+import { readFileSync } from 'fs';
+const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 const globals = (id) => {
 
@@ -26,6 +27,13 @@ const globals = (id) => {
     return id;
 }
 
+const banner =`
+/*!
+ * ${pkg.name} - v${pkg.version}
+ * ${pkg.homepage}
+ * Built: ${new Date()}
+*/
+`;
 
 export default function (commandOptions) {
 
@@ -49,6 +57,7 @@ export default function (commandOptions) {
             }
         ],
         plugins: [
+            banner2(() => banner),
             del({ targets: 'dist/*' }),
             typescript(
                 {
@@ -57,32 +66,7 @@ export default function (commandOptions) {
                     outputToFilesystem: true
                 }
             ),
-            babel({
-                plugins: ["@babel/plugin-transform-runtime"],
-                babelHelpers: 'runtime',
-                include: ['src/**/*'],
-                extensions: [
-                    '.js', '.jsx', '.ts', '.tsx',
-                ],
-                presets: [
-                    [
-                        '@babel/preset-env',
-                        {
-                            targets: {
-                                browsers: [
-                                    "Chrome >= 52",
-                                    "FireFox >= 44",
-                                    "Safari >= 7",
-                                    "Explorer 11",
-                                    "last 4 Edge versions"
-                                ]
-                            }
-                        }
-                    ]
-                ]
-            }),
             resolve(),
-            commonjs(),
             image(),
             postcss({
                 extensions: ['.css', '.sass', '.scss'],

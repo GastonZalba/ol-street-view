@@ -122,3 +122,10 @@
 ## v2.1.1
 * Improved rollup and ts configs
 
+## v2.1.2
+* Fixed bug that happened when pegman was moved outside the draggable area and later reentered
+* Added ".js" extension on imports to work better with webpack 5 default config
+* Lib is builded with es2017 target (dropped esnext)
+* Removed babel deps
+* Added header to dist files
+
