@@ -1,6 +1,5 @@
 /// <reference types="googlemaps" />
 /// <reference types="googlemaps" />
-/// <reference types="googlemaps" />
 import Map from 'ol/Map.js';
 import Feature from 'ol/Feature.js';
 import VectorSource from 'ol/source/Vector.js';
@@ -61,105 +60,64 @@ export default class StreetView extends Control {
     /**
      * Only use this method if `autoLoadGoogleMaps` is `false`. Call it after the Google Maps library is loaded.
      * Otherwise it will called automatically after the Maps Library is loaded.
-     * @public
-     * @returns
      */
     init(): void;
     /**
      * Remove the control from its current map and attach it to the new map.
      * Pass null to just remove the control from the current map.
      * @param map
-     * @public
      */
     setMap(map: Map): void;
     /**
-     * @protected
+     * Show or hide the control depending on the zoom level
+     */
+    private _maybeHideControl;
+    /**
      * @param bool
      */
-    _showControl(bool: boolean): void;
+    private _showControl;
+    private _prepareLayers;
+    private _addTranslateInteraction;
+    private _prepareLayout;
+    private _createMapControls;
     /**
-     * @protected
-     */
-    _prepareLayers(): void;
-    /**
-     * @protected
-     */
-    _addTranslateInteraction(): void;
-    /**
-     * @protected
-     */
-    _prepareLayout(): void;
-    /**
-     * @protected
-     */
-    _createMapControls(): void;
-    /**
-     * @protected
      * @fires load
      */
-    _loadStreetView(): Promise<void>;
-    /**
-     * @protected
-     */
-    _updateStreetViewPosition(coords: Coordinate): void;
-    /**
-     * @protected
-     */
-    _updatePegmanPosition(coords: Coordinate | google.maps.LatLng, isGoogleFormat?: boolean): void;
-    /**
-     * @protected
-     */
-    _centerMapToPegman(): void;
-    /**
-     * @protected
-     */
-    _initPegmanOnMap(): void;
-    /**
-     * @protected
-     */
-    _showNoDataMode(): void;
+    private _loadStreetView;
+    private _updateStreetViewPosition;
+    private _updatePegmanPosition;
+    private _centerMapToPegman;
+    private _initPegmanOnMap;
+    private _showNoDataMode;
     /**
      * Map click listener to translate StreetView position
-     *
-     * @protected
      */
-    _addClickListener(): void;
-    /**
-     * @protected
-     */
-    _refreshMap(centerToPegman?: boolean): void;
+    private _addClickListener;
+    private _refreshMap;
     /**
      * Show Street View mode
      * @param coords Must be in the map projection format
      * @fires streetViewInit
-     * @protected
      */
-    _showStreetView(coords: Coordinate): void;
+    private _showStreetView;
     /**
      * Add Stree View Layer showing areas wheres StreetView exists
-     * @protected
      */
-    _addStreetViewXyzLayer(): void;
-    /**
-     * @protected
-     */
-    _removeStreetViewXyzLayer(): void;
+    private _addStreetViewXyzLayer;
+    private _removeStreetViewXyzLayer;
     /**
      * This is useful if wou wanna add a custom icon on the panorama instance,
      * add custom listeners, etc
-     * @public
      * @returns {google.maps.StreetViewPanorama}
      */
     getStreetViewPanorama(): google.maps.StreetViewPanorama;
     /**
      * Get the Vector Layer in wich Pegman is displayed
-     * @public
      * @returns {VectorLayer<VectorSource>}
      */
     getPegmanLayer(): VectorLayer<VectorSource>;
     /**
      * Get the background Raster layer that displays the existing zones with Street View available
-     * @public
      * @returns {TileLayer<XYZ>}
      */
     getStreetViewLayer(): TileLayer<XYZ>;
@@ -168,13 +126,11 @@ export default class StreetView extends Control {
      * @fires streetViewInit
      * @param {Coordinate} coords Must be in the map projection format
      * @returns {google.maps.StreetViewPanorama}
-     * @public
      */
     showStreetView(coords: Coordinate): google.maps.StreetViewPanorama;
     /**
      * Hide Street View, remove layers and clear features
      * @fires streetViewExit
-     * @public
      */
     hideStreetView(): void;
 }

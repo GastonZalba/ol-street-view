@@ -1,8 +1,8 @@
 
 /*!
- * ol-street-view - v2.2.0
+ * ol-street-view - v2.2.2
  * https://github.com/GastonZalba/ol-street-view#readme
- * Built: Sat May 27 2023 23:54:33 GMT-0300 (Argentina Standard Time)
+ * Built: Sun May 28 2023 12:16:42 GMT-0300 (Argentina Standard Time)
 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/Feature.js'), require('ol/Collection.js'), require('ol/style/Icon.js'), require('ol/style/Style.js'), require('ol/source/Vector.js'), require('ol/source/XYZ.js'), require('ol/geom/Point.js'), require('ol/control/Control.js'), require('ol/proj.js'), require('ol/layer/Vector.js'), require('ol/layer/Tile.js'), require('ol/interaction/Translate.js'), require('ol/Observable.js'), require('interactjs')) :
@@ -146,8 +146,6 @@
         /**
          * Only use this method if `autoLoadGoogleMaps` is `false`. Call it after the Google Maps library is loaded.
          * Otherwise it will called automatically after the Maps Library is loaded.
-         * @public
-         * @returns
          */
         init() {
             if (!this._map)
@@ -191,7 +189,6 @@
          * Remove the control from its current map and attach it to the new map.
          * Pass null to just remove the control from the current map.
          * @param map
-         * @public
          */
         setMap(map) {
             super.setMap(map);
@@ -206,16 +203,9 @@
                     this.init();
                 }
                 if (this._options.minZoom) {
+                    this._maybeHideControl();
                     this._view.on('change:resolution', () => {
-                        const zoom = this._view.getZoom();
-                        if (zoom <= this._options.minZoom) {
-                            if (this._isHidden)
-                                this._showControl(true);
-                        }
-                        else {
-                            if (!this._isHidden)
-                                this._showControl(false);
-                        }
+                        this._maybeHideControl();
                     });
                 }
             }
@@ -225,7 +215,20 @@
             }
         }
         /**
-         * @protected
+         * Show or hide the control depending on the zoom level
+         */
+        _maybeHideControl() {
+            const zoom = this._view.getZoom();
+            if (zoom <= this._options.minZoom) {
+                if (this._isHidden)
+                    this._showControl(true);
+            }
+            else {
+                if (!this._isHidden)
+                    this._showControl(false);
+            }
+        }
+        /**
          * @param bool
          */
         _showControl(bool) {
@@ -236,9 +239,6 @@
                 this.pegmanDivControl.classList.remove(CLASS_HIDE_CONTROL);
             this._isHidden = !bool;
         }
-        /**
-         * @protected
-         */
         _prepareLayers() {
             const calculatePegmanIconOffset = () => {
                 const heading = this._pegmanHeading;
@@ -323,9 +323,6 @@
             });
             this._map.addLayer(this._pegmanLayer);
         }
-        /**
-         * @protected
-         */
         _addTranslateInteraction() {
             if (this._translatePegman) {
                 return this._translatePegman.setActive(true);
@@ -340,9 +337,6 @@
             this._translatePegman.on('translateend', translatePegmanHandler);
             this._map.addInteraction(this._translatePegman);
         }
-        /**
-         * @protected
-         */
         _prepareLayout() {
             /**
              * Create a handler to allow resize the layout
@@ -432,9 +426,6 @@
             };
             addStreetViewHtml();
         }
-        /**
-         * @protected
-         */
         _createMapControls() {
             /**
              * @protected
@@ -624,7 +615,6 @@
             }
         }
         /**
-         * @protected
          * @fires load
          */
         async _loadStreetView() {
@@ -639,9 +629,6 @@
                 console.error(err);
             }
         }
-        /**
-         * @protected
-         */
         _updateStreetViewPosition(coords) {
             const latLon = proj_js.transform(coords, this._view.getProjection(), 'EPSG:4326').reverse();
             const latLonGoogle = { lat: latLon[0], lng: latLon[1] };
@@ -656,9 +643,6 @@
                 }
             });
         }
-        /**
-         * @protected
-         */
         _updatePegmanPosition(coords, isGoogleFormat = true) {
             // If the coordinates are in Google format, extract the values,
             // and convert the projection
@@ -674,18 +658,12 @@
                 .setCoordinates(this._pegmanSelectedCoords);
             this._centerMapToPegman();
         }
-        /**
-         * @protected
-         */
         _centerMapToPegman() {
             this._view.animate({
                 center: this._pegmanSelectedCoords,
                 duration: 100
             });
         }
-        /**
-         * @protected
-         */
         _initPegmanOnMap() {
             if (this._pegmanLayer.getSource().getFeatures().length) {
                 return;
@@ -715,16 +693,11 @@
             this._view.setZoom(this._options.zoomOnInit);
             this._showStreetView(this._pegmanSelectedCoords);
         }
-        /**
-         * @protected
-         */
         _showNoDataMode() {
             this._panorama.setVisible(false);
         }
         /**
          * Map click listener to translate StreetView position
-         *
-         * @protected
          */
         _addClickListener() {
             const clickListener = (evt) => {
@@ -734,9 +707,6 @@
             };
             this._keyClickOnMap = this._map.on('click', clickListener);
         }
-        /**
-         * @protected
-         */
         _refreshMap(centerToPegman = true) {
             // Force refresh the layers
             this._map.updateSize();
@@ -748,7 +718,6 @@
          * Show Street View mode
          * @param coords Must be in the map projection format
          * @fires streetViewInit
-         * @protected
          */
         _showStreetView(coords) {
             if (this._lastHeight) {
@@ -765,16 +734,12 @@
         }
         /**
          * Add Stree View Layer showing areas wheres StreetView exists
-         * @protected
          */
         _addStreetViewXyzLayer() {
             if (!this._addedXyzLayer)
                 this._map.addLayer(this._streetViewXyzLayer);
             this._addedXyzLayer = true;
         }
-        /**
-         * @protected
-         */
         _removeStreetViewXyzLayer() {
             this._map.removeLayer(this._streetViewXyzLayer);
             this._addedXyzLayer = false;
@@ -782,7 +747,6 @@
         /**
          * This is useful if wou wanna add a custom icon on the panorama instance,
          * add custom listeners, etc
-         * @public
          * @returns {google.maps.StreetViewPanorama}
          */
         getStreetViewPanorama() {
@@ -790,7 +754,6 @@
         }
         /**
          * Get the Vector Layer in wich Pegman is displayed
-         * @public
          * @returns {VectorLayer<VectorSource>}
          */
         getPegmanLayer() {
@@ -798,7 +761,6 @@
         }
         /**
          * Get the background Raster layer that displays the existing zones with Street View available
-         * @public
          * @returns {TileLayer<XYZ>}
          */
         getStreetViewLayer() {
@@ -809,7 +771,6 @@
          * @fires streetViewInit
          * @param {Coordinate} coords Must be in the map projection format
          * @returns {google.maps.StreetViewPanorama}
-         * @public
          */
         showStreetView(coords) {
             if (!coords) {
@@ -826,7 +787,6 @@
         /**
          * Hide Street View, remove layers and clear features
          * @fires streetViewExit
-         * @public
          */
         hideStreetView() {
             this._translatePegman.setActive(false);
