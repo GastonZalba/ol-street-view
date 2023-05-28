@@ -129,3 +129,12 @@
 * Removed babel deps
 * Added header to dist files
 
+## v2.2.0
+* Added enums to the umd version
+* Added pegman `transparent` mode
+* Added minZoom option
+
+## v2.2.1
+* Added `touchmove` to animate the direction of pegman in touch devices
+* Small fix to always center the pegman body below the cursor
+* Some scss improvements

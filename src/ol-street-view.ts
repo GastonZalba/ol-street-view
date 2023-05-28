@@ -53,7 +53,7 @@ const controlElement = document.createElement('div');
  * @extends {ol/control/Control~Control}
  */
 export default class StreetView extends Control {
-    protected options: Options;
+    protected _options: Options;
     protected _i18n: i18n;
 
     // Ol
@@ -62,6 +62,7 @@ export default class StreetView extends Control {
     private _viewport: HTMLElement;
 
     protected _isDragging: boolean;
+    protected _isHidden: boolean;
 
     // Control
     protected pegmanDivControl: HTMLElement;
@@ -131,15 +132,17 @@ export default class StreetView extends Control {
         });
 
         // Default options
-        this.options = {
+        this._options = {
             apiKey: null,
             size: BtnControlSize.Large,
+            transparentButton: false,
             resizable: true,
             sizeToggler: true,
             defaultMapSize: MapSize.Expanded,
             language: Language.EN,
             target: null,
             zoomOnInit: 18,
+            minZoom: null,
             autoLoadGoogleMaps: true,
             ...opt_options // Merge user options
         };
@@ -147,8 +150,8 @@ export default class StreetView extends Control {
         // If language selector is provided and translation exists...
         this._i18n =
             languages[
-                this.options.language in languages
-                    ? this.options.language
+                this._options.language in languages
+                    ? this._options.language
                     : 'en'
             ];
 
@@ -158,7 +161,7 @@ export default class StreetView extends Control {
         this._pegmanSelectedCoords = [];
         this._pegmanHeading = 180;
 
-        if (this.options.autoLoadGoogleMaps) {
+        if (this._options.autoLoadGoogleMaps) {
             this.on(SVEventTypes.LOAD_LIB, () => {
                 this._loadedLib = true;
                 this.init();
@@ -247,10 +250,33 @@ export default class StreetView extends Control {
             if (this._loadedLib && !this._initialized) {
                 this.init();
             }
+
+            if (this._options.minZoom) {
+                this._view.on('change:resolution', () => {
+                    const zoom = this._view.getZoom();
+                    if (zoom <= this._options.minZoom) {
+                        if (this._isHidden) this._showControl(true);
+                    } else {
+                        if (!this._isHidden) this._showControl(false);
+                    }
+                });
+            }
         } else {
             controlElement.remove();
             this.hideStreetView();
         }
+    }
+
+    /**
+     * @protected
+     * @param bool
+     */
+    _showControl(bool: boolean): void {
+        const CLASS_HIDE_CONTROL = 'ol-street-view--hide-control';
+        if (bool) this.pegmanDivControl.classList.add(CLASS_HIDE_CONTROL);
+        else this.pegmanDivControl.classList.remove(CLASS_HIDE_CONTROL);
+
+        this._isHidden = !bool;
     }
 
     /**
@@ -383,31 +409,29 @@ export default class StreetView extends Control {
                     bottom: false,
                     right: false
                 },
-                listeners: {
-                    start: () => {
-                        // If not removed, the resize is very janky
-                        this.mapContainer.classList.remove(
-                            'ol-street-view--transitions'
-                        );
-                    },
-                    move: (event) => {
-                        let { y } = event.target.dataset;
-                        y = (parseFloat(y) || 0) + event.deltaRect.top;
+                onstart: () => {
+                    // If not removed, the resize is very janky
+                    this.mapContainer.classList.remove(
+                        'ol-street-view--transitions'
+                    );
+                },
+                onmove: (evt) => {
+                    let { y } = evt.target.dataset;
+                    y = (parseFloat(y) || 0) + evt.deltaRect.top;
 
-                        Object.assign(event.target.style, {
-                            height: `${Math.round(event.rect.height)}px`
-                        });
+                    Object.assign(evt.target.style, {
+                        height: `${Math.round(evt.rect.height)}px`
+                    });
 
-                        Object.assign(event.target.dataset, { y });
+                    Object.assign(evt.target.dataset, { y });
 
-                        debounceRefresh();
-                    },
-                    end: () => {
-                        this.mapContainer.classList.add(
-                            'ol-street-view--transitions'
-                        );
-                        this._refreshMap(false);
-                    }
+                    debounceRefresh();
+                },
+                onend: () => {
+                    this.mapContainer.classList.add(
+                        'ol-street-view--transitions'
+                    );
+                    this._refreshMap(false);
                 },
                 modifiers: [
                     interact.modifiers.restrictSize({
@@ -464,7 +488,7 @@ export default class StreetView extends Control {
 
             this._viewport.classList.add('ol-street-view--map');
 
-            if (this.options.resizable) {
+            if (this._options.resizable) {
                 addHandlerResizable();
             }
         };
@@ -484,23 +508,26 @@ export default class StreetView extends Control {
                 stopInteract;
 
             // Grab Left/Right Direction of Mouse for Pegman Image
-            let onMouseMove: EventListener = (e: MouseEvent) => {
+            let onMouseMove: EventListener = (e: MouseEvent | TouchEvent) => {
+                const pageX =
+                    'changedTouches' in e ? e.changedTouches[0].pageX : e.pageX;
+
                 // Left
-                if (e.pageX < oldPosX) {
+                if (pageX < oldPosX) {
                     this.pegmanDraggable.classList.add('ol-street-view--left');
                     this.pegmanDraggable.classList.remove(
                         'ol-street-view--right'
                     );
 
                     // Right
-                } else if (e.pageX > oldPosX) {
+                } else if (pageX > oldPosX) {
                     this.pegmanDraggable.classList.add('ol-street-view--right');
                     this.pegmanDraggable.classList.remove(
                         'ol-street-view--left'
                     );
                 }
 
-                oldPosX = e.pageX;
+                oldPosX = pageX;
 
                 return oldPosX;
             };
@@ -537,6 +564,7 @@ export default class StreetView extends Control {
                 );
 
                 document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('touchmove', onMouseMove);
             };
 
             // Add Escape support to abort the dragging
@@ -551,11 +579,26 @@ export default class StreetView extends Control {
             interact('.ol-street-view--draggable')
                 .draggable({
                     inertia: false,
+                    onstart: (e) => {
+                        // Always center pegman on the cursor,
+                        // even if the drag start on the control border
+                        const pTarget = e.target;
+
+                        // Get the button width
+                        const w = pTarget.offsetWidth;
+
+                        // Get the button x middle position
+                        const x = pTarget.getBoundingClientRect().left + w / 2;
+
+                        // Update the Position Attributes
+                        pTarget.setAttribute('data-x', -(x - e.x0));
+                    },
                     onmove: (e) => {
                         this._isDragging = true;
                         stopInteract = e.interaction.stop;
 
                         document.addEventListener('mousemove', onMouseMove);
+                        document.addEventListener('touchmove', onMouseMove);
 
                         this.pegmanDraggable.classList.remove(
                             'ol-street-view--dropped'
@@ -574,7 +617,7 @@ export default class StreetView extends Control {
                         pTarget.style.webkitTransform =
                             pTarget.style.transform = `translate(${x}px, ${y}px)`;
 
-                        // Update the Posiion Attributes
+                        // Update the Position Attributes
                         pTarget.setAttribute('data-x', x);
                         pTarget.setAttribute('data-y', y);
                     },
@@ -646,7 +689,13 @@ export default class StreetView extends Control {
         const addPegmanControl = (): void => {
             this.pegmanDivControl = controlElement;
             this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-            this.pegmanDivControl.className = `ol-street-view--${this.options.size}-btn ol-control`;
+            this.pegmanDivControl.className = `ol-street-view--${
+                this._options.size
+            }-btn ol-control ${
+                this._options.transparentButton
+                    ? 'ol-street-view--transparent'
+                    : ''
+            }`;
             this.pegmanDivControl.title = this._i18n.dragToInit;
 
             this.pegmanDraggable = document.createElement('div');
@@ -667,9 +716,9 @@ export default class StreetView extends Control {
             const CLASS_COMPACT = 'ol-street-view--compact';
             const CLASS_HIDDEN = 'ol-street-view--hidden';
 
-            if (this.options.defaultMapSize === 'compact') {
+            if (this._options.defaultMapSize === 'compact') {
                 document.body.classList.add(CLASS_COMPACT);
-            } else if (this.options.defaultMapSize === 'hidden') {
+            } else if (this._options.defaultMapSize === 'hidden') {
                 document.body.classList.add(CLASS_HIDDEN);
             }
 
@@ -715,7 +764,7 @@ export default class StreetView extends Control {
 
         addPegmanControl();
 
-        if (this.options.sizeToggler) {
+        if (this._options.sizeToggler) {
             addSizeTogglerControl();
         }
     }
@@ -725,8 +774,8 @@ export default class StreetView extends Control {
      * @fires load
      */
     async _loadStreetView(): Promise<void> {
-        const loader = new Loader(this.options.apiKey, {
-            language: this.options.language
+        const loader = new Loader(this._options.apiKey, {
+            language: this._options.language
         });
 
         try {
@@ -838,7 +887,7 @@ export default class StreetView extends Control {
         this._addTranslateInteraction();
 
         this._view.setCenter(this._pegmanSelectedCoords);
-        this._view.setZoom(this.options.zoomOnInit);
+        this._view.setZoom(this._options.zoomOnInit);
         this._showStreetView(this._pegmanSelectedCoords);
     }
 
@@ -1114,7 +1163,9 @@ enum MapSize {
  * {
  *   apiKey: null,
  *   size: 'lg',
+ *   transparentButton: false,
  *   zoomOnInit: 18,
+ *   minZoom: null,
  *   resizable: true,
  *   sizeToggler: true,
  *   defaultMapSize: 'expanded',
@@ -1137,9 +1188,19 @@ interface Options {
     size?: `${BtnControlSize}`;
 
     /**
+     * Hides the container button that holds Pegman
+     */
+    transparentButton?: boolean;
+
+    /**
      * Zoom level on the map when init the Panorama
      */
     zoomOnInit?: number;
+
+    /**
+     * Minimum zoom level to show the Pegman control
+     */
+    minZoom?: number;
 
     /**
      * To display a handler that enable dragging changing the height of the layout

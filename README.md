@@ -23,7 +23,7 @@ If you are going to use this module, read the Google [Terms of Service](https://
 ## Examples
 
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/master/examples/basic.html)
+    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v2.2.1/examples/basic.html)
 
 ## Usage
 
@@ -42,9 +42,19 @@ const opt_options = {
     size: 'lg',
 
     /**
+     * Hides the container button that holds Pegman
+     */
+    transparentButton: false;
+
+    /**
      * Zoom level on the map when init the Panorama
      */
     zoomOnInit: 18, 
+
+    /**
+     * Minimum zoom level to show the Pegman control
+     */
+    minZoom: null,
 
     /**
      * To display a handler that enable dragging changing the height of the layout
@@ -161,13 +171,13 @@ streetView.on(`streetViewExit`, () => console.log('Fired everytime after is exit
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.1.2"></script>
+<script src="https://unpkg.com/ol-street-view@2.2.1"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.1.2/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.2.1/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -199,9 +209,9 @@ TypeScript types are shipped with the project in the dist directory and should b
 ## Todo
 
 -   Find the argument in the XYZ request that enables the Photo Spheres in the map
--   \~~Add resizable screen option~~
+-   ~~Add resizable screen option~~
 -   Add feedback support when element can't be dropped
 -   Add extra layout (vertical)
 -   ~~Add scss~~
--   \~~Add size toggler~~
--   Improve scss style (add some variables)
+-   ~~Add size toggler~~
+-   ~~Improve scss style (add some variables)~~

@@ -38,7 +38,7 @@ const banner =`
 export default function (commandOptions) {
 
     const outputs = [{
-        input: 'src/index-umd.js',
+        input: 'src/index-umd.ts',
         output: [
             {
                 file: 'dist/ol-street-view.js',
@@ -87,7 +87,7 @@ export default function (commandOptions) {
                 contentBase: ['', 'examples'],
                 historyApiFallback: '/basic.html',
                 host: 'localhost',
-                port: 3000,
+                port: 3005,
                 // execute function after server has begun listening
                 onListening: function (server) {
                     const address = server.address()

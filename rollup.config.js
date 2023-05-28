@@ -18,7 +18,7 @@ const banner =`
 
 
 export default {
-    input: 'src/index-es.js',
+    input: 'src/ol-street-view.ts',
     output: [
         {
             file: 'lib/ol-street-view.js',

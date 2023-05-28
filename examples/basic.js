@@ -54,12 +54,14 @@ var map = new ol.Map({
 var streetView = new StreetView(
     {
         apiKey: null,
-        language: 'en',
-        size: 'md',
+        language: StreetView.Language.EN,
+        transparentButton: false,
+        size: StreetView.BtnControlSize.Large,
         resizable: true,
         sizeToggler: true,
         zoomOnInit: 18,
-        defaultMapSize: 'expanded',
+        minZoom: 13,
+        defaultMapSize: StreetView.MapSize.Expanded,
         autoLoadGoogleMaps: true,
         i18n: {
             dragToInit: 'Drag and drop me'
