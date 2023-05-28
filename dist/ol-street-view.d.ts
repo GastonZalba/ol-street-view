@@ -28,12 +28,13 @@ import './assets/scss/ol-street-view.scss';
  * @extends {ol/control/Control~Control}
  */
 export default class StreetView extends Control {
-    protected options: Options;
+    protected _options: Options;
     protected _i18n: i18n;
     private _map;
     private _view;
     private _viewport;
     protected _isDragging: boolean;
+    protected _isHidden: boolean;
     protected pegmanDivControl: HTMLElement;
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
@@ -71,6 +72,11 @@ export default class StreetView extends Control {
      * @public
      */
     setMap(map: Map): void;
+    /**
+     * @protected
+     * @param bool
+     */
+    _showControl(bool: boolean): void;
     /**
      * @protected
      */
@@ -245,7 +251,9 @@ declare enum MapSize {
  * {
  *   apiKey: null,
  *   size: 'lg',
+ *   transparentButton: false,
  *   zoomOnInit: 18,
+ *   minZoom: null,
  *   resizable: true,
  *   sizeToggler: true,
  *   defaultMapSize: 'expanded',
@@ -266,9 +274,17 @@ interface Options {
      */
     size?: `${BtnControlSize}`;
     /**
+     * Hides the container button that holds Pegman
+     */
+    transparentButton?: boolean;
+    /**
      * Zoom level on the map when init the Panorama
      */
     zoomOnInit?: number;
+    /**
+     * Minimum zoom level to show the Pegman control
+     */
+    minZoom?: number;
     /**
      * To display a handler that enable dragging changing the height of the layout
      */

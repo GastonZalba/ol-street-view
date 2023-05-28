@@ -1,8 +1,8 @@
 
 /*!
- * ol-street-view - v2.1.2
+ * ol-street-view - v2.2.0
  * https://github.com/GastonZalba/ol-street-view#readme
- * Built: Thu Apr 20 2023 21:46:06 GMT-0300 (Argentina Standard Time)
+ * Built: Sat May 27 2023 23:54:33 GMT-0300 (Argentina Standard Time)
 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/Feature.js'), require('ol/Collection.js'), require('ol/style/Icon.js'), require('ol/style/Style.js'), require('ol/source/Vector.js'), require('ol/source/XYZ.js'), require('ol/geom/Point.js'), require('ol/control/Control.js'), require('ol/proj.js'), require('ol/layer/Vector.js'), require('ol/layer/Tile.js'), require('ol/interaction/Translate.js'), require('ol/Observable.js'), require('interactjs')) :
@@ -124,18 +124,18 @@
             this._loadedLib = false;
             this._initialized = false;
             // Default options
-            this.options = Object.assign({ apiKey: null, size: BtnControlSize.Large, resizable: true, sizeToggler: true, defaultMapSize: MapSize.Expanded, language: Language.EN, target: null, zoomOnInit: 18, autoLoadGoogleMaps: true }, opt_options // Merge user options
+            this._options = Object.assign({ apiKey: null, size: BtnControlSize.Large, transparentButton: false, resizable: true, sizeToggler: true, defaultMapSize: MapSize.Expanded, language: Language.EN, target: null, zoomOnInit: 18, minZoom: null, autoLoadGoogleMaps: true }, opt_options // Merge user options
             );
             // If language selector is provided and translation exists...
             this._i18n =
-                languages[this.options.language in languages
-                    ? this.options.language
+                languages[this._options.language in languages
+                    ? this._options.language
                     : 'en'];
             // Merge custom translations
             this._i18n = Object.assign(this._i18n, opt_options.i18n || {});
             this._pegmanSelectedCoords = [];
             this._pegmanHeading = 180;
-            if (this.options.autoLoadGoogleMaps) {
+            if (this._options.autoLoadGoogleMaps) {
                 this.on(SVEventTypes.LOAD_LIB, () => {
                     this._loadedLib = true;
                     this.init();
@@ -205,11 +205,36 @@
                 if (this._loadedLib && !this._initialized) {
                     this.init();
                 }
+                if (this._options.minZoom) {
+                    this._view.on('change:resolution', () => {
+                        const zoom = this._view.getZoom();
+                        if (zoom <= this._options.minZoom) {
+                            if (this._isHidden)
+                                this._showControl(true);
+                        }
+                        else {
+                            if (!this._isHidden)
+                                this._showControl(false);
+                        }
+                    });
+                }
             }
             else {
                 controlElement.remove();
                 this.hideStreetView();
             }
+        }
+        /**
+         * @protected
+         * @param bool
+         */
+        _showControl(bool) {
+            const CLASS_HIDE_CONTROL = 'ol-street-view--hide-control';
+            if (bool)
+                this.pegmanDivControl.classList.add(CLASS_HIDE_CONTROL);
+            else
+                this.pegmanDivControl.classList.remove(CLASS_HIDE_CONTROL);
+            this._isHidden = !bool;
         }
         /**
          * @protected
@@ -339,24 +364,22 @@
                         bottom: false,
                         right: false
                     },
-                    listeners: {
-                        start: () => {
-                            // If not removed, the resize is very janky
-                            this.mapContainer.classList.remove('ol-street-view--transitions');
-                        },
-                        move: (event) => {
-                            let { y } = event.target.dataset;
-                            y = (parseFloat(y) || 0) + event.deltaRect.top;
-                            Object.assign(event.target.style, {
-                                height: `${Math.round(event.rect.height)}px`
-                            });
-                            Object.assign(event.target.dataset, { y });
-                            debounceRefresh();
-                        },
-                        end: () => {
-                            this.mapContainer.classList.add('ol-street-view--transitions');
-                            this._refreshMap(false);
-                        }
+                    onstart: () => {
+                        // If not removed, the resize is very janky
+                        this.mapContainer.classList.remove('ol-street-view--transitions');
+                    },
+                    onmove: (evt) => {
+                        let { y } = evt.target.dataset;
+                        y = (parseFloat(y) || 0) + evt.deltaRect.top;
+                        Object.assign(evt.target.style, {
+                            height: `${Math.round(evt.rect.height)}px`
+                        });
+                        Object.assign(evt.target.dataset, { y });
+                        debounceRefresh();
+                    },
+                    onend: () => {
+                        this.mapContainer.classList.add('ol-street-view--transitions');
+                        this._refreshMap(false);
                     },
                     modifiers: [
                         interact.modifiers.restrictSize({
@@ -403,7 +426,7 @@
                 this.mapContainer.appendChild(this.streetViewPanoramaDiv);
                 this.mapContainer.appendChild(this._viewport);
                 this._viewport.classList.add('ol-street-view--map');
-                if (this.options.resizable) {
+                if (this._options.resizable) {
                     addHandlerResizable();
                 }
             };
@@ -420,17 +443,18 @@
                 let oldPosX = 0, stopInteract;
                 // Grab Left/Right Direction of Mouse for Pegman Image
                 let onMouseMove = (e) => {
+                    const pageX = 'changedTouches' in e ? e.changedTouches[0].pageX : e.pageX;
                     // Left
-                    if (e.pageX < oldPosX) {
+                    if (pageX < oldPosX) {
                         this.pegmanDraggable.classList.add('ol-street-view--left');
                         this.pegmanDraggable.classList.remove('ol-street-view--right');
                         // Right
                     }
-                    else if (e.pageX > oldPosX) {
+                    else if (pageX > oldPosX) {
                         this.pegmanDraggable.classList.add('ol-street-view--right');
                         this.pegmanDraggable.classList.remove('ol-street-view--left');
                     }
-                    oldPosX = e.pageX;
+                    oldPosX = pageX;
                     return oldPosX;
                 };
                 onMouseMove = onMouseMove.bind(this);
@@ -448,6 +472,7 @@
                     // Remove Dropzone Feedback
                     this._viewport.classList.remove('ol-street-view--drop-active', 'ol-street-view--drop-target');
                     document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('touchmove', onMouseMove);
                 };
                 // Add Escape support to abort the dragging
                 document.addEventListener('keydown', ({ key }) => {
@@ -460,10 +485,22 @@
                 interact('.ol-street-view--draggable')
                     .draggable({
                     inertia: false,
+                    onstart: (e) => {
+                        // Always center pegman on the cursor,
+                        // even if the drag start on the control border
+                        const pTarget = e.target;
+                        // Get the button width
+                        const w = pTarget.offsetWidth;
+                        // Get the button x middle position
+                        const x = pTarget.getBoundingClientRect().left + w / 2;
+                        // Update the Position Attributes
+                        pTarget.setAttribute('data-x', -(x - e.x0));
+                    },
                     onmove: (e) => {
                         this._isDragging = true;
                         stopInteract = e.interaction.stop;
                         document.addEventListener('mousemove', onMouseMove);
+                        document.addEventListener('touchmove', onMouseMove);
                         this.pegmanDraggable.classList.remove('ol-street-view--dropped');
                         const pTarget = e.target, 
                         // Keep the Dragged Position in the data-x/data-y Attributes
@@ -473,7 +510,7 @@
                         // Translate the Element
                         pTarget.style.webkitTransform =
                             pTarget.style.transform = `translate(${x}px, ${y}px)`;
-                        // Update the Posiion Attributes
+                        // Update the Position Attributes
                         pTarget.setAttribute('data-x', x);
                         pTarget.setAttribute('data-y', y);
                     },
@@ -525,7 +562,9 @@
             const addPegmanControl = () => {
                 this.pegmanDivControl = controlElement;
                 this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-                this.pegmanDivControl.className = `ol-street-view--${this.options.size}-btn ol-control`;
+                this.pegmanDivControl.className = `ol-street-view--${this._options.size}-btn ol-control ${this._options.transparentButton
+                ? 'ol-street-view--transparent'
+                : ''}`;
                 this.pegmanDivControl.title = this._i18n.dragToInit;
                 this.pegmanDraggable = document.createElement('div');
                 this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
@@ -540,10 +579,10 @@
             const addSizeTogglerControl = () => {
                 const CLASS_COMPACT = 'ol-street-view--compact';
                 const CLASS_HIDDEN = 'ol-street-view--hidden';
-                if (this.options.defaultMapSize === 'compact') {
+                if (this._options.defaultMapSize === 'compact') {
                     document.body.classList.add(CLASS_COMPACT);
                 }
-                else if (this.options.defaultMapSize === 'hidden') {
+                else if (this._options.defaultMapSize === 'hidden') {
                     document.body.classList.add(CLASS_HIDDEN);
                 }
                 const togglerDiv = document.createElement('div');
@@ -580,7 +619,7 @@
                 }));
             };
             addPegmanControl();
-            if (this.options.sizeToggler) {
+            if (this._options.sizeToggler) {
                 addSizeTogglerControl();
             }
         }
@@ -589,8 +628,8 @@
          * @fires load
          */
         async _loadStreetView() {
-            const loader = new Loader(this.options.apiKey, {
-                language: this.options.language
+            const loader = new Loader(this._options.apiKey, {
+                language: this._options.language
             });
             try {
                 await loader.load();
@@ -673,7 +712,7 @@
             this._pegmanLayer.getSource().addFeature(this._pegmanFeature);
             this._addTranslateInteraction();
             this._view.setCenter(this._pegmanSelectedCoords);
-            this._view.setZoom(this.options.zoomOnInit);
+            this._view.setZoom(this._options.zoomOnInit);
             this._showStreetView(this._pegmanSelectedCoords);
         }
         /**
@@ -868,6 +907,17 @@
         MapSize["Compact"] = "compact";
         MapSize["Hidden"] = "hidden";
     })(MapSize || (MapSize = {}));
+
+    var methods = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        get BtnControlSize () { return BtnControlSize; },
+        get Language () { return Language; },
+        get MapSize () { return MapSize; },
+        get SVEventTypes () { return SVEventTypes; },
+        default: StreetView
+    });
+
+    Object.assign(StreetView, methods);
 
     return StreetView;
 
