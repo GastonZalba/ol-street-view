@@ -174,10 +174,8 @@ export default class StreetView extends Control {
     /**
      * Only use this method if `autoLoadGoogleMaps` is `false`. Call it after the Google Maps library is loaded.
      * Otherwise it will called automatically after the Maps Library is loaded.
-     * @public
-     * @returns
      */
-    init(): void {
+    public init(): void {
         if (!this._map) return;
 
         this._streetViewService = new google.maps.StreetViewService();
@@ -233,9 +231,8 @@ export default class StreetView extends Control {
      * Remove the control from its current map and attach it to the new map.
      * Pass null to just remove the control from the current map.
      * @param map
-     * @public
      */
-    setMap(map: Map): void {
+    public setMap(map: Map): void {
         super.setMap(map);
 
         if (map) {
@@ -252,13 +249,10 @@ export default class StreetView extends Control {
             }
 
             if (this._options.minZoom) {
+                this._maybeHideControl();
+
                 this._view.on('change:resolution', () => {
-                    const zoom = this._view.getZoom();
-                    if (zoom <= this._options.minZoom) {
-                        if (this._isHidden) this._showControl(true);
-                    } else {
-                        if (!this._isHidden) this._showControl(false);
-                    }
+                    this._maybeHideControl();
                 });
             }
         } else {
@@ -268,10 +262,21 @@ export default class StreetView extends Control {
     }
 
     /**
-     * @protected
+     * Show or hide the control depending on the zoom level
+     */
+    private _maybeHideControl(): void {
+        const zoom = this._view.getZoom();
+        if (zoom <= this._options.minZoom) {
+            if (this._isHidden) this._showControl(true);
+        } else {
+            if (!this._isHidden) this._showControl(false);
+        }
+    }
+
+    /**
      * @param bool
      */
-    _showControl(bool: boolean): void {
+    private _showControl(bool: boolean): void {
         const CLASS_HIDE_CONTROL = 'ol-street-view--hide-control';
         if (bool) this.pegmanDivControl.classList.add(CLASS_HIDE_CONTROL);
         else this.pegmanDivControl.classList.remove(CLASS_HIDE_CONTROL);
@@ -279,10 +284,7 @@ export default class StreetView extends Control {
         this._isHidden = !bool;
     }
 
-    /**
-     * @protected
-     */
-    _prepareLayers(): void {
+    private _prepareLayers(): void {
         const calculatePegmanIconOffset = (): Array<number> => {
             const heading = this._pegmanHeading;
 
@@ -361,10 +363,7 @@ export default class StreetView extends Control {
         this._map.addLayer(this._pegmanLayer);
     }
 
-    /**
-     * @protected
-     */
-    _addTranslateInteraction(): void {
+    private _addTranslateInteraction(): void {
         if (this._translatePegman) {
             return this._translatePegman.setActive(true);
         }
@@ -383,10 +382,7 @@ export default class StreetView extends Control {
         this._map.addInteraction(this._translatePegman);
     }
 
-    /**
-     * @protected
-     */
-    _prepareLayout(): void {
+    private _prepareLayout(): void {
         /**
          * Create a handler to allow resize the layout
          *
@@ -496,10 +492,7 @@ export default class StreetView extends Control {
         addStreetViewHtml();
     }
 
-    /**
-     * @protected
-     */
-    _createMapControls(): void {
+    private _createMapControls(): void {
         /**
          * @protected
          */
@@ -770,10 +763,9 @@ export default class StreetView extends Control {
     }
 
     /**
-     * @protected
      * @fires load
      */
-    async _loadStreetView(): Promise<void> {
+    private async _loadStreetView(): Promise<void> {
         const loader = new Loader(this._options.apiKey, {
             language: this._options.language
         });
@@ -786,10 +778,7 @@ export default class StreetView extends Control {
         }
     }
 
-    /**
-     * @protected
-     */
-    _updateStreetViewPosition(coords: Coordinate): void {
+    private _updateStreetViewPosition(coords: Coordinate): void {
         const latLon = transform(
             coords,
             this._view.getProjection(),
@@ -813,10 +802,7 @@ export default class StreetView extends Control {
         );
     }
 
-    /**
-     * @protected
-     */
-    _updatePegmanPosition(
+    private _updatePegmanPosition(
         coords: Coordinate | google.maps.LatLng,
         isGoogleFormat = true
     ): void {
@@ -842,20 +828,14 @@ export default class StreetView extends Control {
         this._centerMapToPegman();
     }
 
-    /**
-     * @protected
-     */
-    _centerMapToPegman(): void {
+    private _centerMapToPegman(): void {
         this._view.animate({
             center: this._pegmanSelectedCoords,
             duration: 100
         });
     }
 
-    /**
-     * @protected
-     */
-    _initPegmanOnMap(): void {
+    private _initPegmanOnMap(): void {
         if (this._pegmanLayer.getSource().getFeatures().length) {
             return;
         }
@@ -891,19 +871,14 @@ export default class StreetView extends Control {
         this._showStreetView(this._pegmanSelectedCoords);
     }
 
-    /**
-     * @protected
-     */
-    _showNoDataMode(): void {
+    private _showNoDataMode(): void {
         this._panorama.setVisible(false);
     }
 
     /**
      * Map click listener to translate StreetView position
-     *
-     * @protected
      */
-    _addClickListener(): void {
+    private _addClickListener(): void {
         const clickListener = (evt: MapBrowserEvent<MouseEvent>) => {
             this._updateStreetViewPosition(evt.coordinate);
             evt.preventDefault();
@@ -913,10 +888,7 @@ export default class StreetView extends Control {
         this._keyClickOnMap = this._map.on('click', clickListener);
     }
 
-    /**
-     * @protected
-     */
-    _refreshMap(centerToPegman = true): void {
+    private _refreshMap(centerToPegman = true): void {
         // Force refresh the layers
         this._map.updateSize();
         window.dispatchEvent(new Event('resize'));
@@ -928,9 +900,8 @@ export default class StreetView extends Control {
      * Show Street View mode
      * @param coords Must be in the map projection format
      * @fires streetViewInit
-     * @protected
      */
-    _showStreetView(coords: Coordinate): void {
+    private _showStreetView(coords: Coordinate): void {
         if (this._lastHeight) {
             this._viewport.style.height = this._lastHeight;
         }
@@ -948,45 +919,38 @@ export default class StreetView extends Control {
 
     /**
      * Add Stree View Layer showing areas wheres StreetView exists
-     * @protected
      */
-    _addStreetViewXyzLayer(): void {
+    private _addStreetViewXyzLayer(): void {
         if (!this._addedXyzLayer) this._map.addLayer(this._streetViewXyzLayer);
         this._addedXyzLayer = true;
     }
 
-    /**
-     * @protected
-     */
-    _removeStreetViewXyzLayer(): void {
+    private _removeStreetViewXyzLayer(): void {
         this._map.removeLayer(this._streetViewXyzLayer);
         this._addedXyzLayer = false;
     }
     /**
      * This is useful if wou wanna add a custom icon on the panorama instance,
      * add custom listeners, etc
-     * @public
      * @returns {google.maps.StreetViewPanorama}
      */
-    getStreetViewPanorama(): google.maps.StreetViewPanorama {
+    public getStreetViewPanorama(): google.maps.StreetViewPanorama {
         return this._panorama;
     }
 
     /**
      * Get the Vector Layer in wich Pegman is displayed
-     * @public
      * @returns {VectorLayer<VectorSource>}
      */
-    getPegmanLayer(): VectorLayer<VectorSource> {
+    public getPegmanLayer(): VectorLayer<VectorSource> {
         return this._pegmanLayer;
     }
 
     /**
      * Get the background Raster layer that displays the existing zones with Street View available
-     * @public
      * @returns {TileLayer<XYZ>}
      */
-    getStreetViewLayer(): TileLayer<XYZ> {
+    public getStreetViewLayer(): TileLayer<XYZ> {
         return this._streetViewXyzLayer;
     }
 
@@ -995,9 +959,8 @@ export default class StreetView extends Control {
      * @fires streetViewInit
      * @param {Coordinate} coords Must be in the map projection format
      * @returns {google.maps.StreetViewPanorama}
-     * @public
      */
-    showStreetView(coords: Coordinate): google.maps.StreetViewPanorama {
+    public showStreetView(coords: Coordinate): google.maps.StreetViewPanorama {
         if (!coords) {
             console.error('Coords are empty');
             return;
@@ -1018,9 +981,8 @@ export default class StreetView extends Control {
     /**
      * Hide Street View, remove layers and clear features
      * @fires streetViewExit
-     * @public
      */
-    hideStreetView(): void {
+    public hideStreetView(): void {
         this._translatePegman.setActive(false);
 
         const pegmanLayerSource = this._pegmanLayer.getSource();
