@@ -49,12 +49,12 @@ const opt_options = {
     /**
      * If true, Pegman will traslate to the new location based on the maximum radius provided
      */
-    updatePegmanToClosestPanorama: true;
+    updatePegmanToClosestPanorama: true,
 
     /**
      * Hides the container button that holds Pegman
      */
-    transparentButton: false;
+    transparentButton: false,
 
     /**
      * Zoom level on the map when init the Panorama
