@@ -1,8 +1,8 @@
 
 /*!
- * ol-street-view - v2.2.2
+ * ol-street-view - v2.2.3
  * https://github.com/GastonZalba/ol-street-view#readme
- * Built: Sun May 28 2023 12:16:42 GMT-0300 (Argentina Standard Time)
+ * Built: Sat Sep 30 2023 17:18:21 GMT-0300 (Argentina Standard Time)
 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/Feature.js'), require('ol/Collection.js'), require('ol/style/Icon.js'), require('ol/style/Style.js'), require('ol/source/Vector.js'), require('ol/source/XYZ.js'), require('ol/geom/Point.js'), require('ol/control/Control.js'), require('ol/proj.js'), require('ol/layer/Vector.js'), require('ol/layer/Tile.js'), require('ol/interaction/Translate.js'), require('ol/Observable.js'), require('interactjs')) :
@@ -102,7 +102,6 @@
         es: es
     });
 
-    const SV_MAX_DISTANCE_METERS = 100;
     const controlElement = document.createElement('div');
     /**
      * Street View implementation for Open Layers.
@@ -124,7 +123,7 @@
             this._loadedLib = false;
             this._initialized = false;
             // Default options
-            this._options = Object.assign({ apiKey: null, size: BtnControlSize.Large, transparentButton: false, resizable: true, sizeToggler: true, defaultMapSize: MapSize.Expanded, language: Language.EN, target: null, zoomOnInit: 18, minZoom: null, autoLoadGoogleMaps: true }, opt_options // Merge user options
+            this._options = Object.assign({ apiKey: null, size: BtnControlSize.Large, radius: 100, updatePegmanToClosestPanorama: true, transparentButton: false, resizable: true, sizeToggler: true, defaultMapSize: MapSize.Expanded, language: Language.EN, target: null, zoomOnInit: 18, minZoom: null, autoLoadGoogleMaps: true }, opt_options // Merge user options
             );
             // If language selector is provided and translation exists...
             this._i18n =
@@ -327,15 +326,21 @@
             if (this._translatePegman) {
                 return this._translatePegman.setActive(true);
             }
+            this._translatePegman = new Translate({
+                features: new Collection([this._pegmanFeature])
+            });
+            this._addTranslateInteractionEvent();
+            this._map.addInteraction(this._translatePegman);
+        }
+        _addTranslateInteractionEvent() {
             const translatePegmanHandler = (evt) => {
                 this._pegmanSelectedCoords = evt.coordinate;
                 this._updateStreetViewPosition(this._pegmanSelectedCoords);
             };
-            this._translatePegman = new Translate({
-                features: new Collection([this._pegmanFeature])
-            });
-            this._translatePegman.on('translateend', translatePegmanHandler);
-            this._map.addInteraction(this._translatePegman);
+            this._translateEventKey = this._translatePegman.on('translateend', translatePegmanHandler);
+        }
+        _remvoveTranslateInteractionEvent() {
+            Observable_js.unByKey(this._translateEventKey);
         }
         _prepareLayout() {
             /**
@@ -632,10 +637,16 @@
         _updateStreetViewPosition(coords) {
             const latLon = proj_js.transform(coords, this._view.getProjection(), 'EPSG:4326').reverse();
             const latLonGoogle = { lat: latLon[0], lng: latLon[1] };
-            this._streetViewService.getPanoramaByLocation(latLonGoogle, SV_MAX_DISTANCE_METERS, (_, status) => {
+            this._streetViewService.getPanoramaByLocation(latLonGoogle, this._options.radius, (streetViewPanoramaData, status) => {
                 if (status === google.maps.StreetViewStatus.OK) {
                     this._panorama.setPosition(latLonGoogle);
                     this._panorama.setVisible(true);
+                    this._panorama.setZoom(1);
+                    if (this._options.updatePegmanToClosestPanorama) {
+                        this._remvoveTranslateInteractionEvent();
+                        this._updatePegmanPosition(streetViewPanoramaData.location.latLng, true);
+                        this._addTranslateInteractionEvent();
+                    }
                 }
                 else {
                     this._showNoDataMode();
@@ -705,7 +716,7 @@
                 evt.preventDefault();
                 evt.stopPropagation();
             };
-            this._keyClickOnMap = this._map.on('click', clickListener);
+            this._clickOnMapEventKey = this._map.on('click', clickListener);
         }
         _refreshMap(centerToPegman = true) {
             // Force refresh the layers
@@ -804,7 +815,7 @@
             setTimeout(() => {
                 this._refreshMap(false);
             }, 150);
-            Observable_js.unByKey(this._keyClickOnMap);
+            Observable_js.unByKey(this._clickOnMapEventKey);
             // Maybe, exit fullscreen
             if (document.fullscreenElement)
                 document.exitFullscreen();

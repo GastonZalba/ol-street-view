@@ -39,7 +39,8 @@ export default class StreetView extends Control {
     protected pegmanDraggable: HTMLElement;
     protected streetViewPanoramaDiv: HTMLElement;
     protected mapContainer: HTMLElement;
-    protected _keyClickOnMap: EventsKey | EventsKey[];
+    protected _clickOnMapEventKey: EventsKey;
+    protected _translateEventKey: EventsKey;
     protected _streetViewXyzLayer: TileLayer<XYZ>;
     protected _addedXyzLayer: boolean;
     protected _pegmanLayer: VectorLayer<VectorSource>;
@@ -78,6 +79,8 @@ export default class StreetView extends Control {
     private _showControl;
     private _prepareLayers;
     private _addTranslateInteraction;
+    private _addTranslateInteractionEvent;
+    private _remvoveTranslateInteractionEvent;
     private _prepareLayout;
     private _createMapControls;
     /**
@@ -208,6 +211,8 @@ declare enum MapSize {
  *   apiKey: null,
  *   size: 'lg',
  *   transparentButton: false,
+ *   radius: 100,
+ *   updatePegmanToClosestPanorama: true,
  *   zoomOnInit: 18,
  *   minZoom: null,
  *   resizable: true,
@@ -233,6 +238,14 @@ interface Options {
      * Hides the container button that holds Pegman
      */
     transparentButton?: boolean;
+    /**
+     * Maximum distance (in meters) that Street View can traslate to show the closest panorama
+     */
+    radius?: number;
+    /**
+     * If true, Pegman will traslate to the new location based on the maximum radius provided
+     */
+    updatePegmanToClosestPanorama?: boolean;
     /**
      * Zoom level on the map when init the Panorama
      */
