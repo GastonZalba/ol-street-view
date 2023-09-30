@@ -39,7 +39,6 @@ import * as languages from './components/i18n/index';
 // Css
 import './assets/scss/ol-street-view.scss';
 
-const SV_MAX_DISTANCE_METERS = 100;
 const controlElement = document.createElement('div');
 
 /**
@@ -72,7 +71,8 @@ export default class StreetView extends Control {
     protected mapContainer: HTMLElement;
 
     // Obserbable keys
-    protected _keyClickOnMap: EventsKey | EventsKey[];
+    protected _clickOnMapEventKey: EventsKey;
+    protected _translateEventKey: EventsKey;
 
     // Layers
     protected _streetViewXyzLayer: TileLayer<XYZ>;
@@ -135,6 +135,8 @@ export default class StreetView extends Control {
         this._options = {
             apiKey: null,
             size: BtnControlSize.Large,
+            radius: 100,
+            updatePegmanToClosestPanorama: true,
             transparentButton: false,
             resizable: true,
             sizeToggler: true,
@@ -368,18 +370,28 @@ export default class StreetView extends Control {
             return this._translatePegman.setActive(true);
         }
 
-        const translatePegmanHandler = (evt: TranslateEvent): void => {
-            this._pegmanSelectedCoords = evt.coordinate;
-            this._updateStreetViewPosition(this._pegmanSelectedCoords);
-        };
-
         this._translatePegman = new Translate({
             features: new Collection([this._pegmanFeature])
         });
 
-        this._translatePegman.on('translateend', translatePegmanHandler);
+        this._addTranslateInteractionEvent();
 
         this._map.addInteraction(this._translatePegman);
+    }
+
+    private _addTranslateInteractionEvent(): void {
+        const translatePegmanHandler = (evt: TranslateEvent): void => {
+            this._pegmanSelectedCoords = evt.coordinate;
+            this._updateStreetViewPosition(this._pegmanSelectedCoords);
+        };
+        this._translateEventKey = this._translatePegman.on(
+            'translateend',
+            translatePegmanHandler
+        );
+    }
+
+    private _remvoveTranslateInteractionEvent(): void {
+        unByKey(this._translateEventKey);
     }
 
     private _prepareLayout(): void {
@@ -789,11 +801,20 @@ export default class StreetView extends Control {
 
         this._streetViewService.getPanoramaByLocation(
             latLonGoogle,
-            SV_MAX_DISTANCE_METERS,
-            (_, status) => {
+            this._options.radius,
+            (streetViewPanoramaData, status) => {
                 if (status === google.maps.StreetViewStatus.OK) {
                     this._panorama.setPosition(latLonGoogle);
                     this._panorama.setVisible(true);
+                    this._panorama.setZoom(1);
+                    if (this._options.updatePegmanToClosestPanorama) {
+                        this._remvoveTranslateInteractionEvent();
+                        this._updatePegmanPosition(
+                            streetViewPanoramaData.location.latLng,
+                            true
+                        );
+                        this._addTranslateInteractionEvent();
+                    }
                 } else {
                     this._showNoDataMode();
                     this._updatePegmanPosition(coords, false);
@@ -885,7 +906,7 @@ export default class StreetView extends Control {
             evt.stopPropagation();
         };
 
-        this._keyClickOnMap = this._map.on('click', clickListener);
+        this._clickOnMapEventKey = this._map.on('click', clickListener);
     }
 
     private _refreshMap(centerToPegman = true): void {
@@ -1008,7 +1029,7 @@ export default class StreetView extends Control {
             this._refreshMap(false);
         }, 150);
 
-        unByKey(this._keyClickOnMap);
+        unByKey(this._clickOnMapEventKey);
 
         // Maybe, exit fullscreen
         if (document.fullscreenElement) document.exitFullscreen();
@@ -1126,6 +1147,8 @@ enum MapSize {
  *   apiKey: null,
  *   size: 'lg',
  *   transparentButton: false,
+ *   radius: 100,
+ *   updatePegmanToClosestPanorama: true,
  *   zoomOnInit: 18,
  *   minZoom: null,
  *   resizable: true,
@@ -1153,6 +1176,16 @@ interface Options {
      * Hides the container button that holds Pegman
      */
     transparentButton?: boolean;
+
+    /**
+     * Maximum distance (in meters) that Street View can traslate to show the closest panorama
+     */
+    radius?: number;
+
+    /**
+     * If true, Pegman will traslate to the new location based on the maximum radius provided
+     */
+    updatePegmanToClosestPanorama?: boolean;
 
     /**
      * Zoom level on the map when init the Panorama

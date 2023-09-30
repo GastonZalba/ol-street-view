@@ -56,6 +56,8 @@ var streetView = new StreetView(
         apiKey: null,
         language: StreetView.Language.EN,
         transparentButton: false,
+        radius: 50,
+        updatePegmanToClosestPanorama: true,
         size: StreetView.BtnControlSize.Large,
         resizable: true,
         sizeToggler: true,

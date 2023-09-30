@@ -141,3 +141,10 @@
 
 ## v2.2.2
 * Fix `minZoom` param on init
+
+## v2.2.3
+* Added `radius` option to allow customize the max displacement of Street View to retrieve the closest panorama
+* Added `updatePegmanToClosestPanorama` option to allow update Pegman accordingly
+* Force default StreetView zoom to `1`
+* Updated to Ol8
+* Updated dev dependencies

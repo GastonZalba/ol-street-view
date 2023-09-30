@@ -95,7 +95,9 @@ $SVtransparentWidthControl: 30px !default;
     height: $SVheightControl;
     pointer-events: auto;
     background-color: transparent;
-    transition: visibility ease 0.5s, opacity ease 0.5s;
+    transition:
+        visibility ease 0.5s,
+        opacity ease 0.5s;
     opacity: 1;
     visibility: visible;
 
@@ -106,7 +108,9 @@ $SVtransparentWidthControl: 30px !default;
 
     &.ol-street-view--hide-control {
         opacity: 0;
-        transition: visibility ease 0.5s, opacity ease 0.5s;
+        transition:
+            visibility ease 0.5s,
+            opacity ease 0.5s;
         visibility: hidden;
     }
 
@@ -269,7 +273,9 @@ $SVtransparentWidthControl: 30px !default;
 }
 
 .ol-street-view--no-results-text {
-    font: 300 14px Arial, sans-serif;
+    font:
+        300 14px Arial,
+        sans-serif;
 }
 
 /* End No results mode */
@@ -400,7 +406,9 @@ $SVtransparentWidthControl: 30px !default;
 }
 
 .ol-street-view--transitions .ol-street-view--map {
-    transition: 0.1s height, 0.1s width;
+    transition:
+        0.1s height,
+        0.1s width;
 }
 
 #ol-street-view--pegman-button-div {
