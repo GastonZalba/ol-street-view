@@ -44,7 +44,7 @@ const opt_options = {
     /**
      * Maximum distance (in meters) that Street View can traslate to show the closest panorama
      */
-    radius: 100;
+    radius: 100,
 
     /**
      * If true, Pegman will traslate to the new location based on the maximum radius provided
