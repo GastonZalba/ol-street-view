@@ -1,8 +1,8 @@
 
 /*!
- * ol-street-view - v2.2.3
+ * ol-street-view - v2.3.0
  * https://github.com/GastonZalba/ol-street-view#readme
- * Built: Sat Sep 30 2023 17:18:21 GMT-0300 (Argentina Standard Time)
+ * Built: Sun Feb 18 2024 21:22:24 GMT-0300 (Argentina Standard Time)
 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/Feature.js'), require('ol/Collection.js'), require('ol/style/Icon.js'), require('ol/style/Style.js'), require('ol/source/Vector.js'), require('ol/source/XYZ.js'), require('ol/geom/Point.js'), require('ol/control/Control.js'), require('ol/proj.js'), require('ol/layer/Vector.js'), require('ol/layer/Tile.js'), require('ol/interaction/Translate.js'), require('ol/Observable.js'), require('interactjs')) :
@@ -459,7 +459,7 @@
                  */
                 const terminateDragging = () => {
                     this._isDragging = false;
-                    document.body.classList.remove('ol-street-view--activated-on-dragging');
+                    this.pegmanDivControl.classList.remove('ol-street-view--activated-on-dragging');
                     // Reset Pegman
                     this.pegmanDraggable.classList.remove('ol-street-view--can-drop', 'ol-street-view--dragged', 'ol-street-view--left', 'ol-street-view--right', 'ol-street-view--active', 'ol-street-view--dropped');
                     this.pegmanDraggable.removeAttribute('style');
@@ -537,7 +537,7 @@
                     },
                     ondragenter: () => {
                         this._addStreetViewXyzLayer();
-                        document.body.classList.add('ol-street-view--activated-on-dragging');
+                        this.pegmanDivControl.classList.add('ol-street-view--activated-on-dragging');
                         this.pegmanDraggable.classList.add('ol-street-view--active', 'ol-street-view--can-drop');
                         this._viewport.classList.add('ol-street-view--drop-target');
                     },
@@ -576,10 +576,10 @@
                 const CLASS_COMPACT = 'ol-street-view--compact';
                 const CLASS_HIDDEN = 'ol-street-view--hidden';
                 if (this._options.defaultMapSize === 'compact') {
-                    document.body.classList.add(CLASS_COMPACT);
+                    this.mapContainer.classList.add(CLASS_COMPACT);
                 }
                 else if (this._options.defaultMapSize === 'hidden') {
-                    document.body.classList.add(CLASS_HIDDEN);
+                    this.mapContainer.classList.add(CLASS_HIDDEN);
                 }
                 const togglerDiv = document.createElement('div');
                 togglerDiv.className =
@@ -589,8 +589,8 @@
                 togglerBtn.innerHTML =
                     '<div class="ol-street-view--size-toggler-img"></div>';
                 togglerBtn.onclick = () => {
-                    document.body.classList.toggle(CLASS_COMPACT);
-                    if (document.body.classList.contains(CLASS_COMPACT)) {
+                    const toggle = this.mapContainer.classList.toggle(CLASS_COMPACT);
+                    if (toggle) {
                         // Minimized
                         togglerBtn.title = this._i18n.expand;
                         // Store height for later
@@ -679,9 +679,9 @@
             if (this._pegmanLayer.getSource().getFeatures().length) {
                 return;
             }
-            // Add Class to Body
-            if (!document.body.classList.contains('ol-street-view--activated')) {
-                document.body.classList.add('ol-street-view--activated');
+            // Add Class to container
+            if (!this.mapContainer.classList.contains('ol-street-view--activated')) {
+                this.mapContainer.classList.add('ol-street-view--activated');
                 // Update Map Size
                 this._map.updateSize();
             }
@@ -806,7 +806,7 @@
             this._pegmanSelectedCoords = [];
             // Remove SV Layer
             this._removeStreetViewXyzLayer();
-            document.body.classList.remove('ol-street-view--activated');
+            this.mapContainer.classList.remove('ol-street-view--activated');
             // Store height for later
             this._lastHeight = this._viewport.style.height;
             // Restore height if it was resized

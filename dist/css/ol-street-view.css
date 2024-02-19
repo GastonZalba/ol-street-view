@@ -23,21 +23,24 @@
   -o-user-select: none;
 }
 
-.ol-street-view--activated #ol-street-view--map-container {
+#ol-street-view--map-container.ol-street-view--activated {
   flex-direction: column;
   display: -webkit-flex;
   display: flex;
 }
-.ol-street-view--activated .ol-street-view--map {
+#ol-street-view--map-container.ol-street-view--activated .ol-street-view--map {
   overflow-y: inherit !important;
 }
-.ol-street-view--activated .ol-street-view--map {
+#ol-street-view--map-container.ol-street-view--activated .ol-street-view--map {
   height: 250px;
 }
-.ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
+#ol-street-view--map-container.ol-street-view--activated.ol-street-view--hidden .ol-street-view--map {
+  display: none;
+}
+#ol-street-view--map-container.ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
   height: 150px !important;
 }
-.ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
+#ol-street-view--map-container.ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
   position: absolute;
   width: 250px;
   left: 20px;
@@ -47,29 +50,26 @@
   border: 2px solid #000;
   overflow: hidden;
 }
-.ol-street-view--activated.ol-street-view--hidden .ol-street-view--map {
-  display: none;
-}
-.ol-street-view--activated.ol-street-view--compact .ol-attribution {
-  display: none;
-}
-.ol-street-view--activated.ol-street-view--compact .ol-zoom {
-  opacity: 0;
-  transition: 0.3s opacity;
-}
-.ol-street-view--activated.ol-street-view--compact .ol-street-view--map:hover .ol-zoom {
+#ol-street-view--map-container.ol-street-view--activated.ol-street-view--compact .ol-street-view--map:hover .ol-zoom {
   opacity: 1;
   transition: 0.3s opacity;
 }
-.ol-street-view--activated #ol-street-view--pegman-button-div {
+#ol-street-view--map-container.ol-street-view--activated.ol-street-view--compact .ol-street-view--map .ol-attribution {
   display: none;
 }
-.ol-street-view--activated #ol-street-view--panorama {
+#ol-street-view--map-container.ol-street-view--activated.ol-street-view--compact .ol-street-view--map .ol-zoom {
+  opacity: 0;
+  transition: 0.3s opacity;
+}
+#ol-street-view--map-container.ol-street-view--activated #ol-street-view--panorama {
   position: relative;
   width: 100%;
   height: 100%;
   display: block;
   border-bottom: 3px solid #222222;
+}
+#ol-street-view--map-container.ol-street-view--activated #ol-street-view--pegman-button-div {
+  display: none;
 }
 
 #ol-street-view--panorama canvas:focus {
@@ -139,7 +139,7 @@
   transform: scale(0.73);
 }
 
-.ol-street-view--activated-on-dragging #ol-street-view--pegman-button-div #ol-street-view--pegman-button {
+#ol-street-view--pegman-button-div.ol-street-view--activated-on-dragging #ol-street-view--pegman-button {
   background-position: -2px -129px !important;
 }
 
@@ -345,10 +345,6 @@
     right: 10px;
   }
 }
-.ol-street-view--activated-on-dragging .tippy-popper {
-  display: none;
-}
-
 .ol-street-view--transitions .ol-street-view--map {
   transition: 0.1s height, 0.1s width;
 }
