@@ -151,4 +151,6 @@
 
 ## v2.3.0
 * Removed all document.body references to add/remove css classes. Now all of these are added in the map container or directly to the control button without polluting the document's body and preventing errors while using html components
+* Improved cleanup and events when using `setMap(null)` method
+* Improved example to allow set and unset the control map
 * Minor scss refactoring

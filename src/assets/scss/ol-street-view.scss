@@ -73,10 +73,6 @@ $SVtransparentWidthControl: 30px !default;
         display: block;
         border-bottom: 3px solid #222222;
     }
-
-    #ol-street-view--pegman-button-div {
-        display: none;
-    }
 }
 
 #ol-street-view--panorama canvas:focus {
@@ -84,7 +80,7 @@ $SVtransparentWidthControl: 30px !default;
 }
 
 #ol-street-view--pegman-button-div {
-    display: none;
+    display: block;
     position: absolute;
     top: 470px;
     right: 20px;
@@ -102,6 +98,10 @@ $SVtransparentWidthControl: 30px !default;
     /* Ol 5 */
     * {
         pointer-events: auto;
+    }
+
+    &.ol-street-view--activated {
+        display: none;
     }
 
     &.ol-street-view--hide-control {
@@ -402,10 +402,6 @@ $SVtransparentWidthControl: 30px !default;
     transition:
         0.1s height,
         0.1s width;
-}
-
-#ol-street-view--pegman-button-div {
-    display: block;
 }
 
 /* Google */
