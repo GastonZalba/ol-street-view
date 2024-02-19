@@ -14,7 +14,7 @@
 
 Street View implementation for Open Layers.
 
-Tested with OpenLayers version 5, 6 and 7. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
+Tested with OpenLayers version 5, 6, 7 and 8. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
 
 ## Disclaimer
 

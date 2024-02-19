@@ -545,7 +545,7 @@ export default class StreetView extends Control {
             const terminateDragging = (): void => {
                 this._isDragging = false;
 
-                document.body.classList.remove(
+                this.pegmanDivControl.classList.remove(
                     'ol-street-view--activated-on-dragging'
                 );
 
@@ -659,7 +659,7 @@ export default class StreetView extends Control {
                 ondragenter: () => {
                     this._addStreetViewXyzLayer();
 
-                    document.body.classList.add(
+                    this.pegmanDivControl.classList.add(
                         'ol-street-view--activated-on-dragging'
                     );
 
@@ -722,9 +722,9 @@ export default class StreetView extends Control {
             const CLASS_HIDDEN = 'ol-street-view--hidden';
 
             if (this._options.defaultMapSize === 'compact') {
-                document.body.classList.add(CLASS_COMPACT);
+                this.mapContainer.classList.add(CLASS_COMPACT);
             } else if (this._options.defaultMapSize === 'hidden') {
-                document.body.classList.add(CLASS_HIDDEN);
+                this.mapContainer.classList.add(CLASS_HIDDEN);
             }
 
             const togglerDiv = document.createElement('div');
@@ -736,9 +736,10 @@ export default class StreetView extends Control {
             togglerBtn.innerHTML =
                 '<div class="ol-street-view--size-toggler-img"></div>';
             togglerBtn.onclick = () => {
-                document.body.classList.toggle(CLASS_COMPACT);
+                const toggle =
+                    this.mapContainer.classList.toggle(CLASS_COMPACT);
 
-                if (document.body.classList.contains(CLASS_COMPACT)) {
+                if (toggle) {
                     // Minimized
                     togglerBtn.title = this._i18n.expand;
                     // Store height for later
@@ -861,9 +862,11 @@ export default class StreetView extends Control {
             return;
         }
 
-        // Add Class to Body
-        if (!document.body.classList.contains('ol-street-view--activated')) {
-            document.body.classList.add('ol-street-view--activated');
+        // Add Class to container
+        if (
+            !this.mapContainer.classList.contains('ol-street-view--activated')
+        ) {
+            this.mapContainer.classList.add('ol-street-view--activated');
 
             // Update Map Size
             this._map.updateSize();
@@ -1015,7 +1018,7 @@ export default class StreetView extends Control {
         // Remove SV Layer
         this._removeStreetViewXyzLayer();
 
-        document.body.classList.remove('ol-street-view--activated');
+        this.mapContainer.classList.remove('ol-street-view--activated');
 
         // Store height for later
         this._lastHeight = this._viewport.style.height;

@@ -148,3 +148,7 @@
 * Force default StreetView zoom to `1`
 * Updated to Ol8
 * Updated dev dependencies
+
+## v2.3.0
+* Removed all document.body references to add/remove css classes. Now all of these are added in the map container or directly to the control button without polluting the document's body and preventing errors while using html components
+* Minor scss refactoring
