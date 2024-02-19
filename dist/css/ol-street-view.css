@@ -68,16 +68,13 @@
   display: block;
   border-bottom: 3px solid #222222;
 }
-#ol-street-view--map-container.ol-street-view--activated #ol-street-view--pegman-button-div {
-  display: none;
-}
 
 #ol-street-view--panorama canvas:focus {
   outline: 0;
 }
 
 #ol-street-view--pegman-button-div {
-  display: none;
+  display: block;
   position: absolute;
   top: 470px;
   right: 20px;
@@ -93,6 +90,9 @@
 }
 #ol-street-view--pegman-button-div * {
   pointer-events: auto;
+}
+#ol-street-view--pegman-button-div.ol-street-view--activated {
+  display: none;
 }
 #ol-street-view--pegman-button-div.ol-street-view--hide-control {
   opacity: 0;
@@ -347,10 +347,6 @@
 }
 .ol-street-view--transitions .ol-street-view--map {
   transition: 0.1s height, 0.1s width;
-}
-
-#ol-street-view--pegman-button-div {
-  display: block;
 }
 
 /* Google */

@@ -2,6 +2,11 @@ var coordsIcon = [-6451474.93, -4153206.94];
 var coordsView = [-6451484.76, -4153214.08];
 var iconUrl = 'http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=star|FF0000';
 
+/**
+ * To test a manual google maps library load
+ */
+const AUTOLOAD_LIBRARY = true;
+
 var map = new ol.Map({
     layers: [
         new ol.layer.Tile({
@@ -64,7 +69,7 @@ var streetView = new StreetView(
         zoomOnInit: 18,
         minZoom: 13,
         defaultMapSize: StreetView.MapSize.Expanded,
-        autoLoadGoogleMaps: true,
+        autoLoadGoogleMaps: AUTOLOAD_LIBRARY,
         i18n: {
             dragToInit: 'Drag and drop me'
         }
@@ -86,9 +91,6 @@ function initiPano() {
 // Init panorama programatically after the lib is loaded
 streetView.once('loadLib', initiPano);
 
-// To test manually loaded library
-// window.initialize = () => { streetView.init(); initiPano() };
-
 // Wait until the Google Maps Panorama is initializated to add the icon (and run once)
 streetView.once('streetViewInit', function () {
 
@@ -109,3 +111,32 @@ streetView.once('streetViewInit', function () {
 
 });
 
+var buttonsSect  = document.getElementById('testButtons');
+
+// Add test buttons
+function createBtn(name, onClick) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = name;
+    btn.onclick = onClick;
+    return btn;
+}
+
+buttonsSect.append(
+    createBtn('Unset map', function () {
+        streetView.setMap(null)
+    }),
+    createBtn('Set map', function () {
+        streetView.setMap(map)
+    })
+);
+
+if (!AUTOLOAD_LIBRARY) {    
+    // To test manually loaded library
+    window.initialize = () => { streetView.init(); initiPano() };
+
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://maps.googleapis.com/maps/api/js?callback=initialize&v=weeklyt";
+    document.body.append(script);
+}
