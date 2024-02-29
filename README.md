@@ -23,7 +23,7 @@ If you are going to use this module, read the Google [Terms of Service](https://
 ## Examples
 
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v2.2.3/examples/basic.html)
+    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v2.3.0/examples/basic.html)
 
 ## Usage
 
@@ -174,13 +174,13 @@ streetView.on(`streetViewExit`, () => console.log('Fired everytime after is exit
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.2.3"></script>
+<script src="https://unpkg.com/ol-street-view@2.3.0"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.2.3/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.3.0/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
