@@ -14,7 +14,7 @@
 
 Street View implementation for Open Layers.
 
-Tested with OpenLayers version 5, 6, 7 and 8. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
+Tested with OpenLayers version 5, 6, 7, 8 and 9. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
 
 ## Disclaimer
 
@@ -86,13 +86,6 @@ const opt_options = {
      * `false` if you are going to load it on your own. If so, you must run the `init` method AFTER the library is loaded. In this case the event 'loadLib' will not be fired.
      */
     autoLoadGoogleMaps: true,
-
-    /**
-     * Specify a target if you want the control to be rendered outside of the map's viewport.
-     * For Ol5, you must set a target to prevent the control from being rendered at the default
-     * target ("ol-overlaycontainer-stopevent"), otherwise the control will not work.
-     */
-    target: 'map',
 
     /**
      * Language support
