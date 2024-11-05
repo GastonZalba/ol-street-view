@@ -156,3 +156,10 @@
 * Minor scss refactoring
 * Improved example to allow set and unset the control map
 * Added ol9 to the example
+
+## v3.0.0
+* Updated to Ol10 
+* Updated multiples deDependencies
+* Replaced `google-maps-loader` with `@googlemaps/js-api-loader`
+* Added `googleMapsLoader` attribute to allow loading another google maps libraries. Now, the module only load the "maps" library. If you want to use the `marker` library, for example, you have to import it manually (see examples).
+* Replaced example's icon (because of a 404 error)

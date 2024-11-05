@@ -1,6 +1,6 @@
 {
   "name": "ol-street-view",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "Street View implementation for Open Layers",
   "main": "dist/ol-street-view.js",
   "module": "lib/ol-street-view.js",
@@ -35,41 +35,40 @@
     "url": "https://github.com/GastonZalba/ol-street-view/issues"
   },
   "homepage": "https://github.com/GastonZalba/ol-street-view#readme",
-  "dependencies": {
-    "@rollup/plugin-json": "^6.0.0",
-    "google-maps": "^4.3.3"
-  },
   "peerDependencies": {
-    "interactjs": ">=1.10.0",
+    "interactjs": ">=1.0.0",
     "ol": ">=5.0.0"
   },
   "devDependencies": {
-    "@interactjs/types": "^1.10.17",
     "@rollup/plugin-image": "^3.0.2",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
-    "@rollup/plugin-typescript": "^11.1.0",
-    "@typescript-eslint/eslint-plugin": "^6.7.3",
-    "@typescript-eslint/parser": "^6.7.3",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "@types/google.maps": "^3.58.1",
+    "@typescript-eslint/eslint-plugin": "^8.13.0",
+    "@typescript-eslint/parser": "^8.13.0",
     "autoprefixer": "^10.4.2",
     "clean-css": "^5.2.4",
     "del-cli": "^5.0.0",
-    "eslint": "^8.6.0",
+    "eslint": "^9.14.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^5.0.0",
-    "interactjs": "^1.10.17",
-    "ol": "^9.0.0",
-    "postcss-preset-env": "^8.3.1",
+    "interactjs": "^1.10.27",
+    "ol": "^10.2.1",
+    "postcss-preset-env": "^10.0.9",
     "prettier": "^3.0.3",
-    "rollup": "^3.20.3",
+    "rollup": "^4.24.4",
     "rollup-plugin-banner2": "^1.2.2",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-serve": "^2.0.2",
+    "rollup-plugin-serve": "^1.1.1",
     "sass": "^1.49.7",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.8"
   }
 }

@@ -14,16 +14,16 @@
 
 Street View implementation for Open Layers.
 
-Tested with OpenLayers version 5, 6, 7, 8 and 9. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
+Tested with OpenLayers versions 5 to 10. For Ol5, you must set a custom "target" to prevent the control from being rendered at the default target ("ol-overlaycontainer-stopevent"), because that messes up the events and breaks the control.
 
 ## Disclaimer
 
-If you are going to use this module, read the Google [Terms of Service](https://www.google.com/help/terms_maps/).
+If you are going to use this module read the Google [Terms of Service](https://www.google.com/help/terms_maps/).
 
 ## Examples
 
--   Basic usage: create an OpenLayers map instance, and pass that map and options to the Street View constructor.
-    -   [Basic](https://raw.githack.com/GastonZalba/ol-street-view/v2.3.0/examples/basic.html)
+- [Basic usage](https://raw.githack.com/GastonZalba/ol-street-view/v3.0.0/examples/basic.html): create an OpenLayers map instance, and pass that map and options to the Street View constructor. 
+- [Manually Load Google Maps Library](https://raw.githack.com/GastonZalba/ol-street-view/v3.0.0/examples/manually-load-maps.html). By default, the Google Maps Library is auto loaded by this module, but it can be disabled if you have already loaded it in another place, or if you want to use a custom Google Maps version.
 
 ## Usage
 
@@ -156,6 +156,7 @@ streetView.hideStreetView();
  */
 streetView.setMap(null);
 
+
 ```
 
 ### Events
@@ -174,13 +175,13 @@ streetView.on(`streetViewExit`, () => console.log('Fired everytime after is exit
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@2.3.0"></script>
+<script src="https://unpkg.com/ol-street-view@3.0.0"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@2.3.0/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@3.0.0/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.

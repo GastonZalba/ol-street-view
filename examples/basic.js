@@ -1,11 +1,6 @@
 var coordsIcon = [-6451474.93, -4153206.94];
 var coordsView = [-6451484.76, -4153214.08];
-var iconUrl = 'http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=star|FF0000';
-
-/**
- * To test a manual google maps library load
- */
-const AUTOLOAD_LIBRARY = true;
+var iconUrl = './icon.png';
 
 var map = new ol.Map({
     layers: [
@@ -32,16 +27,7 @@ var map = new ol.Map({
                 features: [
                     new ol.Feature({
                         name: 'Star',
-                        geometry: new ol.geom.Point(coordsIcon),
-                        style: new ol.style.Style({
-                            image: new ol.style.Icon({
-                                anchor: [0.5, 46],
-                                anchorXUnits: 'fraction',
-                                anchorYUnits: 'pixels',
-                                src: iconUrl,
-                                crossOrigin: 'anonymous'
-                            })
-                        })
+                        geometry: new ol.geom.Point(coordsIcon)
                     })
                 ]
             })
@@ -69,7 +55,7 @@ var streetView = new StreetView(
         zoomOnInit: 18,
         minZoom: 13,
         defaultMapSize: StreetView.MapSize.Expanded,
-        autoLoadGoogleMaps: AUTOLOAD_LIBRARY,
+        autoLoadGoogleMaps: true,
         i18n: {
             dragToInit: 'Drag and drop me'
         }
@@ -92,26 +78,32 @@ function initiPano() {
 streetView.once('loadLib', initiPano);
 
 // Wait until the Google Maps Panorama is initializated to add the icon (and run once)
-streetView.once('streetViewInit', function () {
+streetView.on('streetViewInit', function () {
 
-    // Get the panorama instance
-    var panorama = streetView.getStreetViewPanorama();
+    streetView.googleMapsLoader.importLibrary('marker')
+        .then(() => {
+            // Get the panorama instance
+            var panorama = streetView.getStreetViewPanorama();
 
-    var coords4326 = ol.proj.transform(coordsIcon, 'EPSG:3857', 'EPSG:4326');
+            var coords4326 = ol.proj.transform(coordsIcon, 'EPSG:3857', 'EPSG:4326');
 
-    // Use global google maps functions to add the icon
-    var markerPos = new google.maps.LatLng(coords4326[1], coords4326[0]);
+            // Use global google maps functions to add the icon
+            var markerPos = new google.maps.LatLng(coords4326[1], coords4326[0]);
 
-    new google.maps.Marker({
-        position: markerPos,
-        map: panorama,
-        icon: iconUrl,
-        title: 'Star'
-    });
+            new google.maps.Marker({
+                position: markerPos,
+                map: panorama,
+                icon: iconUrl,
+                title: 'Star'
+            });
 
+        })
+        .catch((err) => {
+            console.error(err);
+        });
 });
 
-var buttonsSect  = document.getElementById('testButtons');
+var buttonsSect = document.getElementById('testButtons');
 
 // Add test buttons
 function createBtn(name, onClick) {
@@ -130,13 +122,3 @@ buttonsSect.append(
         streetView.setMap(map)
     })
 );
-
-if (!AUTOLOAD_LIBRARY) {    
-    // To test manually loaded library
-    window.initialize = () => { streetView.init(); initiPano() };
-
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = "https://maps.googleapis.com/maps/api/js?callback=initialize&v=weeklyt";
-    document.body.append(script);
-}

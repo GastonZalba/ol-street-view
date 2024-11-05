@@ -28,7 +28,7 @@ import { Types as ObjectEventTypes } from 'ol/ObjectEventType.js';
 
 // External
 import interact from 'interactjs';
-import { Loader } from 'google-maps';
+import { Loader } from '@googlemaps/js-api-loader';
 
 // Images
 import pegmanMarkerSprites from './assets/images/pegman_marker.png';
@@ -38,7 +38,6 @@ import * as languages from './components/i18n/index';
 
 // Css
 import './assets/scss/ol-street-view.scss';
-import { Interactable } from '@interactjs/types';
 
 let libraryLoaded = false;
 
@@ -67,6 +66,7 @@ export default class StreetView extends Control {
     // Control
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
+    protected pegmanDivControl: HTMLElement;
     protected _streetViewPanoramaEl: HTMLElement;
     protected mapContainer: HTMLElement;
     protected _sizeTogglerControl: Control;
@@ -99,9 +99,11 @@ export default class StreetView extends Control {
 
     protected _scrollHandlerEl: HTMLElement;
 
-    protected _interactDropzone: Interactable;
-    protected _interactDraggable: Interactable;
-    protected _interactResizable: Interactable;
+    protected _interactDropzone: Interact.Interactable;
+    protected _interactDraggable: Interact.Interactable;
+    protected _interactResizable: Interact.Interactable;
+
+    public googleMapsLoader: Loader;
 
     declare on: OnSignature<
         EventTypes | `${SVEventTypes}`,
@@ -300,13 +302,17 @@ export default class StreetView extends Control {
             }
         });
 
-        const exitControlST = this.exitControlUI.cloneNode(true);
+        const exitControlST = this.exitControlUI.cloneNode(true) as HTMLElement;
         (exitControlST as HTMLButtonElement).onclick =
             this.hideStreetView.bind(this);
 
         this._panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(
             exitControlST
         );
+
+        if (!this._interactDraggable) {
+            this._addPegmanInteraction();
+        }
 
         this._initialized = true;
     }
@@ -540,6 +546,8 @@ export default class StreetView extends Control {
     }
 
     private _addPegmanInteraction(): void {
+        this.pegmanDivControl.title = this._i18n.dragToInit;
+        this.pegmanDivControl.classList.remove('ol-street-view--disabled');
         let oldPosX = 0,
             stopInteract;
 
@@ -713,16 +721,16 @@ export default class StreetView extends Control {
 
     private _addMapControls(): void {
         const preparePegmanControl = (): HTMLElement => {
-            const pegmanDivControl = this.element;
-            pegmanDivControl.id = 'ol-street-view--pegman-button-div';
-            pegmanDivControl.className = `ol-street-view--${
+            this.pegmanDivControl = this.element;
+            this.pegmanDivControl.id = 'ol-street-view--pegman-button-div';
+            this.pegmanDivControl.className = `ol-street-view--${
                 this._options.size
-            }-btn ol-control ${
+            }-btn ol-control ol-street-view--disabled ${
                 this._options.transparentButton
                     ? 'ol-street-view--transparent'
                     : ''
             }`;
-            pegmanDivControl.title = this._i18n.dragToInit;
+            this.pegmanDivControl.title = this._i18n.googleMapsLibraryError;
 
             this.pegmanDraggable = document.createElement('div');
             this.pegmanDraggable.id = 'ol-street-view--pegman-draggable';
@@ -732,10 +740,10 @@ export default class StreetView extends Control {
             const pegmanBtn = document.createElement('div');
             pegmanBtn.id = 'ol-street-view--pegman-button';
 
-            pegmanDivControl.append(this.pegmanDraggable);
-            pegmanDivControl.append(pegmanBtn);
+            this.pegmanDivControl.append(this.pegmanDraggable);
+            this.pegmanDivControl.append(pegmanBtn);
 
-            return pegmanDivControl;
+            return this.pegmanDivControl;
         };
 
         /**
@@ -795,8 +803,6 @@ export default class StreetView extends Control {
             preparePegmanControl();
         }
 
-        this._addPegmanInteraction();
-
         if (this._options.sizeToggler) {
             // run only once
             if (!this._sizeTogglerControl) {
@@ -804,6 +810,10 @@ export default class StreetView extends Control {
             }
 
             this._map.addControl(this._sizeTogglerControl);
+        }
+
+        if (libraryLoaded) {
+            this._addPegmanInteraction();
         }
     }
 
@@ -813,16 +823,20 @@ export default class StreetView extends Control {
     private async _loadStreetView(): Promise<void> {
         if (libraryLoaded) return;
 
-        const loader = new Loader(this._options.apiKey, {
+        this.googleMapsLoader = new Loader({
+            apiKey: this._options.apiKey,
+            version: 'weekly',
             language: this._options.language
         });
 
-        try {
-            await loader.load();
-            super.dispatchEvent(SVEventTypes.LOAD_LIB);
-        } catch (err) {
-            console.error(err);
-        }
+        this.googleMapsLoader
+            .importLibrary('maps')
+            .then(() => {
+                super.dispatchEvent(SVEventTypes.LOAD_LIB);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     }
 
     private _updateStreetViewPosition(coords: Coordinate): void {
@@ -834,6 +848,7 @@ export default class StreetView extends Control {
 
         const latLonGoogle = { lat: latLon[0], lng: latLon[1] };
 
+        //@ts-ignore-error this method is missing in the @types
         this._streetViewService.getPanoramaByLocation(
             latLonGoogle,
             this._options.radius,
@@ -1123,6 +1138,11 @@ interface i18n {
      * Pegman icon title label on mouse hovering
      */
     dragToInit?: string;
+
+    /**
+     * Google Mpas library was not loaded
+     */
+    googleMapsLibraryError?: string;
 
     /**
      * No images information
