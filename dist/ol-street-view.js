@@ -2,7 +2,7 @@
 /*!
  * ol-street-view - v3.0.0
  * https://github.com/GastonZalba/ol-street-view#readme
- * Built: Tue Nov 05 2024 14:21:03 GMT-0300 (hora estándar de Argentina)
+ * Built: Tue Nov 05 2024 14:37:33 GMT-0300 (hora estándar de Argentina)
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/Feature.js'), require('ol/Collection.js'), require('ol/style/Icon.js'), require('ol/style/Style.js'), require('ol/source/Vector.js'), require('ol/source/XYZ.js'), require('ol/geom/Point.js'), require('ol/control/Control.js'), require('ol/proj.js'), require('ol/layer/Vector.js'), require('ol/layer/Tile.js'), require('ol/interaction/Translate.js'), require('ol/Observable.js'), require('interactjs')) :
