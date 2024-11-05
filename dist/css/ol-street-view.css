@@ -12,11 +12,8 @@
 }
 
 #ol-street-view--panorama {
-  background-color: #555555 !important;
-}
-
-#ol-street-view--panorama {
   display: none;
+  background-color: #555555 !important;
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
@@ -29,20 +26,16 @@
   display: flex;
 }
 #ol-street-view--map-container.ol-street-view--activated .ol-street-view--map {
-  overflow-y: inherit !important;
-}
-#ol-street-view--map-container.ol-street-view--activated .ol-street-view--map {
   height: 250px;
+  overflow-y: inherit !important;
 }
 #ol-street-view--map-container.ol-street-view--activated.ol-street-view--hidden .ol-street-view--map {
   display: none;
 }
 #ol-street-view--map-container.ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
-  height: 150px !important;
-}
-#ol-street-view--map-container.ol-street-view--activated.ol-street-view--compact .ol-street-view--map {
   position: absolute;
   width: 250px;
+  height: 150px !important;
   left: 20px;
   bottom: 40px;
   z-index: 99;
@@ -87,6 +80,13 @@
   opacity: 1;
   visibility: visible;
   /* Ol 5 */
+}
+#ol-street-view--pegman-button-div.ol-street-view--disabled {
+  opacity: 0.5;
+}
+#ol-street-view--pegman-button-div.ol-street-view--disabled #ol-street-view--pegman-draggable,
+#ol-street-view--pegman-button-div.ol-street-view--disabled #ol-street-view--pegman-button {
+  pointer-events: none;
 }
 #ol-street-view--pegman-button-div * {
   pointer-events: auto;
@@ -171,8 +171,6 @@
 }
 #ol-street-view--pegman-draggable.ol-street-view--active {
   opacity: 1 !important;
-}
-#ol-street-view--pegman-draggable.ol-street-view--active {
   /* Pegman Marker Icon */
   cursor: -webkit-grabbing;
   cursor: grabbing;
@@ -305,9 +303,6 @@
 
 .ol-control.ol-street-view--size-toggler button {
   background-color: #ffffff !important;
-}
-
-.ol-control.ol-street-view--size-toggler button {
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   height: 31px;
@@ -330,10 +325,8 @@
 }
 @media all and (max-width: 1280px) {
   .ol-street-view--activated .ol-street-view--map {
-    overflow-y: inherit !important;
-  }
-  .ol-street-view--activated .ol-street-view--map {
     height: 180px;
+    overflow-y: inherit !important;
   }
   #ol-street-view--pegman-button-div {
     top: 315px;

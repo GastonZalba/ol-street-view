@@ -95,6 +95,14 @@ $SVtransparentWidthControl: 30px !default;
     opacity: 1;
     visibility: visible;
 
+    &.ol-street-view--disabled {
+        opacity: 0.5;
+        #ol-street-view--pegman-draggable,
+        #ol-street-view--pegman-button {
+            pointer-events: none;
+        }
+    }
+
     /* Ol 5 */
     * {
         pointer-events: auto;
