@@ -33,6 +33,8 @@ export default class StreetView extends Control {
     private _viewport;
     protected _isDragging: boolean;
     protected _isHidden: boolean;
+    protected _onMouseMoveHandler: EventListener;
+    protected _onKeyEventHandler: EventListener;
     protected exitControlUI: HTMLButtonElement;
     protected pegmanDraggable: HTMLElement;
     protected pegmanDivControl: HTMLElement;
@@ -58,6 +60,7 @@ export default class StreetView extends Control {
     protected _interactDropzone: Interact.Interactable;
     protected _interactDraggable: Interact.Interactable;
     protected _interactResizable: Interact.Interactable;
+    protected _interactStop: () => void;
     googleMapsLoader: Loader;
     on: OnSignature<EventTypes | `${SVEventTypes}`, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<`${SVEventTypes}` | ObjectEventTypes | EventTypes, EventsKey>;
     once: OnSignature<EventTypes | `${SVEventTypes}`, BaseEvent, EventsKey> & OnSignature<ObjectEventTypes, ObjectEvent, EventsKey> & CombinedOnSignature<`${SVEventTypes}` | ObjectEventTypes | EventTypes, EventsKey>;
@@ -87,6 +90,11 @@ export default class StreetView extends Control {
     private _remvoveTranslateInteractionEvent;
     private _prepareLayout;
     private _removeLayout;
+    private _addMouseMoveEvents;
+    private _removeMouseMoveEvents;
+    private _addKeyboardEvents;
+    private _removeKeyboardEvents;
+    private _terminateDragging;
     private _addPegmanInteraction;
     private _addMapControls;
     /**
