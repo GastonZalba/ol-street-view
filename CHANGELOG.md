@@ -167,3 +167,6 @@
 
 ## v3.0.1
 * Added `Escape` keyboard handler to allow exiting the parnorama view
+
+## v3.0.2
+* Fix `Exit` button not working if no panorama was not loaded

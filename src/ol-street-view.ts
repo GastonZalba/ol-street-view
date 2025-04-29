@@ -1090,10 +1090,6 @@ export default class StreetView extends Control {
      * @fires streetViewExit
      */
     public hideStreetView(): void {
-        if (!this._panorama.getVisible()) {
-            return;
-        }
-
         this._translatePegman.setActive(false);
 
         const pegmanLayerSource = this._pegmanLayer.getSource();
