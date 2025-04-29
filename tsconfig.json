@@ -13,7 +13,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "declarationMap": true,
-    "incremental": true
+    "incremental": false
   },
   "include": [
     "./src"

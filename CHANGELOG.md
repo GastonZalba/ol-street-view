@@ -170,3 +170,6 @@
 
 ## v3.0.2
 * Fix `Exit` button not working if no panorama was not loaded
+
+## v3.0.3
+* Fix missing types on build
