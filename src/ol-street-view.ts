@@ -1090,7 +1090,6 @@ export default class StreetView extends Control {
      * @fires streetViewExit
      */
     public hideStreetView(): void {
-        
         if (!this._translatePegman?.getActive()) {
             return;
         }

@@ -173,3 +173,6 @@
 
 ## v3.0.3
 * Fix missing types on build
+
+## v3.0.4
+* Fix `Escape` key triggering when not needed

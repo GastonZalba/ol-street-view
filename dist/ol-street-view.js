@@ -1,8 +1,8 @@
 
 /*!
- * ol-street-view - v3.0.2
+ * ol-street-view - v3.0.4
  * https://github.com/GastonZalba/ol-street-view#readme
- * Built: Tue Apr 29 2025 18:19:59 GMT-0300 (Argentina Standard Time)
+ * Built: Thu Jul 10 2025 12:41:07 GMT-0300 (hora estándar de Argentina)
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/Feature.js'), require('ol/Collection.js'), require('ol/style/Icon.js'), require('ol/style/Style.js'), require('ol/source/Vector.js'), require('ol/source/XYZ.js'), require('ol/geom/Point.js'), require('ol/control/Control.js'), require('ol/proj.js'), require('ol/layer/Vector.js'), require('ol/layer/Tile.js'), require('ol/interaction/Translate.js'), require('ol/Observable.js'), require('interactjs')) :
@@ -1209,6 +1209,10 @@
        * @fires streetViewExit
        */
       hideStreetView() {
+          var _a;
+          if (!((_a = this._translatePegman) === null || _a === void 0 ? void 0 : _a.getActive())) {
+              return;
+          }
           this._translatePegman.setActive(false);
           const pegmanLayerSource = this._pegmanLayer.getSource();
           pegmanLayerSource.clear();

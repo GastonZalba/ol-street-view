@@ -22,8 +22,8 @@ If you are going to use this module read the Google [Terms of Service](https://w
 
 ## Examples
 
-- [Basic usage](https://raw.githack.com/GastonZalba/ol-street-view/v3.0.3/examples/basic.html): create an OpenLayers map instance, and pass that map and options to the Street View constructor. 
-- [Manually Load Google Maps Library](https://raw.githack.com/GastonZalba/ol-street-view/v3.0.3/examples/manually-load-maps.html). By default, the Google Maps Library is auto loaded by this module, but it can be disabled if you have already loaded it in another place, or if you want to use a custom Google Maps version.
+- [Basic usage](https://raw.githack.com/GastonZalba/ol-street-view/v3.0.4/examples/basic.html): create an OpenLayers map instance, and pass that map and options to the Street View constructor. 
+- [Manually Load Google Maps Library](https://raw.githack.com/GastonZalba/ol-street-view/v3.0.4/examples/manually-load-maps.html). By default, the Google Maps Library is auto loaded by this module, but it can be disabled if you have already loaded it in another place, or if you want to use a custom Google Maps version.
 
 ## Usage
 
@@ -175,13 +175,13 @@ streetView.on(`streetViewExit`, () => console.log('Fired everytime after is exit
 Load `ol-street-view.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [interactjs](https://www.npmjs.com/package/interactjs). StreetView is available as `StreetView`.
 
 ```HTML
-<script src="https://unpkg.com/ol-street-view@3.0.3"></script>
+<script src="https://unpkg.com/ol-street-view@3.0.4"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-street-view@3.0.3/dist/css/ol-street-view.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-street-view@3.0.4/dist/css/ol-street-view.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
