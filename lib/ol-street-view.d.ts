@@ -144,7 +144,7 @@ export default class StreetView extends Control {
      * @param {Coordinate} coords Must be in the map projection format
      * @returns {google.maps.StreetViewPanorama}
      */
-    showStreetView(coords: Coordinate): google.maps.StreetViewPanorama;
+    showStreetView(coords: Coordinate): google.maps.StreetViewPanorama | undefined;
     /**
      * Hide Street View, remove layers and clear features
      * @fires streetViewExit

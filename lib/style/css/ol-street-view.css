@@ -79,7 +79,6 @@
   transition: visibility ease 0.5s, opacity ease 0.5s;
   opacity: 1;
   visibility: visible;
-  /* Ol 5 */
 }
 #ol-street-view--pegman-button-div.ol-street-view--disabled {
   opacity: 0.5;
@@ -87,6 +86,9 @@
 #ol-street-view--pegman-button-div.ol-street-view--disabled #ol-street-view--pegman-draggable,
 #ol-street-view--pegman-button-div.ol-street-view--disabled #ol-street-view--pegman-button {
   pointer-events: none;
+}
+#ol-street-view--pegman-button-div {
+  /* Ol 5 */
 }
 #ol-street-view--pegman-button-div * {
   pointer-events: auto;
@@ -169,12 +171,6 @@
   content: " ";
   background-position: -2px -8px;
 }
-#ol-street-view--pegman-draggable.ol-street-view--active {
-  opacity: 1 !important;
-  /* Pegman Marker Icon */
-  cursor: -webkit-grabbing;
-  cursor: grabbing;
-}
 #ol-street-view--pegman-draggable.ol-street-view--active::after {
   position: absolute;
   bottom: -18px;
@@ -193,6 +189,12 @@
   border-radius: 30px;
   box-shadow: 3px 10px 25px rgb(105, 185, 70);
   animation: pulse 1.5s infinite;
+}
+#ol-street-view--pegman-draggable.ol-street-view--active {
+  opacity: 1 !important;
+  /* Pegman Marker Icon */
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
 }
 #ol-street-view--pegman-draggable.ol-street-view--active.ol-street-view--can-drop.ol-street-view--left::before {
   background-position: -2px -248px;
