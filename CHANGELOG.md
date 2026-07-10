@@ -176,3 +176,7 @@
 
 ## v3.0.4
 * Fix `Escape` key triggering when not needed
+
+## v3.0.5
+* Minor fix in example to prevent load in an spheric view
+* Updated deps

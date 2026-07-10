@@ -56,57 +56,57 @@ export default class StreetView extends Control {
     protected _i18n: i18n;
 
     // Ol
-    private _map: Map;
-    private _view: View;
-    private _viewport: HTMLElement;
+    private _map!: Map;
+    private _view!: View;
+    private _viewport!: HTMLElement;
 
-    protected _isDragging: boolean;
-    protected _isHidden: boolean;
-    protected _onMouseMoveHandler: EventListener;
-    protected _onKeyEventHandler: EventListener;
+    protected _isDragging!: boolean;
+    protected _isHidden!: boolean;
+    protected _onMouseMoveHandler!: EventListener;
+    protected _onKeyEventHandler!: EventListener;
 
     // Control
-    protected exitControlUI: HTMLButtonElement;
-    protected pegmanDraggable: HTMLElement;
-    protected pegmanDivControl: HTMLElement;
-    protected _streetViewPanoramaEl: HTMLElement;
-    protected mapContainer: HTMLElement;
-    protected _sizeTogglerControl: Control;
+    protected exitControlUI!: HTMLButtonElement;
+    protected pegmanDraggable!: HTMLElement;
+    protected pegmanDivControl!: HTMLElement;
+    protected _streetViewPanoramaEl!: HTMLElement;
+    protected mapContainer!: HTMLElement;
+    protected _sizeTogglerControl!: Control;
 
     // Obserbable keys
-    protected _clickOnMapEventKey: EventsKey;
-    protected _translateEventKey: EventsKey;
-    protected _viewResolutionEventKey: EventsKey;
+    protected _clickOnMapEventKey!: EventsKey;
+    protected _translateEventKey!: EventsKey;
+    protected _viewResolutionEventKey!: EventsKey;
 
     // Layers
     protected _streetViewXyzLayer: TileLayer<XYZ>;
     protected _addedXyzLayer = false;
     protected _pegmanLayer: VectorLayer<VectorSource>;
 
-    protected _panorama: google.maps.StreetViewPanorama;
-    protected _streetViewService: google.maps.StreetViewService;
+    protected _panorama!: google.maps.StreetViewPanorama;
+    protected _streetViewService!: google.maps.StreetViewService;
 
     // Pegman
-    protected _pegmanFeature: Feature<Point>;
+    protected _pegmanFeature!: Feature<Point>;
     protected _pegmanSelectedCoords: Coordinate;
     protected _pegmanHeading: number;
-    protected _translatePegman: Translate;
+    protected _translatePegman!: Translate;
 
     // State
-    protected _lastHeight: string;
+    protected _lastHeight!: string;
 
-    protected _isPositionFired: boolean;
+    protected _isPositionFired!: boolean;
 
     protected _initialized = false;
 
-    protected _scrollHandlerEl: HTMLElement;
+    protected _scrollHandlerEl!: HTMLElement;
 
-    protected _interactDropzone: Interact.Interactable;
-    protected _interactDraggable: Interact.Interactable;
-    protected _interactResizable: Interact.Interactable;
-    protected _interactStop: () => void;
+    protected _interactDropzone!: Interact.Interactable;
+    protected _interactDraggable!: Interact.Interactable;
+    protected _interactResizable!: Interact.Interactable;
+    protected _interactStop!: () => void;
 
-    public googleMapsLoader: Loader;
+    public googleMapsLoader!: Loader;
 
     declare on: OnSignature<
         EventTypes | `${SVEventTypes}`,
@@ -140,12 +140,12 @@ export default class StreetView extends Control {
     constructor(opt_options?: Options) {
         super({
             element: document.createElement('div'),
-            target: opt_options.target
+            target: opt_options?.target
         });
 
         // Default options
         this._options = {
-            apiKey: null,
+            apiKey: '',
             size: BtnControlSize.Large,
             radius: 100,
             updatePegmanToClosestPanorama: true,
@@ -154,9 +154,9 @@ export default class StreetView extends Control {
             sizeToggler: true,
             defaultMapSize: MapSize.Expanded,
             language: Language.EN,
-            target: null,
+            target: undefined,
             zoomOnInit: 18,
-            minZoom: null,
+            minZoom: undefined,
             autoLoadGoogleMaps: true,
             ...opt_options // Merge user options
         };
@@ -170,7 +170,7 @@ export default class StreetView extends Control {
             ];
 
         // Merge custom translations
-        this._i18n = Object.assign(this._i18n, opt_options.i18n || {});
+        this._i18n = Object.assign(this._i18n, opt_options?.i18n || {});
 
         this._pegmanSelectedCoords = [];
         this._pegmanHeading = 180;
@@ -187,7 +187,7 @@ export default class StreetView extends Control {
         const calculatePegmanIconOffset = (): Array<number> => {
             const heading = this._pegmanHeading;
 
-            let offset: Array<number>;
+            let offset: Array<number> = [];
 
             // Calculating the sprite offset
             if (heading >= 0 && heading < 22.5) {
@@ -287,7 +287,7 @@ export default class StreetView extends Control {
             }
 
             setTimeout(() => {
-                this._isPositionFired = null;
+                this._isPositionFired = false;
             }, 400);
 
             this._isPositionFired = true;
@@ -854,7 +854,7 @@ export default class StreetView extends Control {
         if (libraryLoaded) return;
 
         this.googleMapsLoader = new Loader({
-            apiKey: this._options.apiKey,
+            apiKey: this._options.apiKey || '',
             version: 'weekly',
             language: this._options.language
         });
@@ -904,7 +904,7 @@ export default class StreetView extends Control {
     }
 
     private _updatePegmanPosition(
-        coords: Coordinate | google.maps.LatLng,
+        coords: Coordinate | google.maps.LatLng | null,
         isGoogleFormat = true
     ): void {
         // If the coordinates are in Google format, extract the values,
@@ -1067,7 +1067,7 @@ export default class StreetView extends Control {
      * @param {Coordinate} coords Must be in the map projection format
      * @returns {google.maps.StreetViewPanorama}
      */
-    public showStreetView(coords: Coordinate): google.maps.StreetViewPanorama {
+    public showStreetView(coords: Coordinate): google.maps.StreetViewPanorama | undefined {
         if (!coords) {
             console.error('Coords are empty');
             return;
@@ -1098,7 +1098,7 @@ export default class StreetView extends Control {
 
         const pegmanLayerSource = this._pegmanLayer.getSource();
 
-        pegmanLayerSource.clear();
+        pegmanLayerSource?.clear();
 
         this._pegmanSelectedCoords = [];
 
@@ -1112,7 +1112,7 @@ export default class StreetView extends Control {
         this._lastHeight = this._viewport.style.height;
 
         // Restore height if it was resized
-        this._viewport.style.height = null;
+        this._viewport.style.height = '';
 
         this._panorama.setVisible(false);
 

@@ -2,6 +2,8 @@
   "compilerOptions": {
     "declaration": true,
     "allowJs": true,
+    "strict": false,
+    "types": ["google.maps"],
     "baseUrl": "./",
     "outDir": "./tmp-dist",
     "target": "ES2017",

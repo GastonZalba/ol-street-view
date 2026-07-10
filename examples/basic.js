@@ -1,5 +1,5 @@
 var coordsIcon = [-6451474.93, -4153206.94];
-var coordsView = [-6451484.76, -4153214.08];
+var coordsView = [-6451494.76, -4153224.08];
 var iconUrl = './icon.png';
 
 var map = new ol.Map({

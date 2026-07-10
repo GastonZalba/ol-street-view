@@ -7,3 +7,5 @@ declare module '*.svg' {
     const value: unknown;
     export = value;
 }
+
+declare module '*.scss';
