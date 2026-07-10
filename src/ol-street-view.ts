@@ -1067,7 +1067,9 @@ export default class StreetView extends Control {
      * @param {Coordinate} coords Must be in the map projection format
      * @returns {google.maps.StreetViewPanorama}
      */
-    public showStreetView(coords: Coordinate): google.maps.StreetViewPanorama | undefined {
+    public showStreetView(
+        coords: Coordinate
+    ): google.maps.StreetViewPanorama | undefined {
         if (!coords) {
             console.error('Coords are empty');
             return;
